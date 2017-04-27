@@ -48,6 +48,7 @@ const Schema = `
 	 id: ID!
 	 author: Author!
 	 status: String!
+	 slugline: String!
 	 text: String!
 	 dateCreated: String!
 	 dateUpdated: String!
@@ -175,6 +176,10 @@ func (r *postResolver) Author() *authorResolver {
 
 func (r *postResolver) Status() string {
 	return r.post.Status
+}
+
+func (r *postResolver) Slugline() string {
+	return r.post.Slugline
 }
 
 func (r *postResolver) Text() string {

@@ -12,6 +12,7 @@ type Post struct {
 	DateCreated time.Time
 	DateUpdated time.Time
 	Status      string
+	Slugline    string
 	Text        string
 }
 
@@ -46,7 +47,7 @@ func (conn *Database) postQuery(query string, args ...interface{}) []*Post {
 }
 
 func mkPostSql(where string) string {
-	return "select id, author, date_created, date_updated, status, text from post " + where
+	return "select id, author, date_created, date_updated, status, slugline, text from post " + where
 }
 
 func rowsToPosts(rows *sql.Rows) []*Post {
@@ -67,6 +68,7 @@ func rowToPost(rows *sql.Rows) *Post {
 		&p.DateCreated,
 		&p.DateUpdated,
 		&p.Status,
+		&p.Slugline,
 		&p.Text,
 	)
 	if err != nil {
