@@ -1,0 +1,6 @@
+#
+# Ignore third-party libs placed by govendor
+vendor/*/
+#
+#
+.DS_Store

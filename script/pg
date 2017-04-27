@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+set -e
+
+root=$(dirname "$0")
+root=$(cd ${root} ; echo $PWD)
+
+schema=${2}
+
+# This script is really just documentation.
+
+pg_user="blogsvc"
+pg_pass="wanheada"
+pg_db="blogdb"
+
+function start() {
+  docker start blogdb
+}
+
+function init() {
+  docker volume create ${pg_db}
+  docker run --name ${pg_db} \
+         -p 5432:5432 \
+         -v blogdb:/var/lib/postgresql/data \
+         -e POSTGRES_USER=${pg_user} \
+         -e POSTGRES_DB=${pg_db} \
+         -e POSTGRES_PASSWORD=${pg_pass} \
+         -d postgres:alpine
+}
+
+function client() {
+  PGPASSWORD=${pg_pass} psql -h localhost -U ${pg_user} ${pg_db}
+}
+
+function load() {
+  f=${root}/${schema}
+  if [ -f ${f} ]; then
+    echo "Loading: ${f}."
+    PGPASSWORD=${pg_pass} psql -h localhost -U ${pg_user} ${pg_db} < ${f}
+  else
+    echo "Schema not found."
+  fi
+}
+
+function status() {
+  docker ps -a
+}
+
+function stop() {
+  docker stop ${pg_db}
+}
+
+function clean() {
+  docker rm ${pg_db}
+  docker volume rm blogdb
+}
+
+case $1 in
+  init)
+    init
+    ;;
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  status)
+    status
+    ;;
+  client)
+    client
+    ;;
+  load)
+    load
+    ;;
+  clean)
+    clean
+    ;;
+  *)
+    echo "./pg.sh init|start|stop|status|client|load <schema.sql>|clean"
+esac

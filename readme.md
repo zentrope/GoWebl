@@ -1,0 +1,3 @@
+# Web Log
+
+Learning golang.
