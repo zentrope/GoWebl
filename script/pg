@@ -10,7 +10,7 @@ schema=${2}
 # This script is really just documentation.
 
 pg_user="blogsvc"
-pg_pass="wanheada"
+pg_pass="wanheda"
 pg_db="blogdb"
 
 function start() {

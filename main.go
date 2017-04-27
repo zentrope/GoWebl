@@ -13,7 +13,7 @@ import (
 func main() {
 	fmt.Println("Hello GraphQL (http://localhost:8080/).")
 
-	database := db.NewDatabase("blogsvc", "wanheada", "blogdb")
+	database := db.NewDatabase("blogsvc", "wanheda", "blogdb")
 
 	database.Connect()
 	defer database.Disconnect()
