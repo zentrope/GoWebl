@@ -1,4 +1,4 @@
-package webl
+package database
 
 import (
 	"database/sql"
