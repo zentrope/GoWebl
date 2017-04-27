@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	graphql "github.com/neelance/graphql-go"
 	"github.com/neelance/graphql-go/relay"
 	api "github.com/zentrope/webl/api"
 	db "github.com/zentrope/webl/database"
@@ -19,9 +18,7 @@ func main() {
 	database.Connect()
 	defer database.Disconnect()
 
-	var schema *graphql.Schema
-	var err error
-	schema, err = graphql.ParseSchema(api.Schema, &api.Resolver{database})
+	api, err := api.NewApi(database)
 	if err != nil {
 		panic(err)
 	}
@@ -30,7 +27,7 @@ func main() {
 		w.Write(page)
 	}))
 
-	http.Handle("/query", &relay.Handler{Schema: schema})
+	http.Handle("/query", &relay.Handler{Schema: api})
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
