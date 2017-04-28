@@ -1,11 +1,16 @@
 package main
 
 import (
+	"crypto/sha256"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/neelance/graphql-go/relay"
+	"github.com/russross/blackfriday"
 	"github.com/zentrope/webl/api"
 	"github.com/zentrope/webl/database"
 	"github.com/zentrope/webl/resources"
@@ -13,7 +18,37 @@ import (
 
 type HomeData struct {
 	Authors []*database.Author
-	Posts   []*database.Post
+	Posts   []*HtmlPost
+}
+
+type HtmlPost struct {
+	Id          string
+	Author      string
+	DateCreated string
+	DateUpdated string
+	Status      string
+	Slugline    string
+	Text        template.HTML
+}
+
+func idToStr(id int) string {
+	return fmt.Sprintf("%x", sha256.Sum256([]byte(strconv.Itoa(id))))
+}
+
+func toMarkdown(data string) string {
+	return string(blackfriday.MarkdownBasic([]byte(data)))
+}
+
+func templatize(p *database.Post) *HtmlPost {
+	return &HtmlPost{
+		idToStr(p.Id),
+		p.Author,
+		p.DateCreated.Format("Jan 2, 2006"),
+		p.DateUpdated.Format(time.RFC822),
+		p.Status,
+		p.Slugline,
+		template.HTML(toMarkdown(p.Text)),
+	}
 }
 
 func homePage(database *database.Database) http.HandlerFunc {
@@ -21,7 +56,12 @@ func homePage(database *database.Database) http.HandlerFunc {
 		authors := database.Authors()
 		posts := database.Posts()
 
-		data := &HomeData{authors, posts}
+		rPosts := make([]*HtmlPost, 0)
+		for _, p := range posts {
+			rPosts = append(rPosts, templatize(p))
+		}
+
+		data := &HomeData{authors, rPosts}
 
 		page := resources.HomePageTemplate
 		page.Execute(w, data)
