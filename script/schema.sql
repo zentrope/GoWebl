@@ -21,6 +21,7 @@ create type post_status as enum ('published', 'draft');
 
 create table if not exists post (
   id serial primary key,
+  uuid varchar not null unique,
   author varchar references author(handle) not null,
   date_created timestamp with time zone default current_timestamp,
   date_updated timestamp with time zone default current_timestamp,
@@ -29,7 +30,8 @@ create table if not exists post (
   text text default ''
 );
 
-insert into post (author, slugline, text) values ('keith',
+insert into post (author, uuid, slugline, text) values ('keith',
+'b8ec300c-b0f1-4338-b2a7-ca5f06c1fe33',
 'Xena of Amphipolous',
 '#Xena of Amphipolous
 
@@ -89,7 +91,8 @@ the "greater good" and the sacrifices that must be made to accomplish
 it (a central theme in the series in later seasons).  ' );
 
 insert into
-       post (author, slugline, text) values ('xan',
+       post (author, uuid, slugline, text) values ('xan',
+'d08e9b3e-466b-423f-bd41-761f984bd0d0',
 'Zeno of Elea',
 '# Zeno of Elia
 
