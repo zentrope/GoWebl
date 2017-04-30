@@ -1,0 +1,10 @@
+html, body {
+  color: #BAE1FF;
+  background-color: #333;
+  margin: 50px;
+  font-family: sans-serif;
+}
+
+div.postbody h1 {
+  font-size: 12pt;
+}

@@ -9,12 +9,14 @@ import (
 	"strconv"
 	"time"
 
+	rice "github.com/GeertJohan/go.rice"
 	"github.com/neelance/graphql-go/relay"
 	"github.com/russross/blackfriday"
 	"github.com/zentrope/webl/api"
 	"github.com/zentrope/webl/database"
-	"github.com/zentrope/webl/resources"
 )
+
+//	rice "github.com/GeertJohan/go.rice"
 
 type HomeData struct {
 	Authors []*database.Author
@@ -29,6 +31,18 @@ type HtmlPost struct {
 	Status      string
 	Slugline    string
 	Text        template.HTML
+}
+
+func resolveTemplate(name string) (*template.Template, error) {
+	resources := rice.MustFindBox("resources")
+
+	templateString, err := resources.String(name + ".template")
+
+	if err != nil {
+		return nil, err
+	}
+
+	return template.New(name).Parse(templateString)
 }
 
 func idToStr(id int) string {
@@ -51,8 +65,50 @@ func templatize(p *database.Post) *HtmlPost {
 	}
 }
 
+// func MkHandler(location string) http.HandlerFunc {
+
+//	// This craziness allows me to serve index.html when routes
+//	// are otherwise not found.
+
+//	box := rice.MustFindBox(location)
+//	fs := http.FileServer(box.HTTPBox())
+
+//	return func(w http.ResponseWriter, r *http.Request) {
+//		content := r.URL.Path[1:]
+
+//		f, err := box.Open(content)
+
+//		if err == nil {
+//			f.Close()
+//			fs.ServeHTTP(w, r)
+//			return
+//		}
+
+//		body, _ := box.Bytes("index.html")
+//		w.Header().Set("Content-Type", "text/html")
+//		w.WriteHeader(http.StatusOK)
+//		w.Write(body)
+//	}
+// }
+
 func homePage(database *database.Database) http.HandlerFunc {
+
+	page, err := resolveTemplate("index.html")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	box := rice.MustFindBox("resources/public")
+	fs := http.FileServer(box.HTTPBox())
+
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		if (r.URL.Path != "/") && (r.URL.Path != "/index.html") {
+			fs.ServeHTTP(w, r)
+			return
+		}
+
 		authors := database.Authors()
 		posts := database.Posts()
 
@@ -63,8 +119,19 @@ func homePage(database *database.Database) http.HandlerFunc {
 
 		data := &HomeData{authors, rPosts}
 
-		page := resources.HomePageTemplate
 		page.Execute(w, data)
+	}
+}
+
+func graphQlClientPage() http.HandlerFunc {
+	page, err := resolveTemplate("graphql.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		data := make([]interface{}, 0)
+		page.Execute(w, &data)
 	}
 }
 
@@ -85,14 +152,10 @@ func main() {
 	}
 
 	home := http.HandlerFunc(homePage(database))
+	gql := http.HandlerFunc(graphQlClientPage())
 
-	http.Handle("/graphql", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write(resources.GraphQlPage)
-	}))
-
+	http.Handle("/graphql", gql)
 	http.Handle("/query", &relay.Handler{Schema: api})
-
-	http.Handle("/index.html", home)
 	http.Handle("/", home)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))

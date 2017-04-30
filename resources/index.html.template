@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Index Template</title>
+    <link rel="stylesheet" href="index.css" type="text/css"/>
+  </head>
+  <body>
+    <h1>Hello Templates</h1>
+    <h2>Authors</h2>
+    <ul>
+      {{range .Authors}}
+      <li>{{ .Email }}</li>
+      {{end}}
+    </ul>
+    <h2>Posts</h2>
+    {{ range .Posts }}
+    <article id={{.Id}}>
+      <h3>{{ .Slugline }} by {{ .Author }}</h3>
+      <h4>{{ .DateCreated }}</h4>
+      <div class='postbody'>
+        {{ .Text }}
+      </div>
+    </article>
+    {{ end }}
+  </body>
+  </head>
