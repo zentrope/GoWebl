@@ -5,8 +5,13 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	rice "github.com/GeertJohan/go.rice"
 	"github.com/imdario/mergo"
 )
+
+//-----------------------------------------------------------------------------
+// Exports
+//-----------------------------------------------------------------------------
 
 type StorageConfig struct {
 	User     string `json:"user,omitempty"`
@@ -29,7 +34,7 @@ const DefaultConfigFile = "resources/config.json"
 
 func LoadConfigFile(pathToOverride string) (*AppConfig, error) {
 
-	config, err := loadConfigFile(DefaultConfigFile)
+	config, err := loadDefaultConfigFile()
 	if err != nil {
 		return nil, err
 	}
@@ -48,6 +53,35 @@ func LoadConfigFile(pathToOverride string) (*AppConfig, error) {
 	}
 
 	return &override, nil
+}
+
+//-----------------------------------------------------------------------------
+// Implementation
+//-----------------------------------------------------------------------------
+
+var resourceBox *rice.Box
+
+func resources() *rice.Box {
+	if resourceBox == nil {
+		fmt.Println("resources loaded")
+		resourceBox = rice.MustFindBox("../resources")
+	}
+	return resourceBox
+}
+
+func loadDefaultConfigFile() (AppConfig, error) {
+	contents, err := resources().String("config.json")
+
+	if err != nil {
+		return AppConfig{}, err
+	}
+
+	var config AppConfig
+	if err := json.Unmarshal([]byte(contents), &config); err != nil {
+		return AppConfig{}, err
+	}
+
+	return config, nil
 }
 
 func loadConfigFile(path string) (AppConfig, error) {
