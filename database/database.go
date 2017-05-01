@@ -6,22 +6,22 @@ import (
 	"log"
 
 	_ "github.com/lib/pq"
+	"github.com/zentrope/webl/internal"
 )
 
 type Database struct {
-	User     string
-	Password string
-	Database string
-	db       *sql.DB
+	Config internal.StorageConfig
+	db     *sql.DB
 }
 
-func NewDatabase(user, pass, dbname string) *Database {
-	return &Database{user, pass, dbname, nil}
+func NewDatabase(config internal.StorageConfig) *Database {
+	return &Database{config, nil}
 }
 
 func (conn *Database) Connect() {
-	config := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
-		conn.User, conn.Password, conn.Database)
+	config := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable",
+		conn.Config.User, conn.Config.Password, conn.Config.Database,
+		conn.Config.Host, conn.Config.Port)
 	db, err := sql.Open("postgres", config)
 	if err != nil {
 		log.Fatal(err)

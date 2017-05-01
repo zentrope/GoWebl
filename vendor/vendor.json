@@ -21,6 +21,12 @@
 			"revisionTime": "2015-03-29T02:31:25Z"
 		},
 		{
+			"checksumSHA1": "VBXGouqOkPe3OkeJnyUBkx3aZXA=",
+			"path": "github.com/imdario/mergo",
+			"revision": "d806ba8c21777d504a2090a2ca4913c750dd3a33",
+			"revisionTime": "2017-03-26T20:45:27Z"
+		},
+		{
 			"checksumSHA1": "eWtEV0iBNTL6DRJVqEeniS+thHA=",
 			"path": "github.com/kardianos/osext",
 			"revision": "9d302b58e975387d0b4d9be876622c86cefe64be",

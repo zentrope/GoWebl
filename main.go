@@ -2,10 +2,12 @@ package main
 
 import (
 	"crypto/sha256"
+	"flag"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -14,9 +16,8 @@ import (
 	"github.com/russross/blackfriday"
 	"github.com/zentrope/webl/api"
 	"github.com/zentrope/webl/database"
+	"github.com/zentrope/webl/internal"
 )
-
-//	rice "github.com/GeertJohan/go.rice"
 
 type HomeData struct {
 	Authors []*database.Author
@@ -136,12 +137,24 @@ func graphQlClientPage() http.HandlerFunc {
 }
 
 func main() {
-	fmt.Println("Hello GraphQL")
-	fmt.Println(" - web     -> http://localhost:8080/")
-	fmt.Println(" - graphql -> http://localhost:8080/graphql")
-	fmt.Println(" - query   -> http://localhost:8080/query")
 
-	database := database.NewDatabase("blogsvc", "wanheda", "blogdb")
+	var overrideConfigFile string
+	flag.StringVar(&overrideConfigFile, "c", internal.DefaultConfigFile,
+		"Path to configuration override file.")
+
+	flag.Parse()
+
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage:\n")
+		flag.PrintDefaults()
+	}
+
+	config, err := internal.LoadConfigFile(overrideConfigFile)
+	if err != nil {
+		panic(err)
+	}
+
+	database := database.NewDatabase(config.Storage)
 
 	database.Connect()
 	defer database.Disconnect()
@@ -158,5 +171,10 @@ func main() {
 	http.Handle("/query", &relay.Handler{Schema: api})
 	http.Handle("/", home)
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Printf("Hello Webl\n")
+	fmt.Printf(" - web     -> http://localhost:%s/\n", config.Web.Port)
+	fmt.Printf(" - graphql -> http://localhost:%s/graphql\n", config.Web.Port)
+	fmt.Printf(" - query   -> http://localhost:%s/query\n", config.Web.Port)
+
+	log.Fatal(http.ListenAndServe(":"+config.Web.Port, nil))
 }
