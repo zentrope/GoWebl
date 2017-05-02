@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
 	"time"
 
@@ -162,9 +163,30 @@ func mkWebApp(resources *internal.Resources, database *internal.Database,
 	return service
 }
 
+func mkServer(config *internal.AppConfig, app *http.ServeMux) *http.Server {
+	server := &http.Server{}
+	server.Addr = ":" + config.Web.Port
+	server.Handler = app
+	return server
+}
+
 //-----------------------------------------------------------------------------
 // Boostraap
 //-----------------------------------------------------------------------------
+
+func blockUntilShutdownThenDo(fn func()) {
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt)
+	<-sigChan
+	fn()
+}
+
+func notify(config *internal.AppConfig) {
+	p := config.Web.Port
+	log.Printf("Web access -> http://localhost:%s/\n", p)
+	log.Printf("GraphQL explorer access -> http://localhost:%s/graphql\n", p)
+	log.Printf("Query API access -> http://localhost:%s/query\n", p)
+}
 
 func main() {
 
@@ -175,10 +197,20 @@ func main() {
 	database := mkDatabase(config)
 	graphapi := mkGraphAPI(database)
 	app := mkWebApp(resources, database, graphapi)
+	server := mkServer(config, app)
 
-	log.Printf("Web access -> http://localhost:%s/\n", config.Web.Port)
-	log.Printf("GraphQL explorer access -> http://localhost:%s/graphql\n", config.Web.Port)
-	log.Printf("Query API access -> http://localhost:%s/query\n", config.Web.Port)
+	go server.ListenAndServe()
 
-	log.Fatal(http.ListenAndServe(":"+config.Web.Port, app))
+	notify(config)
+
+	blockUntilShutdownThenDo(func() {
+		log.Println("^C")
+		log.Println("Shutdown")
+		log.Println("- Server shutdown.")
+		server.Close()
+		log.Println("- Database disconnect.")
+		database.Disconnect()
+	})
+
+	log.Println("System halt.")
 }
