@@ -31,9 +31,9 @@ type AppConfig struct {
 
 const DefaultConfigFile = "resources/config.json"
 
-func LoadConfigFile(pathToOverride string) (*AppConfig, error) {
+func LoadConfigFile(pathToOverride string, resources *Resources) (*AppConfig, error) {
 
-	config, err := loadDefaultConfigFile()
+	config, err := loadDefaultConfigFile(resources)
 	if err != nil {
 		return nil, err
 	}
@@ -58,8 +58,8 @@ func LoadConfigFile(pathToOverride string) (*AppConfig, error) {
 // Implementation
 //-----------------------------------------------------------------------------
 
-func loadDefaultConfigFile() (AppConfig, error) {
-	contents, err := Resources().String("config.json")
+func loadDefaultConfigFile(resources *Resources) (AppConfig, error) {
+	contents, err := resources.Private.String("config.json")
 
 	if err != nil {
 		return AppConfig{}, err

@@ -31,18 +31,6 @@ type HtmlPost struct {
 	Text        template.HTML
 }
 
-func resolveTemplate(name string) (*template.Template, error) {
-	resources := internal.Resources()
-
-	templateString, err := resources.String(name + ".template")
-
-	if err != nil {
-		return nil, err
-	}
-
-	return template.New(name).Parse(templateString)
-}
-
 func idToStr(id int) string {
 	return fmt.Sprintf("%x", sha256.Sum256([]byte(strconv.Itoa(id))))
 }
@@ -63,42 +51,15 @@ func templatize(p *internal.Post) *HtmlPost {
 	}
 }
 
-// func MkHandler(location string) http.HandlerFunc {
+func homePage(database *internal.Database, resources *internal.Resources) http.HandlerFunc {
 
-//	// This craziness allows me to serve index.html when routes
-//	// are otherwise not found.
-
-//	box := rice.MustFindBox(location)
-//	fs := http.FileServer(box.HTTPBox())
-
-//	return func(w http.ResponseWriter, r *http.Request) {
-//		content := r.URL.Path[1:]
-
-//		f, err := box.Open(content)
-
-//		if err == nil {
-//			f.Close()
-//			fs.ServeHTTP(w, r)
-//			return
-//		}
-
-//		body, _ := box.Bytes("index.html")
-//		w.Header().Set("Content-Type", "text/html")
-//		w.WriteHeader(http.StatusOK)
-//		w.Write(body)
-//	}
-// }
-
-func homePage(database *internal.Database) http.HandlerFunc {
-
-	page, err := resolveTemplate("index.html")
+	page, err := resources.ResolveTemplate("index.html")
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	box := internal.PublicResources()
-	fs := http.FileServer(box.HTTPBox())
+	fs := resources.PublicFileServer()
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -121,8 +82,8 @@ func homePage(database *internal.Database) http.HandlerFunc {
 	}
 }
 
-func graphQlClientPage() http.HandlerFunc {
-	page, err := resolveTemplate("graphql.html")
+func graphQlClientPage(resources *internal.Resources) http.HandlerFunc {
+	page, err := resources.ResolveTemplate("graphql.html")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -137,6 +98,7 @@ func graphQlClientPage() http.HandlerFunc {
 // Application Components and Resources
 //-----------------------------------------------------------------------------
 
+var resources *internal.Resources
 var config *internal.AppConfig
 var database *internal.Database
 var graphapi *internal.GraphAPI
@@ -147,6 +109,15 @@ var graphapi *internal.GraphAPI
 
 func init() {
 	log.Println("Welcome to Webl")
+}
+
+func init() {
+	log.Println("Initializing resources.")
+	r, err := internal.NewResources()
+	if err != nil {
+		log.Fatal(err)
+	}
+	resources = r
 }
 
 func init() {
@@ -162,7 +133,7 @@ func init() {
 		flag.PrintDefaults()
 	}
 
-	c, err := internal.LoadConfigFile(overrideConfigFile)
+	c, err := internal.LoadConfigFile(overrideConfigFile, resources)
 	if err != nil {
 		panic(err)
 	}
@@ -189,11 +160,14 @@ func init() {
 	graphapi = a
 }
 
-func main() {
-	defer database.Disconnect()
+//-----------------------------------------------------------------------------
+// Bootstrap
+//-----------------------------------------------------------------------------
 
-	home := http.HandlerFunc(homePage(database))
-	gql := http.HandlerFunc(graphQlClientPage())
+func main() {
+
+	home := http.HandlerFunc(homePage(database, resources))
+	gql := http.HandlerFunc(graphQlClientPage(resources))
 
 	http.Handle("/graphql", gql)
 	http.Handle("/query", &relay.Handler{Schema: graphapi.Schema})
