@@ -2,7 +2,6 @@ package internal
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 
 	"github.com/imdario/mergo"
@@ -48,7 +47,7 @@ func LoadConfigFile(pathToOverride string, resources *Resources) (*AppConfig, er
 	}
 
 	if err := mergo.Merge(&override, config); err != nil {
-		fmt.Printf("Merge Error: %v\n", err)
+		return nil, err
 	}
 
 	return &override, nil
