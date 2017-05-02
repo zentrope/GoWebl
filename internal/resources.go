@@ -39,3 +39,7 @@ func (r *Resources) ResolveTemplate(name string) (*template.Template, error) {
 func (r *Resources) PublicFileServer() http.Handler {
 	return http.FileServer(r.Public.HTTPBox())
 }
+
+func (r *Resources) PrivateString(name string) (string, error) {
+	return r.Private.String(name)
+}

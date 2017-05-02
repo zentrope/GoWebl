@@ -132,7 +132,6 @@ func mkConfig(resources *internal.Resources) *internal.AppConfig {
 func mkDatabase(config *internal.AppConfig) *internal.Database {
 	log.Println("Constructing database connection.")
 	d := internal.NewDatabase(config.Storage)
-
 	d.Connect()
 	return d
 }
@@ -195,6 +194,8 @@ func main() {
 	resources := mkResources()
 	config := mkConfig(resources)
 	database := mkDatabase(config)
+	database.MustRunMigrations(resources)
+
 	graphapi := mkGraphAPI(database)
 	app := mkWebApp(resources, database, graphapi)
 	server := mkServer(config, app)
