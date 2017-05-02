@@ -95,33 +95,20 @@ func graphQlClientPage(resources *internal.Resources) http.HandlerFunc {
 }
 
 //-----------------------------------------------------------------------------
-// Application Components and Resources
+// Construction
 //-----------------------------------------------------------------------------
 
-var resources *internal.Resources
-var config *internal.AppConfig
-var database *internal.Database
-var graphapi *internal.GraphAPI
-
-//-----------------------------------------------------------------------------
-// Initializers
-//-----------------------------------------------------------------------------
-
-func init() {
-	log.Println("Welcome to Webl")
-}
-
-func init() {
-	log.Println("Initializing resources.")
+func mkResources() *internal.Resources {
+	log.Println("Constructing resources.")
 	r, err := internal.NewResources()
 	if err != nil {
 		log.Fatal(err)
 	}
-	resources = r
+	return r
 }
 
-func init() {
-	log.Println("Initializing application configuration.")
+func mkConfig(resources *internal.Resources) *internal.AppConfig {
+	log.Println("Constructing application configuration.")
 	var overrideConfigFile string
 	flag.StringVar(&overrideConfigFile, "c", internal.DefaultConfigFile,
 		"Path to configuration override file.")
@@ -138,45 +125,60 @@ func init() {
 		panic(err)
 	}
 
-	config = c
+	return c
 }
 
-func init() {
-	log.Println("Initializing database connection.")
+func mkDatabase(config *internal.AppConfig) *internal.Database {
+	log.Println("Constructing database connection.")
 	d := internal.NewDatabase(config.Storage)
 
 	d.Connect()
-
-	database = d
+	return d
 }
 
-func init() {
-	log.Println("Intializing GraphQL API")
+func mkGraphAPI(database *internal.Database) *internal.GraphAPI {
+	log.Println("Constructing GraphQL API.")
 
-	a, err := internal.NewApi(database)
+	api, err := internal.NewApi(database)
 	if err != nil {
 		panic(err)
 	}
-	graphapi = a
+	return api
 }
 
-//-----------------------------------------------------------------------------
-// Bootstrap
-//-----------------------------------------------------------------------------
+func mkWebApp(resources *internal.Resources, database *internal.Database,
+	graphapi *internal.GraphAPI) *http.ServeMux {
+	log.Println("Constructing web app.")
 
-func main() {
+	service := http.NewServeMux()
 
 	home := http.HandlerFunc(homePage(database, resources))
 	gql := http.HandlerFunc(graphQlClientPage(resources))
 
-	http.Handle("/graphql", gql)
-	http.Handle("/query", &relay.Handler{Schema: graphapi.Schema})
-	http.Handle("/", home)
+	service.Handle("/graphql", gql)
+	service.Handle("/query", &relay.Handler{Schema: graphapi.Schema})
+	service.Handle("/", home)
 
-	fmt.Printf("Hello Webl\n")
-	fmt.Printf(" - web     -> http://localhost:%s/\n", config.Web.Port)
-	fmt.Printf(" - graphql -> http://localhost:%s/graphql\n", config.Web.Port)
-	fmt.Printf(" - query   -> http://localhost:%s/query\n", config.Web.Port)
+	return service
+}
 
-	log.Fatal(http.ListenAndServe(":"+config.Web.Port, nil))
+//-----------------------------------------------------------------------------
+// Boostraap
+//-----------------------------------------------------------------------------
+
+func main() {
+
+	log.Println("Welcome to Webl")
+
+	resources := mkResources()
+	config := mkConfig(resources)
+	database := mkDatabase(config)
+	graphapi := mkGraphAPI(database)
+	app := mkWebApp(resources, database, graphapi)
+
+	log.Printf("Web access -> http://localhost:%s/\n", config.Web.Port)
+	log.Printf("GraphQL explorer access -> http://localhost:%s/graphql\n", config.Web.Port)
+	log.Printf("Query API access -> http://localhost:%s/query\n", config.Web.Port)
+
+	log.Fatal(http.ListenAndServe(":"+config.Web.Port, app))
 }
