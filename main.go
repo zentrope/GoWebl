@@ -11,7 +11,6 @@ import (
 	"strconv"
 	"time"
 
-	rice "github.com/GeertJohan/go.rice"
 	"github.com/neelance/graphql-go/relay"
 	"github.com/russross/blackfriday"
 	"github.com/zentrope/webl/internal"
@@ -33,7 +32,7 @@ type HtmlPost struct {
 }
 
 func resolveTemplate(name string) (*template.Template, error) {
-	resources := rice.MustFindBox("resources")
+	resources := internal.Resources()
 
 	templateString, err := resources.String(name + ".template")
 
@@ -98,7 +97,7 @@ func homePage(database *internal.Database) http.HandlerFunc {
 		log.Fatal(err)
 	}
 
-	box := rice.MustFindBox("resources/public")
+	box := internal.PublicResources()
 	fs := http.FileServer(box.HTTPBox())
 
 	return func(w http.ResponseWriter, r *http.Request) {

@@ -4,9 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 
-	rice "github.com/GeertJohan/go.rice"
 	"github.com/imdario/mergo"
 )
 
@@ -60,18 +58,8 @@ func LoadConfigFile(pathToOverride string) (*AppConfig, error) {
 // Implementation
 //-----------------------------------------------------------------------------
 
-var resourceBox *rice.Box
-
-func resources() *rice.Box {
-	if resourceBox == nil {
-		log.Println("resources loaded")
-		resourceBox = rice.MustFindBox("../resources")
-	}
-	return resourceBox
-}
-
 func loadDefaultConfigFile() (AppConfig, error) {
-	contents, err := resources().String("config.json")
+	contents, err := Resources().String("config.json")
 
 	if err != nil {
 		return AppConfig{}, err
