@@ -1,4 +1,4 @@
-package database
+package internal
 
 import (
 	"database/sql"
@@ -6,15 +6,14 @@ import (
 	"log"
 
 	_ "github.com/lib/pq"
-	"github.com/zentrope/webl/internal"
 )
 
 type Database struct {
-	Config internal.StorageConfig
+	Config StorageConfig
 	db     *sql.DB
 }
 
-func NewDatabase(config internal.StorageConfig) *Database {
+func NewDatabase(config StorageConfig) *Database {
 	return &Database{config, nil}
 }
 

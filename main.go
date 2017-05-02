@@ -14,13 +14,11 @@ import (
 	rice "github.com/GeertJohan/go.rice"
 	"github.com/neelance/graphql-go/relay"
 	"github.com/russross/blackfriday"
-	"github.com/zentrope/webl/api"
-	"github.com/zentrope/webl/database"
 	"github.com/zentrope/webl/internal"
 )
 
 type HomeData struct {
-	Authors []*database.Author
+	Authors []*internal.Author
 	Posts   []*HtmlPost
 }
 
@@ -54,7 +52,7 @@ func toMarkdown(data string) string {
 	return string(blackfriday.MarkdownBasic([]byte(data)))
 }
 
-func templatize(p *database.Post) *HtmlPost {
+func templatize(p *internal.Post) *HtmlPost {
 	return &HtmlPost{
 		idToStr(p.Id),
 		p.Author,
@@ -92,7 +90,7 @@ func templatize(p *database.Post) *HtmlPost {
 //	}
 // }
 
-func homePage(database *database.Database) http.HandlerFunc {
+func homePage(database *internal.Database) http.HandlerFunc {
 
 	page, err := resolveTemplate("index.html")
 
@@ -136,8 +134,24 @@ func graphQlClientPage() http.HandlerFunc {
 	}
 }
 
-func main() {
+//-----------------------------------------------------------------------------
+// Application Components and Resources
+//-----------------------------------------------------------------------------
 
+var config *internal.AppConfig
+var database *internal.Database
+var graphapi *internal.GraphAPI
+
+//-----------------------------------------------------------------------------
+// Initializers
+//-----------------------------------------------------------------------------
+
+func init() {
+	log.Println("Welcome to Webl")
+}
+
+func init() {
+	log.Println("Initializing application configuration.")
 	var overrideConfigFile string
 	flag.StringVar(&overrideConfigFile, "c", internal.DefaultConfigFile,
 		"Path to configuration override file.")
@@ -149,26 +163,41 @@ func main() {
 		flag.PrintDefaults()
 	}
 
-	config, err := internal.LoadConfigFile(overrideConfigFile)
+	c, err := internal.LoadConfigFile(overrideConfigFile)
 	if err != nil {
 		panic(err)
 	}
 
-	database := database.NewDatabase(config.Storage)
+	config = c
+}
 
-	database.Connect()
+func init() {
+	log.Println("Initializing database connection.")
+	d := internal.NewDatabase(config.Storage)
+
+	d.Connect()
+
+	database = d
+}
+
+func init() {
+	log.Println("Intializing GraphQL API")
+
+	a, err := internal.NewApi(database)
+	if err != nil {
+		panic(err)
+	}
+	graphapi = a
+}
+
+func main() {
 	defer database.Disconnect()
-
-	api, err := api.NewApi(database)
-	if err != nil {
-		panic(err)
-	}
 
 	home := http.HandlerFunc(homePage(database))
 	gql := http.HandlerFunc(graphQlClientPage())
 
 	http.Handle("/graphql", gql)
-	http.Handle("/query", &relay.Handler{Schema: api})
+	http.Handle("/query", &relay.Handler{Schema: graphapi.Schema})
 	http.Handle("/", home)
 
 	fmt.Printf("Hello Webl\n")

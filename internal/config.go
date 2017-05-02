@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 
 	rice "github.com/GeertJohan/go.rice"
 	"github.com/imdario/mergo"
@@ -63,7 +64,7 @@ var resourceBox *rice.Box
 
 func resources() *rice.Box {
 	if resourceBox == nil {
-		fmt.Println("resources loaded")
+		log.Println("resources loaded")
 		resourceBox = rice.MustFindBox("../resources")
 	}
 	return resourceBox

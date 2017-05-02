@@ -1,11 +1,10 @@
-package api
+package internal
 
 import (
 	"fmt"
 	"time"
 
 	graphql "github.com/neelance/graphql-go"
-	db "github.com/zentrope/webl/database"
 )
 
 //=============================================================================
@@ -59,12 +58,21 @@ const Schema = `
 // Root Resolver
 //=============================================================================
 
-type Resolver struct {
-	Database *db.Database
+type GraphAPI struct {
+	Schema *graphql.Schema
 }
 
-func NewApi(database *db.Database) (*graphql.Schema, error) {
-	return graphql.ParseSchema(Schema, &Resolver{database})
+type Resolver struct {
+	Database *Database
+}
+
+func NewApi(database *Database) (*GraphAPI, error) {
+	schema, err := graphql.ParseSchema(Schema, &Resolver{database})
+	if err != nil {
+		return nil, err
+	}
+
+	return &GraphAPI{schema}, nil
 }
 
 //=============================================================================
@@ -88,8 +96,8 @@ func (r *Resolver) Nums() ([]int32, error) {
 //=============================================================================
 
 type authorResolver struct {
-	database *db.Database
-	author   *db.Author
+	database *Database
+	author   *Author
 }
 
 type AuthorInput struct {
@@ -153,8 +161,8 @@ func (r *authorResolver) Posts() []*postResolver {
 //=============================================================================
 
 type postResolver struct {
-	database *db.Database
-	post     *db.Post
+	database *Database
+	post     *Post
 }
 
 func (r *Resolver) Posts() []*postResolver {
