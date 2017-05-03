@@ -5,25 +5,22 @@
 package internal
 
 import (
-	"crypto/sha256"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	"strconv"
-	"time"
 
 	"github.com/russross/blackfriday"
 )
 
 type HomeData struct {
-	Authors []*Author
-	Posts   []*HtmlPost
+	Posts []*HtmlPost
 }
 
 type HtmlPost struct {
-	Id          string
+	UUID        string
 	Author      string
+	Email       string
 	DateCreated string
 	DateUpdated string
 	Status      string
@@ -31,20 +28,17 @@ type HtmlPost struct {
 	Text        template.HTML
 }
 
-func idToStr(id int) string {
-	return fmt.Sprintf("%x", sha256.Sum256([]byte(strconv.Itoa(id))))
-}
-
 func toMarkdown(data string) string {
 	return string(blackfriday.MarkdownBasic([]byte(data)))
 }
 
-func templatize(p *Post) *HtmlPost {
+func templatize(p *LatestPost) *HtmlPost {
 	return &HtmlPost{
-		idToStr(p.Id),
+		p.UUID,
 		p.Author,
+		p.Email,
 		p.DateCreated.Format("Jan 2, 2006"),
-		p.DateUpdated.Format(time.RFC822),
+		p.DateUpdated.Format("Jan 2, 2006"),
 		p.Status,
 		p.Slugline,
 		template.HTML(toMarkdown(p.Text)),
@@ -68,17 +62,24 @@ func HomePage(database *Database, resources *Resources) http.HandlerFunc {
 			return
 		}
 
-		authors := database.Authors()
-		posts := database.Posts()
+		posts, err := database.LatestPosts(40)
+
+		if err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
 
 		rPosts := make([]*HtmlPost, 0)
 		for _, p := range posts {
 			rPosts = append(rPosts, templatize(p))
 		}
 
-		data := &HomeData{authors, rPosts}
+		data := &HomeData{rPosts}
 
-		page.Execute(w, data)
+		if err := page.Execute(w, data); err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
 	}
 }
 

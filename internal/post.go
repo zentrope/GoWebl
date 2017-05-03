@@ -1,3 +1,7 @@
+// Copyright 2017 Keith Irwin. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package internal
 
 import (
@@ -5,6 +9,62 @@ import (
 	"log"
 	"time"
 )
+
+type LatestPost struct {
+	UUID        string
+	DateCreated time.Time
+	DateUpdated time.Time
+	Status      string
+	Slugline    string
+	Author      string
+	Email       string
+	Text        string
+}
+
+func (conn *Database) LatestPosts(limit int) ([]*LatestPost, error) {
+	var query = `
+	 select
+		 p.uuid, p.date_created, p.date_updated, p.status,
+		 p.slugline, a.handle as author, a.email, p.text
+	 from
+		 post p, author a
+	 where
+		 p.author=a.handle
+		 and p.status='published'
+	 order by date_created desc
+	 limit $1`
+
+	rows, err := conn.db.Query(query, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	posts := make([]*LatestPost, 0)
+
+	for rows.Next() {
+		var p LatestPost
+		err := rows.Scan(
+			&p.UUID,
+			&p.DateCreated,
+			&p.DateUpdated,
+			&p.Status,
+			&p.Slugline,
+			&p.Author,
+			&p.Email,
+			&p.Text,
+		)
+
+		if err != nil {
+			return make([]*LatestPost, 0), err
+		}
+
+		posts = append(posts, &p)
+	}
+
+	return posts, nil
+}
 
 type Post struct {
 	Id          int
