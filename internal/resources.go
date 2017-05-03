@@ -27,7 +27,7 @@ func NewResources() (*Resources, error) {
 }
 
 func (r *Resources) ResolveTemplate(name string) (*template.Template, error) {
-	templateString, err := r.Private.String(name + ".template")
+	templateString, err := r.Private.String(name)
 
 	if err != nil {
 		return nil, err
