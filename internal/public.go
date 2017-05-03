@@ -46,6 +46,10 @@ func templatize(p *LatestPost) *HtmlPost {
 	}
 }
 
+func logRequest(r *http.Request) {
+	log.Printf("%s %s\n", r.Method, r.URL.Path)
+}
+
 func HomePage(database *Database, resources *Resources) http.HandlerFunc {
 
 	page, err := resources.ResolveTemplate("index.html")
@@ -57,7 +61,7 @@ func HomePage(database *Database, resources *Resources) http.HandlerFunc {
 	fs := resources.PublicFileServer()
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.URL.Path)
+		logRequest(r)
 
 		if (r.URL.Path != "/") && (r.URL.Path != "/index.html") {
 			fs.ServeHTTP(w, r)
@@ -94,7 +98,7 @@ func PostPage(database *Database, resources *Resources) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		log.Println(r.URL.Path)
+		logRequest(r)
 
 		uuid := strings.Split(r.URL.Path, "/")[2]
 
@@ -121,6 +125,7 @@ func GraphQlClientPage(resources *Resources) http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		logRequest(r)
 		data := make([]interface{}, 0)
 		page.Execute(w, &data)
 	}
