@@ -11,7 +11,7 @@ createuser blogsvc -P
 createdb blogdb -O blogsvc
 ```
 
-The app itself will take care of populating all the tables. I'm not sure if "createdb" and "superuser" are actually needed, here.
+The app itself will take care of populating all the tables.
 
 There's also a script:
 
