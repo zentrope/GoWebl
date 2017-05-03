@@ -119,14 +119,13 @@ func PostPage(database *Database, resources *Resources) http.HandlerFunc {
 }
 
 func GraphQlClientPage(resources *Resources) http.HandlerFunc {
-	page, err := resources.ResolveTemplate("graphql.html")
+	page, err := resources.PrivateString("graphql.html")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		logRequest(r)
-		data := make([]interface{}, 0)
-		page.Execute(w, &data)
+		fmt.Fprintf(w, page)
 	}
 }
