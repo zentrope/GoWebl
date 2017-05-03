@@ -5,18 +5,26 @@
     <link rel="stylesheet" href="index.css" type="text/css"/>
   </head>
   <body>
+    <section class="NavBar">
+      <div class="Links">
+        <a href="/archive">Archive</a> |
+        <a href="/graphql">GraphQL</a>
+      </div>
+    </section>
     <section class="Content">
       <h1>Webl Webl</h1>
       {{ range .Posts }}
       <article id={{.UUID}}>
-        <div class="author">
-          <i>By {{ .Author }}</i> on <i>{{ .DateCreated }}</i>
-        </div>
         <div class='postbody'>
           {{ .Text }}
         </div>
-        <div class="permalink">
-          <a href="/post/{{ .UUID }}">permalink</a>
+        <div class="MetaBar">
+          <div class="Permalink">
+            <a href="/post/{{ .UUID }}">permalink</a>
+          </div>
+          <div class="Author">
+            <i>By {{ .Author }}</i> on <i>{{ .DateCreated }}</i>
+          </div>
         </div>
       </article>
       {{ end }}
