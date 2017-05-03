@@ -1,10 +1,54 @@
 html, body {
-  color: #BAE1FF;
-  background-color: #333;
-  margin: 50px;
-  font-family: sans-serif;
+  color: white;
+  background-color: #111;
+  margin: 0;
+  padding: 0;
+  font-family: system, -apple-system, BlinkMacSystemFont, HelveticaNeue, LucidaGrande, sans-serif;
+}
+
+a {
+  color: Peru;
+}
+
+article {
+  margin-bottom: 48pt;
+}
+
+section.Content {
+  width: 650px;
+  margin: auto;
+}
+
+div.author {
+  color: peru;
+  margin-top: 10px;
+  font-size: 10pt;
+  margin-bottom: 10px;
+  border-bottom: 1px dotted DodgerBlue;
+  text-align: right;
+}
+
+div.permalink {
+  margin-top: 10px;
+  font-size: 10pt;
+  margin-bottom: 10px;
+  border-top: 1px dotted DodgerBlue;
+}
+
+div.postbody {
+  font-size: 12pt;
+  color: #0df;
 }
 
 div.postbody h1 {
-  font-size: 12pt;
+  color: Lime;
+}
+
+div.postbody p {
+  line-height: 17pt;
+}
+
+div.postbody blockquote {
+  border-left: 1px dotted DodgerBlue;
+  padding-left: 1em;
 }

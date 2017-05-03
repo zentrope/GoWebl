@@ -1,25 +1,30 @@
 <!doctype html>
 <html>
   <head>
-    <title>Webl! Webl! Webl!</title>
-    <link rel="stylesheet" href="index.css" type="text/css"/>
+    <title>{{ .Slugline }}</title>
+    <link rel="stylesheet" href="../index.css" type="text/css"/>
   </head>
   <body>
     <section class="Content">
-      <h1>Webl Webl</h1>
-      {{ range .Posts }}
+      <p>
+        <a href="/">Home</a> |
+        <a href="/archive">Archive</a>
+      </p>
+
       <article id={{.UUID}}>
+
         <div class="author">
           <i>By {{ .Author }}</i> on <i>{{ .DateCreated }}</i>
         </div>
+
         <div class='postbody'>
           {{ .Text }}
         </div>
+
         <div class="permalink">
           <a href="/post/{{ .UUID }}">permalink</a>
         </div>
       </article>
-      {{ end }}
     </section>
   </body>
 </html>

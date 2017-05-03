@@ -10,6 +10,10 @@ import (
 	"time"
 )
 
+//-----------------------------------------------------------------------------
+// Queries for Public Pages
+//-----------------------------------------------------------------------------
+
 type LatestPost struct {
 	UUID        string
 	DateCreated time.Time
@@ -19,6 +23,47 @@ type LatestPost struct {
 	Author      string
 	Email       string
 	Text        string
+}
+
+func (conn *Database) FocusPost(uuid string) (*LatestPost, error) {
+	var query = `
+	 select
+		 p.uuid, p.date_created, p.date_updated, p.status,
+		 p.slugline, a.handle as author, a.email, p.text
+	 from
+		 post p, author a
+	 where
+		 p.uuid = $1
+		 and p.author=a.handle
+		 and p.status='published'
+	`
+
+	rows, err := conn.db.Query(query, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	rows.Next()
+	var p LatestPost
+
+	err = rows.Scan(
+		&p.UUID,
+		&p.DateCreated,
+		&p.DateUpdated,
+		&p.Status,
+		&p.Slugline,
+		&p.Author,
+		&p.Email,
+		&p.Text,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &p, nil
 }
 
 func (conn *Database) LatestPosts(limit int) ([]*LatestPost, error) {
@@ -65,6 +110,10 @@ func (conn *Database) LatestPosts(limit int) ([]*LatestPost, error) {
 
 	return posts, nil
 }
+
+//-----------------------------------------------------------------------------
+// Queries for GraphQL
+//-----------------------------------------------------------------------------
 
 type Post struct {
 	Id          int

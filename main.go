@@ -74,10 +74,12 @@ func mkWebApp(resources *internal.Resources, database *internal.Database,
 	service := http.NewServeMux()
 
 	home := http.HandlerFunc(internal.HomePage(database, resources))
+	post := http.HandlerFunc(internal.PostPage(database, resources))
 	gql := http.HandlerFunc(internal.GraphQlClientPage(resources))
 
 	service.Handle("/graphql", gql)
 	service.Handle("/query", &relay.Handler{Schema: graphapi.Schema})
+	service.Handle("/post/", post)
 	service.Handle("/", home)
 
 	return service

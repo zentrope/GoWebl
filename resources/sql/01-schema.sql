@@ -33,7 +33,7 @@ create table if not exists post (
 insert into post (author, uuid, slugline, text) values ('keith',
 'b8ec300c-b0f1-4338-b2a7-ca5f06c1fe33',
 'Xena of Amphipolous',
-'#Xena of Amphipolous
+'# Xena of Amphipolous
 
 Xena is a fictional
 character from Robert Tapert''s Xena: Warrior Princess

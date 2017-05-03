@@ -9,6 +9,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/russross/blackfriday"
 )
@@ -29,7 +30,7 @@ type HtmlPost struct {
 }
 
 func toMarkdown(data string) string {
-	return string(blackfriday.MarkdownBasic([]byte(data)))
+	return string(blackfriday.MarkdownCommon([]byte(data)))
 }
 
 func templatize(p *LatestPost) *HtmlPost {
@@ -56,6 +57,7 @@ func HomePage(database *Database, resources *Resources) http.HandlerFunc {
 	fs := resources.PublicFileServer()
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.URL.Path)
 
 		if (r.URL.Path != "/") && (r.URL.Path != "/index.html") {
 			fs.ServeHTTP(w, r)
@@ -81,6 +83,35 @@ func HomePage(database *Database, resources *Resources) http.HandlerFunc {
 			return
 		}
 	}
+}
+
+func PostPage(database *Database, resources *Resources) http.HandlerFunc {
+	page, err := resources.ResolveTemplate("post.html")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		log.Println(r.URL.Path)
+
+		uuid := strings.Split(r.URL.Path, "/")[2]
+
+		post, err := database.FocusPost(uuid)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+			return
+		}
+
+		data := templatize(post)
+
+		if err := page.Execute(w, data); err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+	}
+
 }
 
 func GraphQlClientPage(resources *Resources) http.HandlerFunc {
