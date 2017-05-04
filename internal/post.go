@@ -6,7 +6,7 @@ package internal
 
 import (
 	"database/sql"
-	"log"
+	"fmt"
 	"time"
 )
 
@@ -168,7 +168,7 @@ func (conn *Database) ArchiveEntries() ([]*ArchiveEntry, error) {
 //-----------------------------------------------------------------------------
 
 type Post struct {
-	Id          int
+	UUID        string
 	Author      string
 	DateCreated time.Time
 	DateUpdated time.Time
@@ -177,54 +177,59 @@ type Post struct {
 	Text        string
 }
 
-func (conn *Database) PostStatus() []string {
-	return conn.enums("post_status")
+func (conn *Database) Posts() ([]*Post, error) {
+	q := mkPostSql("")
+	return conn.postQuery(q)
 }
 
-func (conn *Database) Posts() []*Post {
-	return conn.postQuery(
-		mkPostSql(""),
-	)
-}
-
-func (conn *Database) PostsByAuthor(handle string) []*Post {
+func (conn *Database) PostsByAuthor(handle string) ([]*Post, error) {
 	return conn.postQuery(
 		mkPostSql("where lower(author)=lower($1)"),
 		handle,
 	)
 }
 
-func (conn *Database) postQuery(query string, args ...interface{}) []*Post {
+func (conn *Database) postQuery(query string, args ...interface{}) ([]*Post, error) {
 
 	rows, err := conn.db.Query(query, args...)
 
 	defer rows.Close()
 
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return rowsToPosts(rows)
+	results, err := rowsToPosts(rows)
+	if err != nil {
+		return nil, err
+	}
+	return results, nil
 }
 
 func mkPostSql(where string) string {
-	return "select id, author, date_created, date_updated, status, slugline, text from post " + where
+	q := "select uuid, author, date_created, date_updated, status, slugline, text from post %s"
+	return fmt.Sprintf(q, where)
 }
 
-func rowsToPosts(rows *sql.Rows) []*Post {
+func rowsToPosts(rows *sql.Rows) ([]*Post, error) {
+
 	posts := make([]*Post, 0)
 
 	for rows.Next() {
-		posts = append(posts, rowToPost(rows))
+		post, err := rowToPost(rows)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
 	}
 
-	return posts
+	return posts, nil
 }
 
-func rowToPost(rows *sql.Rows) *Post {
+func rowToPost(rows *sql.Rows) (*Post, error) {
 	var p Post
 	err := rows.Scan(
-		&p.Id,
+		&p.UUID,
 		&p.Author,
 		&p.DateCreated,
 		&p.DateUpdated,
@@ -233,7 +238,7 @@ func rowToPost(rows *sql.Rows) *Post {
 		&p.Text,
 	)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return &p
+	return &p, nil
 }

@@ -53,7 +53,7 @@ func mkConfig(resources *internal.Resources) *internal.AppConfig {
 func mkDatabase(config *internal.AppConfig) *internal.Database {
 	log.Println("Constructing database connection.")
 	d := internal.NewDatabase(config.Storage)
-	d.Connect()
+	d.MustConnect()
 	return d
 }
 

@@ -44,7 +44,7 @@ const Schema = `
  }
 
  type Post {
-	 id: ID!
+	 uuid: ID!
 	 author: Author!
 	 status: String!
 	 slugline: String!
@@ -154,13 +154,16 @@ func (r *authorResolver) Status() string {
 	return r.author.Status
 }
 
-func (r *authorResolver) Posts() []*postResolver {
-	posts := r.database.PostsByAuthor(r.author.Handle)
+func (r *authorResolver) Posts() ([]*postResolver, error) {
+	posts, err := r.database.PostsByAuthor(r.author.Handle)
+	if err != nil {
+		return nil, err
+	}
 	var rs []*postResolver
 	for _, p := range posts {
 		rs = append(rs, &postResolver{r.database, p})
 	}
-	return rs
+	return rs, nil
 }
 
 //=============================================================================
@@ -172,17 +175,21 @@ type postResolver struct {
 	post     *Post
 }
 
-func (r *Resolver) Posts() []*postResolver {
-	posts := r.Database.Posts()
+func (r *Resolver) Posts() ([]*postResolver, error) {
+	posts, err := r.Database.Posts()
+	if err != nil {
+		return nil, err
+	}
+
 	var rs []*postResolver
 	for _, p := range posts {
 		rs = append(rs, &postResolver{r.Database, p})
 	}
-	return rs
+	return rs, nil
 }
 
-func (r *postResolver) ID() graphql.ID {
-	return graphql.ID(fmt.Sprintf("%v", r.post.Id))
+func (r *postResolver) UUID() graphql.ID {
+	return graphql.ID(fmt.Sprintf("%v", r.post.UUID))
 }
 
 func (r *postResolver) Author() (*authorResolver, error) {
