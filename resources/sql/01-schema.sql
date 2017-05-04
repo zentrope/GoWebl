@@ -30,8 +30,9 @@ create table if not exists post (
   text text default ''
 );
 
-insert into post (author, uuid, slugline, text) values ('keith',
+insert into post (author, uuid, status, slugline, text) values ('keith',
 'b8ec300c-b0f1-4338-b2a7-ca5f06c1fe33',
+'published',
 'Xena of Amphipolous',
 '# Xena of Amphipolous
 
@@ -91,8 +92,9 @@ the "greater good" and the sacrifices that must be made to accomplish
 it (a central theme in the series in later seasons).  ' );
 
 insert into
-       post (author, uuid, slugline, text) values ('xan',
+       post (author, uuid, status, slugline, text) values ('xan',
 'd08e9b3e-466b-423f-bd41-761f984bd0d0',
+'published',
 'Zeno of Elea',
 '# Zeno of Elia
 
