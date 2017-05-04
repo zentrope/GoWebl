@@ -72,6 +72,40 @@ func logRequest(r *http.Request) {
 	log.Printf("%s %s\n", r.Method, r.URL.Path)
 }
 
+func isIndexPath(prefix string, r *http.Request) bool {
+	path := r.URL.Path
+	return (path == prefix) || strings.HasSuffix(path, "/index.html")
+}
+
+func StaticPage(resources *Resources) http.HandlerFunc {
+	fs := resources.AdminFileServer()
+	return func(w http.ResponseWriter, r *http.Request) {
+		logRequest(r)
+		fs.ServeHTTP(w, r)
+	}
+}
+
+func AdminPage(resources *Resources) http.HandlerFunc {
+	fs := resources.AdminFileServer()
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		logRequest(r)
+
+		if resources.AdminFileExists(r.URL.Path[1:]) {
+			fs.ServeHTTP(w, r)
+			return
+		}
+
+		page, err := resources.Admin.String("index.html")
+		if err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+			return
+		}
+
+		fmt.Fprintf(w, page)
+	}
+}
+
 func HomePage(database *Database, resources *Resources) http.HandlerFunc {
 
 	page, err := resources.ResolveTemplate("index.html")
@@ -85,7 +119,7 @@ func HomePage(database *Database, resources *Resources) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		logRequest(r)
 
-		if (r.URL.Path != "/") && (r.URL.Path != "/index.html") {
+		if !isIndexPath("/", r) {
 			fs.ServeHTTP(w, r)
 			return
 		}

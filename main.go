@@ -78,10 +78,15 @@ func mkWebApp(resources *internal.Resources, database *internal.Database,
 	archive := http.HandlerFunc(internal.ArchivePage(database, resources))
 	gql := http.HandlerFunc(internal.GraphQlClientPage(resources))
 
+	admin := http.HandlerFunc(internal.AdminPage(resources))
+	static := http.HandlerFunc(internal.StaticPage(resources))
+
 	service.Handle("/archive", archive)
 	service.Handle("/graphql", gql)
 	service.Handle("/query", &relay.Handler{Schema: graphapi.Schema})
 	service.Handle("/post/", post)
+	service.Handle("/static/", static)
+	service.Handle("/admin/", admin)
 	service.Handle("/", home)
 
 	return service
