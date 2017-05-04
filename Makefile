@@ -3,7 +3,7 @@ PACKAGE = github.com/zentrope/webl
 .PHONY: admin build govendor vendor vendor-check vendor-unused help
 .DEFAULT_GOAL := help
 
-govendor: ## Install govendor
+govendor:
 	@hash govendor > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
 		go get -u github.com/kardianos/govendor; \
 	fi
