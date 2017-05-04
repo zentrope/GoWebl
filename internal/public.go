@@ -18,6 +18,10 @@ type HomeData struct {
 	Posts []*HtmlPost
 }
 
+type ArchiveData struct {
+	Entries []*TemplateArchiveEntry
+}
+
 type HtmlPost struct {
 	UUID        string
 	Author      string
@@ -27,6 +31,24 @@ type HtmlPost struct {
 	Status      string
 	Slugline    string
 	Text        template.HTML
+}
+
+type TemplateArchiveEntry struct {
+	UUID        string
+	DateCreated string
+	DateUpdated string
+	Slugline    string
+	Author      string
+}
+
+func xformArchiveEntry(e *ArchiveEntry) *TemplateArchiveEntry {
+	return &TemplateArchiveEntry{
+		e.UUID,
+		e.DateCreated.Format("Jan 2, 2006"),
+		e.DateUpdated.Format("Jan 2, 2006"),
+		e.Slugline,
+		e.Author,
+	}
 }
 
 func toMarkdown(data string) string {
@@ -115,7 +137,36 @@ func PostPage(database *Database, resources *Resources) http.HandlerFunc {
 			return
 		}
 	}
+}
 
+func ArchivePage(database *Database, resources *Resources) http.HandlerFunc {
+
+	page, err := resources.ResolveTemplate("archive.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		logRequest(r)
+
+		entries, err := database.ArchiveEntries()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+
+		data := make([]*TemplateArchiveEntry, 0)
+		for _, e := range entries {
+			data = append(data, xformArchiveEntry(e))
+		}
+
+		values := &ArchiveData{data}
+
+		if err := page.Execute(w, values); err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+	}
 }
 
 func GraphQlClientPage(resources *Resources) http.HandlerFunc {

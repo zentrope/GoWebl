@@ -1,31 +1,38 @@
 <!doctype html>
 <html>
   <head>
-    <title>Webl - {{ .Slugline }}</title>
+    <title>Webl - Archives</title>
     <link rel="stylesheet" href="../index.css" type="text/css"/>
   </head>
+
   <body>
     <section class="NavBar">
       <div class="Links">
         <a href="/">Home</a> |
-        <a href="/archive">Archive</a> |
         <a href="/graphql">GraphQL</a>
       </div>
     </section>
+
     <section class="Content">
-      <article id={{.UUID}}>
-        <div class='postbody'>
-          {{ .Text }}
-        </div>
-        <div class="MetaBar">
-          <div class="Permalink">
-            <a href="/post/{{ .UUID }}">permalink</a>
+      <h1>Archives</h1>
+
+      <section class="TableOfContents">
+        {{ range .Entries }}
+        <div class="ArchiveEntry">
+          <div class="Date">
+            {{ .DateCreated }}
           </div>
+          <div class="Post">
+            <a href="/post/{{ .UUID }}">{{ .Slugline }}</a>
+          </div>
+
           <div class="Author">
-            <i>By {{ .Author }}</i> on <i>{{ .DateCreated }}</i>
+            {{ .Author }}
           </div>
         </div>
-      </article>
+        {{ end }}
+      </section>
     </section>
   </body>
+
 </html>

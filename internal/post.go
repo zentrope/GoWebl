@@ -76,7 +76,8 @@ func (conn *Database) LatestPosts(limit int) ([]*LatestPost, error) {
 	 where
 		 p.author=a.handle
 		 and p.status='published'
-	 order by date_created desc
+	 order
+		 by date_created desc
 	 limit $1`
 
 	rows, err := conn.db.Query(query, limit)
@@ -109,6 +110,57 @@ func (conn *Database) LatestPosts(limit int) ([]*LatestPost, error) {
 	}
 
 	return posts, nil
+}
+
+type ArchiveEntry struct {
+	UUID        string
+	DateCreated time.Time
+	DateUpdated time.Time
+	Slugline    string
+	Author      string
+}
+
+func (conn *Database) ArchiveEntries() ([]*ArchiveEntry, error) {
+
+	var query = `
+		select
+			uuid, date_created, date_updated, slugline, author
+		from
+			post
+		where
+			status='published'
+		order by
+			date_created desc;
+	`
+
+	rows, err := conn.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	entries := make([]*ArchiveEntry, 0)
+
+	for rows.Next() {
+		var e ArchiveEntry
+		err := rows.Scan(
+			&e.UUID,
+			&e.DateCreated,
+			&e.DateUpdated,
+			&e.Slugline,
+			&e.Author,
+		)
+
+		if err != nil {
+			return make([]*ArchiveEntry, 0), err
+		}
+
+		entries = append(entries, &e)
+	}
+
+	return entries, nil
+
 }
 
 //-----------------------------------------------------------------------------
