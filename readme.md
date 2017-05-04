@@ -48,4 +48,4 @@ Homebrew's `brew services` stuff is actually kind handy.
     $ brew services start postgres
     $ brew services list
 
-I believe started and stopped stuff survices a reboot, if you care.
+This is especially useful if you don't want to or can't use Docker on your Mac. (I have an old Macbook Air, for instance, that won't run it.)
