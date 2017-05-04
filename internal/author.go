@@ -1,8 +1,11 @@
+// Copyright 2017 Keith Irwin. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package internal
 
 import (
 	"database/sql"
-	"log"
 
 	_ "github.com/lib/pq"
 )
@@ -14,65 +17,54 @@ type Author struct {
 	Status string
 }
 
-func (conn *Database) Authentic(handle, password string) bool {
+func (conn *Database) Authentic(handle, password string) (bool, error) {
 
 	const q = "select handle from author where lower(handle)=lower($1) and password=$2"
 
 	rows, err := conn.db.Query(q, handle, password)
 
+	defer rows.Close()
+
 	if err != nil {
-		log.Fatal(err)
+		return false, err
 	}
 
-	return rows.Next()
+	return rows.Next(), err
 }
 
-func (conn *Database) AuthorTypes() []string {
-	return conn.enums("author_type")
-}
-
-func (conn *Database) Author(handle string) *Author {
+func (conn *Database) Author(handle string) (*Author, error) {
 	const query = "select handle, email, type, status from author where lower(handle)=lower($1)"
 	rows, err := conn.db.Query(query, handle)
 
 	defer rows.Close()
 
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	rows.Next()
 	return rowToAuthor(rows)
 }
 
-func (conn *Database) AuthorExists(handle string) bool {
-	const query = "select handle from author where lower(handle)=lower($1)"
-	rows, err := conn.db.Query(query, handle)
-
-	defer rows.Close()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return rows.Next()
-}
-
-func (conn *Database) Authors() []*Author {
+func (conn *Database) Authors() ([]*Author, error) {
 	rows, err := conn.db.Query("select handle, email, type, status from author")
 	defer rows.Close()
 
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	authors := make([]*Author, 0)
 
 	for rows.Next() {
-		authors = append(authors, rowToAuthor(rows))
+		author, err := rowToAuthor(rows)
+		if err != nil {
+			return nil, err
+		}
+		authors = append(authors, author)
 	}
 
-	return authors
+	return authors, nil
 }
 
 func (conn *Database) CreateAuthor(handle, email, password string) error {
@@ -84,18 +76,11 @@ func (conn *Database) CreateAuthor(handle, email, password string) error {
 	return err
 }
 
-func (conn *Database) DeleteAuthor(handle string) {
-	_, err := conn.db.Exec("delete from author where lower(handle)=lower($1)", handle)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func rowToAuthor(rows *sql.Rows) *Author {
+func rowToAuthor(rows *sql.Rows) (*Author, error) {
 	var a Author
 	err := rows.Scan(&a.Handle, &a.Email, &a.Status, &a.Type)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return &a
+	return &a, nil
 }

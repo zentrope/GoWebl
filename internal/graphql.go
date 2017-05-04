@@ -113,18 +113,25 @@ func (r *Resolver) CreateAuthor(args *struct{ Author *AuthorInput }) (*authorRes
 		return nil, err
 	}
 
-	author := r.Database.Author(args.Author.Handle)
+	author, err := r.Database.Author(args.Author.Handle)
+
+	if err != nil {
+		return nil, err
+	}
 
 	return &authorResolver{r.Database, author}, nil
 }
 
-func (r *Resolver) Authors() []*authorResolver {
-	authors := r.Database.Authors()
+func (r *Resolver) Authors() ([]*authorResolver, error) {
+	authors, err := r.Database.Authors()
+	if err != nil {
+		return nil, err
+	}
 	var rs []*authorResolver
 	for _, a := range authors {
 		rs = append(rs, &authorResolver{r.Database, a})
 	}
-	return rs
+	return rs, nil
 }
 
 func (r *authorResolver) ID() graphql.ID {
@@ -178,8 +185,12 @@ func (r *postResolver) ID() graphql.ID {
 	return graphql.ID(fmt.Sprintf("%v", r.post.Id))
 }
 
-func (r *postResolver) Author() *authorResolver {
-	return &authorResolver{r.database, r.database.Author(r.post.Author)}
+func (r *postResolver) Author() (*authorResolver, error) {
+	author, err := r.database.Author(r.post.Author)
+	if err != nil {
+		return nil, err
+	}
+	return &authorResolver{r.database, author}, nil
 }
 
 func (r *postResolver) Status() string {
