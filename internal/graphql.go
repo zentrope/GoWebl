@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -18,8 +19,6 @@ const Schema = `
  }
 
  type Query {
-	 hello: String!
-	 nums: [Int!]!
 	 authors: [Author]!
 	 posts: [Post]!
  }
@@ -58,6 +57,10 @@ const Schema = `
 // Root Resolver
 //=============================================================================
 
+type AuthKeyContextType string
+
+const AUTH_KEY = AuthKeyContextType("auth-key")
+
 type GraphAPI struct {
 	Schema *graphql.Schema
 }
@@ -76,22 +79,6 @@ func NewApi(database *Database) (*GraphAPI, error) {
 }
 
 //=============================================================================
-// Random trial balloons
-//=============================================================================
-
-func (r *Resolver) Hello() (string, error) {
-	return "Hello world!", nil
-}
-
-func (r *Resolver) Nums() ([]int32, error) {
-	l := make([]int32, 3)
-	l[0] = 1
-	l[1] = 2
-	l[2] = 3
-	return l, nil
-}
-
-//=============================================================================
 // Author
 //=============================================================================
 
@@ -106,7 +93,8 @@ type AuthorInput struct {
 	Password string
 }
 
-func (r *Resolver) CreateAuthor(args *struct{ Author *AuthorInput }) (*authorResolver, error) {
+func (r *Resolver) CreateAuthor(ctx context.Context, args *struct{ Author *AuthorInput }) (*authorResolver, error) {
+	fmt.Printf("AUTH: %v\n", ctx.Value(AUTH_KEY))
 	err := r.Database.CreateAuthor(args.Author.Handle, args.Author.Email, args.Author.Password)
 
 	if err != nil {
@@ -122,7 +110,8 @@ func (r *Resolver) CreateAuthor(args *struct{ Author *AuthorInput }) (*authorRes
 	return &authorResolver{r.Database, author}, nil
 }
 
-func (r *Resolver) Authors() ([]*authorResolver, error) {
+func (r *Resolver) Authors(ctx context.Context) ([]*authorResolver, error) {
+	fmt.Printf("AUTH: %v\n", ctx.Value(AUTH_KEY))
 	authors, err := r.Database.Authors()
 	if err != nil {
 		return nil, err
@@ -175,7 +164,8 @@ type postResolver struct {
 	post     *Post
 }
 
-func (r *Resolver) Posts() ([]*postResolver, error) {
+func (r *Resolver) Posts(ctx context.Context) ([]*postResolver, error) {
+	fmt.Printf("AUTH: %v\n", ctx.Value(AUTH_KEY))
 	posts, err := r.Database.Posts()
 	if err != nil {
 		return nil, err

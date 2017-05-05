@@ -5,6 +5,8 @@
 package internal
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -75,6 +77,39 @@ func logRequest(r *http.Request) {
 func isIndexPath(prefix string, r *http.Request) bool {
 	path := r.URL.Path
 	return (path == prefix) || strings.HasSuffix(path, "/index.html")
+}
+
+func QueryAPI(api *GraphAPI) http.HandlerFunc {
+
+	var params struct {
+		Query         string                 `json:"query"`
+		OperationName string                 `json:"operationName"`
+		Variables     map[string]interface{} `json:"variables"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		authToken := r.Header.Get("x-auth-token")
+		if authToken == "" {
+			authToken = "NO_AUTH_TOKEN"
+		}
+
+		authCtx := context.WithValue(r.Context(), AUTH_KEY, authToken)
+
+		response := api.Schema.Exec(authCtx, params.Query, params.OperationName, params.Variables)
+		responseJSON, err := json.Marshal(response)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Write(responseJSON)
+	}
 }
 
 func StaticPage(resources *Resources) http.HandlerFunc {

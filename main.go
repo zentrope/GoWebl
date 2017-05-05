@@ -12,7 +12,6 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/neelance/graphql-go/relay"
 	"github.com/zentrope/webl/internal"
 )
 
@@ -73,17 +72,17 @@ func mkWebApp(resources *internal.Resources, database *internal.Database,
 
 	service := http.NewServeMux()
 
-	home := http.HandlerFunc(internal.HomePage(database, resources))
-	post := http.HandlerFunc(internal.PostPage(database, resources))
+	admin := http.HandlerFunc(internal.AdminPage(resources))
+	api := http.HandlerFunc(internal.QueryAPI(graphapi))
 	archive := http.HandlerFunc(internal.ArchivePage(database, resources))
 	gql := http.HandlerFunc(internal.GraphQlClientPage(resources))
-
-	admin := http.HandlerFunc(internal.AdminPage(resources))
+	home := http.HandlerFunc(internal.HomePage(database, resources))
+	post := http.HandlerFunc(internal.PostPage(database, resources))
 	static := http.HandlerFunc(internal.StaticPage(resources))
 
 	service.Handle("/archive", archive)
 	service.Handle("/graphql", gql)
-	service.Handle("/query", &relay.Handler{Schema: graphapi.Schema})
+	service.Handle("/query", api)
 	service.Handle("/post/", post)
 	service.Handle("/static/", static)
 	service.Handle("/admin/", admin)
