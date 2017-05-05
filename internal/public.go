@@ -15,7 +15,7 @@ import (
 )
 
 type HomeData struct {
-	Posts []*HtmlPost
+	Posts []*TemplatePost
 }
 
 type ArchiveData struct {
