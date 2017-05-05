@@ -22,7 +22,7 @@ type ArchiveData struct {
 	Entries []*TemplateArchiveEntry
 }
 
-type HtmlPost struct {
+type TemplatePost struct {
 	UUID        string
 	Author      string
 	Email       string
@@ -55,8 +55,8 @@ func toMarkdown(data string) string {
 	return string(blackfriday.MarkdownCommon([]byte(data)))
 }
 
-func templatize(p *LatestPost) *HtmlPost {
-	return &HtmlPost{
+func xformTemplatePost(p *LatestPost) *TemplatePost {
+	return &TemplatePost{
 		p.UUID,
 		p.Author,
 		p.Email,
@@ -131,9 +131,9 @@ func HomePage(database *Database, resources *Resources) http.HandlerFunc {
 			return
 		}
 
-		rPosts := make([]*HtmlPost, 0)
+		rPosts := make([]*TemplatePost, 0)
 		for _, p := range posts {
-			rPosts = append(rPosts, templatize(p))
+			rPosts = append(rPosts, xformTemplatePost(p))
 		}
 
 		data := &HomeData{rPosts}
@@ -164,7 +164,7 @@ func PostPage(database *Database, resources *Resources) http.HandlerFunc {
 			return
 		}
 
-		data := templatize(post)
+		data := xformTemplatePost(post)
 
 		if err := page.Execute(w, data); err != nil {
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
