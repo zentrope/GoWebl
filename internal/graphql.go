@@ -24,7 +24,7 @@ const Schema = `
  }
 
  type Query {
-	 checkCreds(creds: CredInput!): Boolean!
+	 validate(creds: CredInput!): Boolean!
 	 authenticate(creds: LoginInput!): String!
 
 	 authors: [Author]!
@@ -166,7 +166,7 @@ type LoginInput struct {
 	Pass string
 }
 
-func (r *Resolver) CheckCreds(args *struct{ Creds *CredInput }) (bool, error) {
+func (r *Resolver) Validate(args *struct{ Creds *CredInput }) (bool, error) {
 	tokenString := args.Creds.Token
 	return isValidAuthToken(tokenString)
 }

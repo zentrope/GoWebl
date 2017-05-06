@@ -28,24 +28,73 @@ class Authors extends React.PureComponent {
 
 class Home extends React.PureComponent {
 
+  constructor(props) {
+    super(props)
+
+    this.state = {loggedIn : 0}
+  }
+
   render() {
-    const { endpoint, client } = this.props
+    const { client } = this.props
+    const { loggedIn } = this.state
+
+    const logout = () => {
+      this.setState({loggedIn : -1})
+      client.invalidateAuthToken()
+      localStorage.setItem("auth-token", "no-auth")
+
+    }
+
+    const login = () => {
+      client.login("keith", "test1234", (result) => {
+        console.log("login=", result)
+
+        if (!result.data.authenticate) {
+          console.log("Bad login.")
+          this.setState({loggedIn : -1})
+        } else {
+          client.setAuthToken(result.data.authenticate)
+          localStorage.setItem("auth-token", result.data.authenticate)
+          this.setState({loggedIn : 1})
+        }
+      })
+    }
 
     const check = () => {
       var token = "" + localStorage.getItem("auth-token")
 
-      client.checkCreds(token, (result) => {
-        console.log("cred check = ", result)
+      client.validate(token, (result) => {
+        if (! result.data.validate) {
+          console.log("User isn't logged in any more.")
+          this.setState({loggedIn : -1})
+        } else {
+          console.log("User is logged in.")
+          this.setState({loggedIn : 1})
+        }
       })
     }
+
+    const status = (loggedIn === 1) ? (
+      "Logged In" ) : (
+        (loggedIn === 0) ? (
+          "Maybe"
+        ) : (
+          "Logged out"
+        )
+      )
+
     return (
       <div>
-        <h1>Placeholder ({endpoint})</h1>
+        <h1>Placeholder ({status})</h1>
         <ul>
           <li><Link to="/admin/post">Posts</Link></li>
           <li><Link to="/admin/authors">Authors</Link></li>
         </ul>
         <button onClick={check}>Check Creds</button>
+        <br/>
+        <button onClick={login}>Test Login</button>
+        <br/>
+        <button onClick={logout}>Test Log Out</button>
       </div>
     )
   }
@@ -74,7 +123,7 @@ class App extends React.PureComponent {
         <section>
           <PropsRoute path="/" component={Redirect} to="/admin/home" endpoint={endpoint}/>
           <PropsRoute path="/admin" component={Redirect} to="/admin/home" endpoint={endpoint}/>
-          <PropsRoute path="/admin/home" component={Home} endpoint={endpoint} client={this.client}/>
+          <PropsRoute path="/admin/home" component={Home} client={this.client}/>
           <PropsRoute path="/admin/post" component={Posts}/>
           <PropsRoute path="/admin/authors" component={Authors}/>
         </section>

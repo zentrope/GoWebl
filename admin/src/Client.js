@@ -5,18 +5,19 @@
 // const fl = (s) =>
 //   s.replace(/\s+/g, " ")
 
-const headers =
-  { "Content-Type": "application/json; charset=utf8" }
-
-const checkCreds = (token) => {
+const validateQL = (token) => {
   return {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify({
-      query: "query CheckCreds($input: CredInput) { checkCreds(creds: $input) }",
-      operationName: "CheckCreds",
+      query: "query Validate($input: CredInput) { validate(creds: $input) }",
+      operationName: "Validate",
       variables: {input: {token: token}}
-    })
+  }
+}
+
+const loginQL = (user, pass) => {
+  return {
+    query: "query Authenticate($input: LoginInput) { authenticate(creds: $input) }",
+    operationName: "Authenticate",
+    variables: {input: {user: user, pass: pass}}
   }
 }
 
@@ -35,16 +36,48 @@ class Client {
   constructor(url, errorDelegate) {
     this.url = url + "/query"
     this.errorDelegate = errorDelegate
+    this.authToken = "no-auth"
   }
 
-  checkCreds(token, callback) {
-    fetch(this.url, checkCreds(token))
+  __mkHeaders() {
+    return {
+      "Content-Type": "application/json; charset=utf8",
+      "Authorization": "Bearer " + this.authToken
+    }
+  }
+
+  __mkPost(body) {
+    return {
+      method: 'POST',
+      headers: this.__mkHeaders(),
+      body: JSON.stringify(body)
+    }
+  }
+
+  __doQuery(ql, callback) {
+    let query = this.__mkPost(ql)
+    fetch(this.url, query)
       .then(res => checkStatus(res))
       .then(res => res.json())
       .then(data => callback(data))
       .catch(err => err.response.json()
                        .then(data => this.errorDelegate(data)))
+  }
 
+  setAuthToken(token) {
+    this.authToken = token
+  }
+
+  invalidateAuthToken() {
+    this.authToken = "no-auth"
+  }
+
+  login(user, pass, callback) {
+    this.__doQuery(loginQL(user, pass), callback)
+  }
+
+  validate(token, callback) {
+    this.__doQuery(validateQL(token), callback)
   }
 
 }
