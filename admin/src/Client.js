@@ -33,7 +33,7 @@ const checkStatus = (response) => {
 class Client {
 
   constructor(url, errorDelegate) {
-    this.url = url + "/query/"
+    this.url = url + "/query"
     this.errorDelegate = errorDelegate
   }
 

@@ -6,6 +6,7 @@ package internal
 
 import (
 	"database/sql"
+	"errors"
 
 	_ "github.com/lib/pq"
 )
@@ -17,19 +18,24 @@ type Author struct {
 	Status string
 }
 
-func (conn *Database) Authentic(handle, password string) (bool, error) {
+func (conn *Database) Authentic(handle, password string) (*Author, error) {
 
-	const q = "select handle from author where lower(handle)=lower($1) and password=$2"
+	const q = `select handle, email, type, status from author
+							where lower(handle)=lower($1) and password=$2`
 
 	rows, err := conn.db.Query(q, handle, password)
 
 	defer rows.Close()
 
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
-	return rows.Next(), err
+	if !rows.Next() {
+		return nil, errors.New("User not found.")
+	}
+
+	return rowToAuthor(rows)
 }
 
 func (conn *Database) Author(handle string) (*Author, error) {

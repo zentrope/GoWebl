@@ -82,7 +82,7 @@ func mkWebApp(resources *internal.Resources, database *internal.Database,
 
 	service.Handle("/archive", archive)
 	service.Handle("/graphql", gql)
-	service.Handle("/query/", api)
+	service.Handle("/query", api)
 	service.Handle("/post/", post)
 	service.Handle("/static/", static)
 	service.Handle("/admin/", admin)

@@ -90,6 +90,7 @@ func QueryAPI(api *GraphAPI) http.HandlerFunc {
 			"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 
 		if r.Method == "OPTIONS" {
+			log.Println("Returning options")
 			return
 		}
 
@@ -115,6 +116,7 @@ func QueryAPI(api *GraphAPI) http.HandlerFunc {
 		response := api.Schema.Exec(authCtx, params.Query, params.OperationName, params.Variables)
 		responseJSON, err := json.Marshal(response)
 		if err != nil {
+			log.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

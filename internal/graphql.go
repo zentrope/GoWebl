@@ -1,11 +1,15 @@
+// Copyright 2017 Keith Irwin. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package internal
 
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	graphql "github.com/neelance/graphql-go"
 )
 
@@ -21,6 +25,8 @@ const Schema = `
 
  type Query {
 	 checkCreds(creds: CredInput!): Boolean!
+	 authenticate(creds: LoginInput!): String!
+
 	 authors: [Author]!
 	 posts: [Post]!
  }
@@ -37,6 +43,11 @@ const Schema = `
 
  input CredInput {
 	 token: String!
+ }
+
+ input LoginInput {
+	 user: String!
+	 pass: String!
  }
 
  type Author {
@@ -85,20 +96,95 @@ func NewApi(database *Database) (*GraphAPI, error) {
 }
 
 //=============================================================================
+// Auth Tokens (JWT)
+//=============================================================================
+
+// TODO(keith): Grab from env and config
+var SECRET = []byte("thirds-and-fifths")
+
+type ViewerClaims struct {
+	User string `json:"user"`
+	Type string `json:"type"`
+	jwt.StandardClaims
+}
+
+func mkAuthToken(author *Author) (string, error) {
+	claims := ViewerClaims{
+		author.Handle, author.Type,
+		jwt.StandardClaims{
+			Issuer: "vaclav",
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(SECRET)
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
+func checkAlgKey(token *jwt.Token) (interface{}, error) {
+	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+	}
+	return SECRET, nil
+}
+
+func isValidAuthToken(tokenString string) (bool, error) {
+
+	token, err := jwt.ParseWithClaims(tokenString, &ViewerClaims{}, checkAlgKey)
+
+	if err != nil {
+		return false, err
+	}
+
+	return token.Valid, nil
+}
+
+func decodeAuthToken(tokenString string) (*ViewerClaims, error) {
+
+	token, err := jwt.ParseWithClaims(tokenString, &ViewerClaims{}, checkAlgKey)
+
+	if claims, ok := token.Claims.(*ViewerClaims); ok && token.Valid {
+		return claims, nil
+	}
+	return nil, err
+}
+
+//=============================================================================
+// Auth
+//=============================================================================
 
 type CredInput struct {
 	Token string
 }
 
-func (r *Resolver) CheckCreds(ctx context.Context,
-	args *struct{ Creds *CredInput }) (bool, error) {
+type LoginInput struct {
+	User string
+	Pass string
+}
 
-	log.Printf("Authenticate: [%v].\n", args.Creds.Token)
-	return true, nil
+func (r *Resolver) CheckCreds(args *struct{ Creds *CredInput }) (bool, error) {
+	tokenString := args.Creds.Token
+	return isValidAuthToken(tokenString)
+}
+
+func (r *Resolver) Authenticate(args *struct{ Creds *LoginInput }) (string, error) {
+	user := args.Creds.User
+	pass := args.Creds.Pass
+
+	author, err := r.Database.Authentic(user, pass)
+	if err != nil {
+		return "", err
+	}
+
+	return mkAuthToken(author)
 }
 
 //=============================================================================
-// Author
+// author
 //=============================================================================
 
 type authorResolver struct {
