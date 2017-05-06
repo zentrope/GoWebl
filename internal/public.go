@@ -82,6 +82,16 @@ func isIndexPath(prefix string, r *http.Request) bool {
 func QueryAPI(api *GraphAPI) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		logRequest(r)
+
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers",
+			"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+		if r.Method == "OPTIONS" {
+			return
+		}
 
 		var params struct {
 			Query         string                 `json:"query"`
@@ -91,6 +101,7 @@ func QueryAPI(api *GraphAPI) http.HandlerFunc {
 
 		if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			log.Println(err)
 			return
 		}
 

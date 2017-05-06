@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	graphql "github.com/neelance/graphql-go"
@@ -19,6 +20,7 @@ const Schema = `
  }
 
  type Query {
+	 checkCreds(creds: CredInput!): Boolean!
 	 authors: [Author]!
 	 posts: [Post]!
  }
@@ -31,6 +33,10 @@ const Schema = `
 	 handle: String!
 	 email: String!
 	 password: String!
+ }
+
+ input CredInput {
+	 token: String!
  }
 
  type Author {
@@ -76,6 +82,19 @@ func NewApi(database *Database) (*GraphAPI, error) {
 	}
 
 	return &GraphAPI{schema}, nil
+}
+
+//=============================================================================
+
+type CredInput struct {
+	Token string
+}
+
+func (r *Resolver) CheckCreds(ctx context.Context,
+	args *struct{ Creds *CredInput }) (bool, error) {
+
+	log.Printf("Authenticate: [%v].\n", args.Creds.Token)
+	return true, nil
 }
 
 //=============================================================================
