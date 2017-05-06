@@ -1,11 +1,10 @@
+// Copyright 2017 Keith Irwin. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package internal
 
 import "log"
-
-//
-// createuser blogsvc --createdb --superuser -P
-// createdb blogdb -O blogsvc
-//
 
 var migrations = []string{
 	"sql/01-schema.sql",
