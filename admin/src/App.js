@@ -1,3 +1,7 @@
+// Copyright 2017 Keith Irwin. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom'
 
@@ -69,8 +73,16 @@ class Home extends React.PureComponent {
           this.setState({loggedIn : -1})
         } else {
           console.log("User is logged in.")
+          client.setAuthToken(token)
+          localStorage.setItem("auth-token", token)
           this.setState({loggedIn : 1})
         }
+      })
+    }
+
+    const viewer = () => {
+      client.viewerData((result) => {
+        console.log(result.data.viewer)
       })
     }
 
@@ -93,6 +105,8 @@ class Home extends React.PureComponent {
         <button onClick={check}>Check Creds</button>
         <br/>
         <button onClick={login}>Test Login</button>
+        <br/>
+        <button onClick={viewer}>Get Viewer Data</button>
         <br/>
         <button onClick={logout}>Test Log Out</button>
       </div>

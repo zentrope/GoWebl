@@ -90,7 +90,6 @@ func QueryAPI(api *GraphAPI) http.HandlerFunc {
 			"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 
 		if r.Method == "OPTIONS" {
-			log.Println("Returning options")
 			return
 		}
 
@@ -106,9 +105,11 @@ func QueryAPI(api *GraphAPI) http.HandlerFunc {
 			return
 		}
 
-		authToken := r.Header.Get("x-auth-token")
+		authToken := r.Header.Get("Authorization")
 		if authToken == "" {
 			authToken = "NO_AUTH_TOKEN"
+		} else {
+			authToken = strings.Replace(authToken, "Bearer ", "", 1)
 		}
 
 		authCtx := context.WithValue(r.Context(), AUTH_KEY, authToken)

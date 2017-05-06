@@ -24,11 +24,21 @@ const Schema = `
  }
 
  type Query {
-	 validate(creds: CredInput!): Boolean!
-	 authenticate(creds: LoginInput!): String!
 
-	 authors: [Author]!
-	 posts: [Post]!
+	 # Client can verify the token it's using is still
+	 # good and can consider the user logged in.
+
+	 validate(token: String!): Boolean!
+
+	 # If user/pass are valid, return an auth-token.
+
+	 authenticate(user: String!, pass: String!): String!
+
+	 # Token is optional. Will retrieve from authorization header
+	 # (via context) if not provided. This is so we can run queries
+	 # outside the app.
+
+	 viewer(token: String): Viewer!
  }
 
  type Mutation {
@@ -41,13 +51,12 @@ const Schema = `
 	 password: String!
  }
 
- input CredInput {
-	 token: String!
- }
-
- input LoginInput {
+ type Viewer {
+	 id: ID!
 	 user: String!
-	 pass: String!
+	 email: String!
+	 type: String!
+	 posts: [Post]!
  }
 
  type Author {
@@ -147,9 +156,14 @@ func decodeAuthToken(tokenString string) (*ViewerClaims, error) {
 
 	token, err := jwt.ParseWithClaims(tokenString, &ViewerClaims{}, checkAlgKey)
 
+	if err != nil {
+		return nil, err
+	}
+
 	if claims, ok := token.Claims.(*ViewerClaims); ok && token.Valid {
 		return claims, nil
 	}
+
 	return nil, err
 }
 
@@ -166,14 +180,15 @@ type LoginInput struct {
 	Pass string
 }
 
-func (r *Resolver) Validate(args *struct{ Creds *CredInput }) (bool, error) {
-	tokenString := args.Creds.Token
+func (r *Resolver) Validate(args *struct{ Token string }) (bool, error) {
+	tokenString := args.Token
+	// TODO: Make sure the user in the token still exists
 	return isValidAuthToken(tokenString)
 }
 
-func (r *Resolver) Authenticate(args *struct{ Creds *LoginInput }) (string, error) {
-	user := args.Creds.User
-	pass := args.Creds.Pass
+func (r *Resolver) Authenticate(args *struct{ User, Pass string }) (string, error) {
+	user := args.User
+	pass := args.Pass
 
 	author, err := r.Database.Authentic(user, pass)
 	if err != nil {
@@ -184,7 +199,72 @@ func (r *Resolver) Authenticate(args *struct{ Creds *LoginInput }) (string, erro
 }
 
 //=============================================================================
-// author
+// Viewer
+//=============================================================================
+
+type Viewer struct {
+	ID    graphql.ID
+	User  string
+	Type  string
+	Posts []*Post
+}
+
+type viewerResolver struct {
+	database *Database
+	author   *Author
+}
+
+func (r *Resolver) Viewer(ctx context.Context, args *struct{ Token *string }) (*viewerResolver, error) {
+
+	auth := ctx.Value(AUTH_KEY).(string)
+	if args.Token != nil {
+		auth = *args.Token
+	}
+
+	claims, err := decodeAuthToken(auth)
+	if err != nil {
+		return nil, err
+	}
+
+	author, err := r.Database.Author(claims.User)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &viewerResolver{r.Database, author}, nil
+}
+
+func (v *viewerResolver) ID() graphql.ID {
+	return graphql.ID(v.author.Handle)
+}
+
+func (v *viewerResolver) User() string {
+	return v.author.Handle
+}
+
+func (v *viewerResolver) Email() string {
+	return v.author.Email
+}
+
+func (v *viewerResolver) Type() string {
+	return v.author.Type
+}
+
+func (v *viewerResolver) Posts() ([]*postResolver, error) {
+	posts, err := v.database.PostsByAuthor(v.author.Handle)
+	if err != nil {
+		return nil, err
+	}
+	var rs []*postResolver
+	for _, p := range posts {
+		rs = append(rs, &postResolver{v.database, p})
+	}
+	return rs, nil
+}
+
+//=============================================================================
+// Author
 //=============================================================================
 
 type authorResolver struct {
@@ -199,7 +279,6 @@ type AuthorInput struct {
 }
 
 func (r *Resolver) CreateAuthor(ctx context.Context, args *struct{ Author *AuthorInput }) (*authorResolver, error) {
-	fmt.Printf("AUTH: %v\n", ctx.Value(AUTH_KEY))
 	err := r.Database.CreateAuthor(args.Author.Handle, args.Author.Email, args.Author.Password)
 
 	if err != nil {
@@ -216,7 +295,6 @@ func (r *Resolver) CreateAuthor(ctx context.Context, args *struct{ Author *Autho
 }
 
 func (r *Resolver) Authors(ctx context.Context) ([]*authorResolver, error) {
-	fmt.Printf("AUTH: %v\n", ctx.Value(AUTH_KEY))
 	authors, err := r.Database.Authors()
 	if err != nil {
 		return nil, err

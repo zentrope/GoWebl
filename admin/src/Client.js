@@ -2,23 +2,34 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// const fl = (s) =>
-//   s.replace(/\s+/g, " ")
+const fl = (s) =>
+  s.replace(/\s+/g, " ")
 
 const validateQL = (token) => {
   return {
-      query: "query Validate($input: CredInput) { validate(creds: $input) }",
-      operationName: "Validate",
-      variables: {input: {token: token}}
+    query: "query Validate($token: String!) { validate(token: $token) }",
+    operationName: "Validate",
+    variables: {token: token}
   }
 }
 
 const loginQL = (user, pass) => {
+  const q = fl(`query
+    Authenticate($user: String! $pass: String!) {
+      authenticate(user: $user pass: $pass) }`)
   return {
-    query: "query Authenticate($input: LoginInput) { authenticate(creds: $input) }",
+    query: q,
     operationName: "Authenticate",
-    variables: {input: {user: user, pass: pass}}
+    variables: {user: user, pass: pass}
   }
+}
+
+const viewerQL = () => {
+  const q = fl(`query {
+    viewer { id user type email
+      posts { uuid status slugline dateCreated dateUpdated } } }
+  `)
+  return { query: q }
 }
 
 const checkStatus = (response) => {
@@ -78,6 +89,10 @@ class Client {
 
   validate(token, callback) {
     this.__doQuery(validateQL(token), callback)
+  }
+
+  viewerData(callback) {
+    this.__doQuery(viewerQL(), callback)
   }
 
 }
