@@ -29,13 +29,13 @@ init: vendor ## Make sure everything is set up properly for dev.
 build: vendor admin ## Build webl into a local binary ./webl.
 	go build
 
-clean: ## Clean build artifacts (but keep vendored/modules).
+clean: ## Clean build artifacts.
 	rm -rf webl
 	rm -rf admin/build
 
-dist-clean: clean ## Clean everything, including vendored pkgs and modules
+dist-clean: clean ## Clean everything (vendor, node_modules).
 	rm -rf vendor/*/
 	rm -rf admin/node_modules
 
 help:
-	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' | sort
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}' | sort
