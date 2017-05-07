@@ -171,15 +171,6 @@ func decodeAuthToken(tokenString string) (*ViewerClaims, error) {
 // Auth
 //=============================================================================
 
-type CredInput struct {
-	Token string
-}
-
-type LoginInput struct {
-	User string
-	Pass string
-}
-
 func (r *Resolver) Validate(args *struct{ Token string }) (bool, error) {
 	tokenString := args.Token
 	// TODO: Make sure the user in the token still exists
