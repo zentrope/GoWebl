@@ -5,14 +5,18 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Link, Redirect, Switch } from 'react-router-dom'
 
+import './StatusBar.css'
+import './TitleBar.css'
+import './WorkArea.css'
+
 class Posts extends React.PureComponent {
 
   render() {
     return (
-      <section>
+      <WorkArea>
         <h1>Posts</h1>
         <Link to="/admin/home">Home</Link>
-      </section>
+      </WorkArea>
     )
   }
 }
@@ -23,12 +27,53 @@ class Home extends React.PureComponent {
     const { viewer } = this.props
 
     return (
-      <div>
+      <WorkArea>
         <h1>[{viewer.email}]</h1>
         <ul>
           <li><Link to="/admin/post">Posts</Link></li>
         </ul>
-      </div>
+      </WorkArea>
+    )
+  }
+}
+
+
+class StatusBar extends React.PureComponent {
+  render() {
+    return (
+      <section className="StatusBar">
+        <div className="Copyright">&copy; 2017, Keith Irwin</div>
+      </section>
+    )
+  }
+}
+
+class TitleBar extends React.PureComponent {
+
+  render() {
+    const { viewer, logout } = this.props
+    const { email, user } = viewer
+
+    return (
+      <section className="TitleBar">
+        <div className="Title">Webl Admin App</div>
+        <div className="Name">
+          {user + ' <' + email + '>'}
+        </div>
+        <div className="Options">
+          <button onClick={logout}>Sign out</button>
+        </div>
+      </section>
+    )
+  }
+}
+
+class WorkArea extends React.PureComponent {
+  render() {
+    return (
+      <section className="WorkArea">
+        { this.props.children }
+      </section>
     )
   }
 }
@@ -59,7 +104,8 @@ class MainPhase extends React.PureComponent {
     return (
       <Router>
         <section>
-          <p><button onClick={logout}>log out</button> -- {viewer.id}</p>
+          <TitleBar viewer={viewer} logout={logout}/>
+          <StatusBar/>
           <Switch>
             <PropRoute path="/admin/home" component={Home} viewer={viewer}/>
             <PropRoute path="/admin/post" component={Posts}/>

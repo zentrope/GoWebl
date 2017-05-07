@@ -1,0 +1,10 @@
+.WorkArea {
+  position: fixed;
+  top: 31px;
+  bottom: 21px;
+  left: 0;
+  right: 0;
+
+  padding-left: 30px;
+  padding-right: 30px;
+}

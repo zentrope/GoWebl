@@ -1,0 +1,40 @@
+.TitleBar {
+  position: fixed;
+  top: 0;
+  left: 30px;
+  right: 30px;
+  background-color: white;
+  height: 30px;
+  border-bottom: 1px solid #369;
+
+  display: flex;
+}
+
+.TitleBar .Title {
+  width: 150px;
+  font-size: 12pt;
+  padding-top: 7px;
+  white-space: nowrap;
+}
+
+.TitleBar .Name {
+  width: 150px;
+  font-size: 10pt;
+  text-align: center;
+  padding-top: 8px;
+  color: #777;
+  font-style: italic;
+
+  white-space: nowrap;
+}
+
+.TitleBar .Options {
+  flex: 4;
+  padding-top: 4px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.TitleBar .Options button {
+  margin-left: 5px;
+}

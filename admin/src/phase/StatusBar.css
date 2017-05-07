@@ -1,0 +1,15 @@
+.StatusBar {
+  position: fixed;
+  bottom: 0;
+  left: 30px;
+  right: 30px;
+  border-top: 1px solid #369;
+  height: 20px;
+}
+
+.StatusBar .Copyright {
+  text-align: center;
+  font-size: 9pt;
+  color: #888;
+  padding-top: 2px;
+}
