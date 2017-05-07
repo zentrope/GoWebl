@@ -13,7 +13,7 @@
 .TitleBar .Title {
   width: 150px;
   font-size: 12pt;
-  padding-top: 7px;
+  padding-top: 10px;
   white-space: nowrap;
 }
 
@@ -21,7 +21,7 @@
   width: 150px;
   font-size: 10pt;
   text-align: center;
-  padding-top: 8px;
+  padding-top: 13px;
   color: #777;
   font-style: italic;
 
@@ -30,7 +30,7 @@
 
 .TitleBar .Options {
   flex: 4;
-  padding-top: 4px;
+  padding-top: 6px;
   text-align: right;
   white-space: nowrap;
 }
