@@ -53,6 +53,7 @@
   display: flex;
   margin: 0;
 
+  padding: 2px;
   background-color: white;
   border: 1px solid silver;
   border-top-left-radius: 4px;
