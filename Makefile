@@ -1,18 +1,20 @@
 PACKAGE = github.com/zentrope/webl
 
-.PHONY: admin build govendor vendor vendor-check vendor-unused help
+.PHONY: build-admin build init govendor vendor vendor-check vendor-unused help
 .DEFAULT_GOAL := help
 
 govendor:
 	@hash govendor > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		go get -u github.com/kardianos/govendor; \
+		go get -v -u github.com/kardianos/govendor; \
+	fi
+
+ricebox:
+	@hash rice > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		go get -v -u github.com/GeertJohan/go.rice/rice; \
 	fi
 
 vendor: govendor ## Install govendor and sync deps
 	govendor sync
-
-admin: ## Build the admin client
-	cd admin; yarn ; yarn build
 
 vendor-check: ## Verify that vendored packages match git HEAD
 	@git diff-index --quiet HEAD vendor/ || (echo "check-vendor target failed: vendored packages out of sync" && echo && git diff vendor/ && exit 1)
@@ -23,13 +25,18 @@ run: vendor ## Run the app from source
 vendor-unused: govendor ## Find unused vendored dependencies
 	@govendor list +unused
 
-init: vendor ## Make sure everything is set up properly for dev.
+init: vendor ricebox ## Make sure everything is set up properly for dev.
 	cd admin ; yarn
 
-build: vendor admin ## Build webl into a local binary ./webl.
+build-admin: ## Build the admin client
+	cd admin; yarn ; yarn build
+
+build: init build-admin ## Build webl into a local binary ./webl.
+	cd internal ; rm -f rice-box.go ;  rice -v embed-go
 	go build
 
 clean: ## Clean build artifacts.
+	rm -f internal/rice-box.go
 	rm -rf webl
 	rm -rf admin/build
 
