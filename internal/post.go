@@ -8,6 +8,8 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 //-----------------------------------------------------------------------------
@@ -163,6 +165,14 @@ func (conn *Database) ArchiveEntries() ([]*ArchiveEntry, error) {
 
 }
 
+func (conn *Database) CreatePost(author, slugline, status, text string) (string, error) {
+	uuid := mkUuid()
+	_, err := conn.db.Exec(
+		"insert into post (uuid, author, slugline, status, text) values ($1, $2, $3, $4, $5)",
+		uuid, author, slugline, status, text)
+	return uuid, err
+}
+
 //-----------------------------------------------------------------------------
 // Queries for GraphQL
 //-----------------------------------------------------------------------------
@@ -187,6 +197,27 @@ func (conn *Database) PostsByAuthor(handle string) ([]*Post, error) {
 		mkPostSql("where lower(author)=lower($1)"),
 		handle,
 	)
+}
+
+func (conn *Database) Post(uuid string) (*Post, error) {
+	posts, err := conn.postQuery(mkPostSql("where uuid=$1"), uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(posts) == 0 {
+		return nil, fmt.Errorf("Post by UUID[%s] not found.", uuid)
+	}
+
+	return posts[0], nil
+}
+
+//-----------------------------------------------------------------------------
+// Support
+//-----------------------------------------------------------------------------
+
+func mkUuid() string {
+	return fmt.Sprintf("%s", uuid.NewV4())
 }
 
 func (conn *Database) postQuery(query string, args ...interface{}) ([]*Post, error) {

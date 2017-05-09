@@ -43,6 +43,9 @@ const Schema = `
 
  type Mutation {
 	 createAuthor(author: AuthorInput!): Author
+
+	 # if token not present, consults context for JWT token
+	 createPost(slugline: String! status: String! text: String!, token: String): Post!
  }
 
  input AuthorInput {
@@ -167,6 +170,20 @@ func decodeAuthToken(tokenString string) (*ViewerClaims, error) {
 	return nil, err
 }
 
+func findAuthClaims(ctx context.Context, token *string) (*ViewerClaims, error) {
+	auth := ctx.Value(AUTH_KEY).(string)
+	if token != nil {
+		auth = *token
+	}
+
+	claims, err := decodeAuthToken(auth)
+	if err != nil {
+		return nil, err
+	}
+
+	return claims, nil
+}
+
 //=============================================================================
 // Auth
 //=============================================================================
@@ -207,12 +224,7 @@ type viewerResolver struct {
 
 func (r *Resolver) Viewer(ctx context.Context, args *struct{ Token *string }) (*viewerResolver, error) {
 
-	auth := ctx.Value(AUTH_KEY).(string)
-	if args.Token != nil {
-		auth = *args.Token
-	}
-
-	claims, err := decodeAuthToken(auth)
+	claims, err := findAuthClaims(ctx, args.Token)
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +281,7 @@ type AuthorInput struct {
 	Password string
 }
 
-func (r *Resolver) CreateAuthor(ctx context.Context, args *struct{ Author *AuthorInput }) (*authorResolver, error) {
+func (r *Resolver) CreateAuthor(args *struct{ Author *AuthorInput }) (*authorResolver, error) {
 	err := r.Database.CreateAuthor(args.Author.Handle, args.Author.Email, args.Author.Password)
 
 	if err != nil {
@@ -338,8 +350,38 @@ type postResolver struct {
 	post     *Post
 }
 
+func (r *Resolver) CreatePost(ctx context.Context, args *struct {
+	Slugline string
+	Status   string
+	Text     string
+	Token    *string
+}) (*postResolver, error) {
+
+	claims, err := findAuthClaims(ctx, args.Token)
+	if err != nil {
+		return nil, err
+	}
+
+	uuid, err := r.Database.CreatePost(
+		claims.User,
+		args.Slugline,
+		args.Status,
+		args.Text,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	post, err := r.Database.Post(uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &postResolver{r.Database, post}, nil
+}
+
 func (r *Resolver) Posts(ctx context.Context) ([]*postResolver, error) {
-	fmt.Printf("AUTH: %v\n", ctx.Value(AUTH_KEY))
 	posts, err := r.Database.Posts()
 	if err != nil {
 		return nil, err
