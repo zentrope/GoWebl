@@ -73,15 +73,6 @@ func (conn *Database) Authors() ([]*Author, error) {
 	return authors, nil
 }
 
-func (conn *Database) CreateAuthor(handle, email, password string) error {
-	_, err := conn.db.Exec(
-		"insert into author (handle, email, password) values ($1, $2, $3)",
-		handle, email, password,
-	)
-
-	return err
-}
-
 func rowToAuthor(rows *sql.Rows) (*Author, error) {
 	var a Author
 	err := rows.Scan(&a.Handle, &a.Email, &a.Status, &a.Type)

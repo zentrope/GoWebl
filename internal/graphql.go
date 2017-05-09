@@ -25,33 +25,27 @@ const Schema = `
 
  type Query {
 
-	 # Client can verify the token it's using is still
-	 # good and can consider the user logged in.
-
 	 validate(token: String!): Boolean!
+		 #
+		 # Client can verify the token it's using is still
+		 # good and can consider the user logged in.
 
-	 # If user/pass are valid, return an auth-token.
-
-	 authenticate(user: String!, pass: String!): String!
-
-	 # Token is optional. Will retrieve from authorization header
-	 # (via context) if not provided. This is so we can run queries
-	 # outside the app.
+	 authenticate(user: String! pass: String!): String!
+		 #
+		 # If user/pass are valid, return an auth-token.
 
 	 viewer(token: String): Viewer!
+		 #
+		 # Token is optional. Will retrieve from authorization header
+		 # (via context) if not provided. This is so we can run queries
+		 # outside the app.
  }
 
  type Mutation {
-	 createAuthor(author: AuthorInput!): Author
 
-	 # if token not present, consults context for JWT token
-	 createPost(slugline: String! status: String! text: String!, token: String): Post!
- }
-
- input AuthorInput {
-	 handle: String!
-	 email: String!
-	 password: String!
+	 createPost(slugline: String! status: String! text: String! token: String): Post!
+		 #
+		 # If token not present, consults context for JWT token
  }
 
  type Viewer {
@@ -68,7 +62,6 @@ const Schema = `
 	 email: String!
 	 type: String!
 	 status: String!
-	 posts: [Post]!
  }
 
  type Post {
@@ -275,28 +268,6 @@ type authorResolver struct {
 	author   *Author
 }
 
-type AuthorInput struct {
-	Handle   string
-	Email    string
-	Password string
-}
-
-func (r *Resolver) CreateAuthor(args *struct{ Author *AuthorInput }) (*authorResolver, error) {
-	err := r.Database.CreateAuthor(args.Author.Handle, args.Author.Email, args.Author.Password)
-
-	if err != nil {
-		return nil, err
-	}
-
-	author, err := r.Database.Author(args.Author.Handle)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &authorResolver{r.Database, author}, nil
-}
-
 func (r *Resolver) Authors(ctx context.Context) ([]*authorResolver, error) {
 	authors, err := r.Database.Authors()
 	if err != nil {
@@ -327,18 +298,6 @@ func (r *authorResolver) Type() string {
 
 func (r *authorResolver) Status() string {
 	return r.author.Status
-}
-
-func (r *authorResolver) Posts() ([]*postResolver, error) {
-	posts, err := r.database.PostsByAuthor(r.author.Handle)
-	if err != nil {
-		return nil, err
-	}
-	var rs []*postResolver
-	for _, p := range posts {
-		rs = append(rs, &postResolver{r.database, p})
-	}
-	return rs, nil
 }
 
 //=============================================================================
