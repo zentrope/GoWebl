@@ -18,25 +18,29 @@
 			"checksumSHA1": "8i+beEgcVf0q/I7lTqo2ERZM/OU=",
 			"path": "github.com/daaku/go.zipexe",
 			"revision": "a5fe2436ffcb3236e175e5149162b41cd28bd27d",
-			"revisionTime": "2015-03-29T02:31:25Z"
+			"revisionTime": "2015-03-29T02:31:25Z",
+			"tree": true
 		},
 		{
-			"checksumSHA1": "2Fy1Y6Z3lRRX1891WF/+HT4XS2I=",
+			"checksumSHA1": "UfaJE86QfcBdh4/rPss09nA9P3g=",
 			"path": "github.com/dgrijalva/jwt-go",
-			"revision": "2268707a8f0843315e2004ee4f1d021dc08baedf",
-			"revisionTime": "2017-02-01T22:58:49Z"
+			"revision": "6c8dedd55f8a2e41f605de6d5d66e51ed1f299fc",
+			"revisionTime": "2017-05-08T16:54:58Z",
+			"tree": true
 		},
 		{
 			"checksumSHA1": "VBXGouqOkPe3OkeJnyUBkx3aZXA=",
 			"path": "github.com/imdario/mergo",
 			"revision": "d806ba8c21777d504a2090a2ca4913c750dd3a33",
-			"revisionTime": "2017-03-26T20:45:27Z"
+			"revisionTime": "2017-03-26T20:45:27Z",
+			"tree": true
 		},
 		{
 			"checksumSHA1": "eWtEV0iBNTL6DRJVqEeniS+thHA=",
 			"path": "github.com/kardianos/osext",
 			"revision": "9d302b58e975387d0b4d9be876622c86cefe64be",
-			"revisionTime": "2017-03-09T17:28:38Z"
+			"revisionTime": "2017-03-09T17:28:38Z",
+			"tree": true
 		},
 		{
 			"checksumSHA1": "uTUsjF7bymOuKvXbW2BpkK/w4Vg=",
@@ -153,22 +157,25 @@
 			"revisionTime": "2017-04-05T14:58:39Z"
 		},
 		{
-			"checksumSHA1": "K79H77/Wj89RB1no+o+G8ePeRDE=",
+			"checksumSHA1": "MnRnniTE94p6DieveIFQxx3PArg=",
 			"path": "github.com/russross/blackfriday",
-			"revision": "b253417e1cb644d645a0a3bb1fa5034c8030127c",
-			"revisionTime": "2017-04-13T17:36:32Z"
+			"revision": "0ba0f2b6ed7c475a92e4df8641825cb7a11d1fa3",
+			"revisionTime": "2017-05-09T06:07:14Z",
+			"tree": true
 		},
 		{
 			"checksumSHA1": "VE58NR7GGkZe2A+htz5kC39SHF0=",
 			"path": "github.com/shurcooL/sanitized_anchor_name",
 			"revision": "79c90efaf01eddc01945af5bc1797859189b830b",
-			"revisionTime": "2017-04-23T18:15:05Z"
+			"revisionTime": "2017-04-23T18:15:05Z",
+			"tree": true
 		},
 		{
-			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",
+			"checksumSHA1": "N9/rBjQ7Srw2cLmjw94JCWw08mg=",
 			"path": "golang.org/x/net/context",
-			"revision": "0b588ed7a0cd59c271d128ec8c429c1c1607e8ab",
-			"revisionTime": "2017-04-21T11:32:07Z"
+			"revision": "feeb485667d1fdabe727840fe00adc22431bc86e",
+			"revisionTime": "2017-05-02T17:39:58Z",
+			"tree": true
 		}
 	],
 	"rootPath": "github.com/zentrope/webl"
