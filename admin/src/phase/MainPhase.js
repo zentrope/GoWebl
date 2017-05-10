@@ -6,6 +6,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 
 import './StatusBar.css'
+import './Tabular.css'
 import './TitleBar.css'
 import './WorkArea.css'
 
@@ -22,33 +23,59 @@ class DateShow extends React.PureComponent {
   }
 }
 
+class TabularView extends React.PureComponent {
+
+  render() {
+    const { columns, render, data } = this.props
+
+    const headers = (
+      <thead>
+        <tr>
+          { columns.map(c => <th key={c}>{ c }</th>) }
+        </tr>
+      </thead>
+    );
+
+    let table = null
+    if (data) {
+      table = (
+        <tbody>
+          { data.map(d => render(d)) }
+        </tbody>
+      )
+    }
+
+    return (
+      <div className="Tabular">
+        <table>
+          { headers }
+          { table }
+        </table>
+      </div>
+    )
+  }
+}
+
 class Posts extends React.PureComponent {
 
   render() {
     const { posts } = this.props
 
-    const renderPost = p =>
-      <tr key={p.uuid}>
-        <td className={p.status}>{p.status}</td>
-        <td><a>{p.slugline}</a></td>
-        <td><DateShow date={p.dateCreated}/></td>
-        <td><DateShow date={p.dateUpdated}/></td>
-      </tr>
+    const renderPost = p => {
+      return (
+        <tr key={p.uuid}>
+          <td className={p.status}>{p.status}</td>
+          <td><a>{p.slugline}</a></td>
+          <td><DateShow date={p.dateCreated}/></td>
+          <td><DateShow date={p.dateUpdated}/></td>
+        </tr>
+      )
+    }
+
+    const cols = ["status", "slugline", "created", "updated"]
 
     return (
-      <table>
-        <thead>
-          <tr>
-            <th>status</th>
-            <th>slugline</th>
-            <th>created</th>
-            <th>updated</th>
-          </tr>
-        </thead>
-        <tbody>
-          { posts ? posts.map(p => renderPost(p)) : null }
-        </tbody>
-      </table>
+      <TabularView columns={cols} data={posts} render={renderPost}/>
     )
   }
 }

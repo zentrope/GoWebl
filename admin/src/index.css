@@ -16,6 +16,7 @@ html, body {
 a {
   color: #369;
   text-decoration: none;
+  cursor: pointer;
 }
 
 a:hover {
