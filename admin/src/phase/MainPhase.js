@@ -5,12 +5,95 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 
+import './MarkdownEditor.css'
 import './StatusBar.css'
 import './Tabular.css'
 import './TitleBar.css'
 import './WorkArea.css'
 
 const moment = require('moment')
+const markdown = require('markdown-it')()
+  .use(require('markdown-it-footnote'))
+
+class MarkdownEditor extends React.PureComponent {
+
+  constructor(props) {
+    super(props)
+
+    this.state = {slugline: "", text: "", showPreview : false}
+
+    this.handleChange = this.handleChange.bind(this)
+    this.togglePreview = this.togglePreview.bind(this)
+    this.isSubmittable = this.isSubmittable.bind(this)
+  }
+
+  handleChange(event) {
+    const name = event.target.name
+    const value = event.target.value
+    this.setState({[name]: value})
+  }
+
+  togglePreview() {
+    const show = ! this.state.showPreview
+    this.setState({showPreview: show})
+  }
+
+  isSubmittable() {
+    const t = this.state.text.trim()
+    const s = this.state.slugline.trim()
+    return (s.length >= 3) && (t.length >= 3)
+  }
+
+  render() {
+    const { onSave, onCancel, onPublish } = this.props
+    const { slugline, text, showPreview } = this.state
+
+    const html = showPreview ? markdown.render(text) : ""
+
+    const preview = showPreview ? (
+      <div className="Html" dangerouslySetInnerHTML={{__html: html}}/>
+    ) : (
+      null
+    )
+
+    return (
+      <section className="MarkdownEditor">
+        <div className="Slugline">
+          <input name="slugline"
+                 autoFocus={true}
+                 type="text"
+                 value={slugline}
+                 placeholder="Summary or slugline...."
+                 onChange={this.handleChange}/>
+        </div>
+        <div className="Editor">
+          <div className={"Text" + (showPreview ? "" : " Full")}>
+            <textarea name="text"
+                      autoFocus={false}
+                      placeholder="Thoughts?"
+                      value={text}
+                      onChange={this.handleChange}/>
+          </div>
+          { preview }
+        </div>
+        <div className="Controls">
+          <button disabled={!this.isSubmittable()} onClick={onSave}>
+            Save draft
+          </button>
+          <button  disabled={!this.isSubmittable()} onClick={onPublish}>
+            Publish
+          </button>
+          <button onClick={this.togglePreview}>
+            { showPreview ? "Hide Preview" : "Show Preview" }
+          </button>
+          <button onClick={onCancel}>
+            Cancel
+          </button>
+        </div>
+      </section>
+    )
+  }
+}
 
 class DateShow extends React.PureComponent {
   render () {
@@ -82,13 +165,49 @@ class Posts extends React.PureComponent {
 
 class Home extends React.PureComponent {
 
+  constructor(props) {
+    super(props)
+
+    this.state = { showEditor: false }
+
+    this.savePost = this.savePost.bind(this)
+    this.publishPost = this.publishPost.bind(this)
+    this.hideEditor = this.hideEditor.bind(this)
+    this.showEditor = this.showEditor.bind(this)
+  }
+
+  savePost() {
+    console.log("save draft of post -> not implemented")
+  }
+
+  publishPost() {
+    console.log("publish post -> not implemented")
+  }
+
+  showEditor() {
+    this.setState({showEditor: true})
+  }
+
+  hideEditor() {
+    this.setState({showEditor: false})
+  }
 
   render() {
     const { viewer } = this.props
+    const { showEditor } = this.state
+
+    const editor = showEditor === true ? (
+      <MarkdownEditor onPublish={this.publishPost}
+                      onCancel={this.hideEditor}
+                      onSave={this.savePost}/>
+    ) : (
+      <button onClick={this.showEditor}>New post</button>
+    )
 
     return (
       <WorkArea>
         <h1>Webl Posts</h1>
+        {editor}
         <Posts posts={viewer.posts}/>
       </WorkArea>
     )

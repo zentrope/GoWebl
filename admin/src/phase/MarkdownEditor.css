@@ -1,0 +1,110 @@
+/*
+**  Copyright 2017 Keith Irwin. All rights reserved.
+**  Use of this source code is governed by a BSD-style
+**  license that can be found in the LICENSE file.
+*/
+
+.MarkdownEditor {
+  height: 66%;
+  position: relative;
+}
+
+.MarkdownEditor .Slugline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  display: flex;
+  border: 1px solid #d8d8d8;
+  border-bottom: none;
+
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.MarkdownEditor .Slugline input {
+  flex: 1;
+  margin: 0;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-size: 12pt;
+  border: 0;
+  outline: none;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.MarkdownEditor .Editor {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  bottom: 30px;
+  display: flex;
+}
+
+.MarkdownEditor .Editor .Text {
+  flex: 1;
+  display: flex;
+  border: 1px solid #d8d8d8;
+  border-bottom-left-radius: 4px;
+}
+
+.MarkdownEditor .Editor .Text.Full {
+  border-bottom-right-radius: 4px;
+}
+
+.MarkdownEditor .Editor .Text textarea {
+  flex: 1;
+  margin: 0;
+  padding: 20px;
+  font-family: menlo, monaco, monospace;
+  font-size: 10pt;
+  outline: none;
+  resize: none;
+  border: 0;
+  background-color: #f8f8f8;
+  line-height: 1.6;
+  color: black;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.MarkdownEditor .Editor .Html {
+  flex: 1;
+  padding: 0px;
+  padding-left: 20px;
+  padding-right: 20px;
+
+  border: 1px solid #d8d8d8;
+  border-left: 0;
+  overflow: auto;
+
+  background-color: #f6f6f6;
+  border-bottom-right-radius: 4px;
+}
+
+.MarkdownEditor .Editor .Html h1 {
+  font-size: 20pt;
+  color: #369;
+}
+
+.MarkdownEditor .Editor .Html h2 {
+  color: darkred;
+}
+
+.MarkdownEditor .Editor .Html pre {
+  font-size: 12pt;
+  color: #369;
+  margin: 20px;
+}
+
+
+.MarkdownEditor .Controls {
+  margin-top: 10px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
