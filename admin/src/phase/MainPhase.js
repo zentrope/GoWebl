@@ -9,6 +9,19 @@ import './StatusBar.css'
 import './TitleBar.css'
 import './WorkArea.css'
 
+const moment = require('moment')
+
+class DateShow extends React.PureComponent {
+  render () {
+    const { date } = this.props
+    const show = moment(date).format("D MMM YY - hh:mm A")
+
+    return (
+      <span className="DateShow">{ show }</span>
+    )
+  }
+}
+
 class Posts extends React.PureComponent {
 
   render() {
@@ -18,7 +31,8 @@ class Posts extends React.PureComponent {
       <tr key={p.uuid}>
         <td className={p.status}>{p.status}</td>
         <td><a>{p.slugline}</a></td>
-        <td>{p.dateCreated}</td>
+        <td><DateShow date={p.dateCreated}/></td>
+        <td><DateShow date={p.dateUpdated}/></td>
       </tr>
 
     return (
@@ -28,6 +42,7 @@ class Posts extends React.PureComponent {
             <th>status</th>
             <th>slugline</th>
             <th>created</th>
+            <th>updated</th>
           </tr>
         </thead>
         <tbody>
