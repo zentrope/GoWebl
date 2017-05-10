@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 import React from 'react';
-import { BrowserRouter as Router, Route, Link, Redirect, Switch } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 
 import './StatusBar.css'
 import './TitleBar.css'
@@ -12,26 +12,42 @@ import './WorkArea.css'
 class Posts extends React.PureComponent {
 
   render() {
+    const { posts } = this.props
+
+    const renderPost = p =>
+      <tr key={p.uuid}>
+        <td className={p.status}>{p.status}</td>
+        <td><a>{p.slugline}</a></td>
+        <td>{p.dateCreated}</td>
+      </tr>
+
     return (
-      <WorkArea>
-        <h1>Posts</h1>
-        <Link to="/admin/home">Home</Link>
-      </WorkArea>
+      <table>
+        <thead>
+          <tr>
+            <th>status</th>
+            <th>slugline</th>
+            <th>created</th>
+          </tr>
+        </thead>
+        <tbody>
+          { posts ? posts.map(p => renderPost(p)) : null }
+        </tbody>
+      </table>
     )
   }
 }
 
 class Home extends React.PureComponent {
 
+
   render() {
     const { viewer } = this.props
 
     return (
       <WorkArea>
-        <h1>[{viewer.email}]</h1>
-        <ul>
-          <li><Link to="/admin/post">Posts</Link></li>
-        </ul>
+        <h1>Webl Posts</h1>
+        <Posts posts={viewer.posts}/>
       </WorkArea>
     )
   }
@@ -55,7 +71,7 @@ class TitleBar extends React.PureComponent {
 
     return (
       <section className="TitleBar">
-        <div className="Title">Webl Admin App</div>
+        <div className="Title">Administration</div>
         <div className="Name">
           {user + ' <' + email + '>'}
         </div>
@@ -107,7 +123,6 @@ class MainPhase extends React.PureComponent {
           <StatusBar/>
           <Switch>
             <PropRoute path="/admin/home" component={Home} viewer={viewer}/>
-            <PropRoute path="/admin/post" component={Posts}/>
             <Redirect to="/admin/home"/>
           </Switch>
         </section>
