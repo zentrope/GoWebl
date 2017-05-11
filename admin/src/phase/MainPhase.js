@@ -5,148 +5,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 
+import { DateShow } from '../component/DateShow'
 import { Icon } from '../component/Icon'
-
-import './MarkdownEditor.css'
-import './StatusBar.css'
-import './Tabular.css'
-import './TitleBar.css'
-import './WorkArea.css'
-
-const moment = require('moment')
-const markdown = require('markdown-it')()
-  .use(require('markdown-it-footnote'))
-
-class MarkdownEditor extends React.PureComponent {
-
-  constructor(props) {
-    super(props)
-
-    this.state = {slugline: "", text: "", showPreview : false}
-
-    this.handleChange = this.handleChange.bind(this)
-    this.togglePreview = this.togglePreview.bind(this)
-    this.isSubmittable = this.isSubmittable.bind(this)
-    this.savePost = this.savePost.bind(this)
-  }
-
-  handleChange(event) {
-    const name = event.target.name
-    const value = event.target.value
-    this.setState({[name]: value})
-  }
-
-  togglePreview() {
-    const show = ! this.state.showPreview
-    this.setState({showPreview: show})
-  }
-
-  isSubmittable() {
-    const t = this.state.text.trim()
-    const s = this.state.slugline.trim()
-    return (s.length >= 3) && (t.length >= 3)
-  }
-
-  savePost() {
-    const { onSave } = this.props
-    onSave(this.state.slugline, this.state.text)
-  }
-
-  render() {
-    const { onCancel, onPublish } = this.props
-    const { slugline, text, showPreview } = this.state
-
-    const html = showPreview ? markdown.render(text) : ""
-
-    const preview = showPreview ? (
-      <div className="Html" dangerouslySetInnerHTML={{__html: html}}/>
-    ) : (
-      null
-    )
-
-    return (
-      <section className="MarkdownEditor">
-        <div className="Slugline">
-          <input name="slugline"
-                 autoFocus={true}
-                 type="text"
-                 value={slugline}
-                 placeholder="Summary or slugline...."
-                 onChange={this.handleChange}/>
-        </div>
-        <div className="Editor">
-          <div className={"Text" + (showPreview ? "" : " Full")}>
-            <textarea name="text"
-                      autoFocus={false}
-                      placeholder="Thoughts?"
-                      value={text}
-                      onChange={this.handleChange}/>
-          </div>
-          { preview }
-        </div>
-        <div className="Controls">
-          <button disabled={!this.isSubmittable()}
-                  onClick={this.savePost}>
-            Save draft
-          </button>
-          <button  disabled={!this.isSubmittable()} onClick={onPublish}>
-            Publish
-          </button>
-          <button onClick={this.togglePreview}>
-            { showPreview ? "Hide Preview" : "Show Preview" }
-          </button>
-          <button onClick={onCancel}>
-            Cancel
-          </button>
-        </div>
-      </section>
-    )
-  }
-}
-
-class DateShow extends React.PureComponent {
-  render () {
-    const { date } = this.props
-    const show = moment(date).format("D MMM YY - hh:mm A")
-
-    return (
-      <span className="DateShow">{ show }</span>
-    )
-  }
-}
-
-class TabularView extends React.PureComponent {
-
-  render() {
-    const { columns, render, data } = this.props
-
-    const headers = (
-      <thead>
-        <tr>
-          { columns.map(c => <th key={Math.random()}>{ c }</th>) }
-        </tr>
-      </thead>
-    );
-
-    let table = null
-    if (data) {
-      table = (
-        <tbody>
-          { data.map(d => render(d)) }
-        </tbody>
-      )
-    }
-
-    return (
-      <div className="Tabular">
-        <table>
-          { headers }
-          { table }
-        </table>
-      </div>
-    )
-  }
-}
+import { MarkdownEditor } from '../component/MarkdownEditor'
+import { StatusBar } from '../component/StatusBar'
+import { Tabular } from '../component/Tabular'
+import { TitleBar } from '../component/TitleBar'
+import { WorkArea } from '../component/WorkArea'
 
 class Posts extends React.PureComponent {
 
@@ -176,7 +41,7 @@ class Posts extends React.PureComponent {
     const cols = [null, "slugline", "created", "updated", null]
 
     return (
-      <TabularView columns={cols} data={posts} render={renderPost}/>
+      <Tabular columns={cols} data={posts} render={renderPost}/>
     )
   }
 }
@@ -232,50 +97,10 @@ class Home extends React.PureComponent {
 
     return (
       <WorkArea>
-        <h1>Webl Posts</h1>
+        <h1>{viewer.user}'s posts</h1>
         {editor}
         <Posts posts={viewer.posts}/>
       </WorkArea>
-    )
-  }
-}
-
-class StatusBar extends React.PureComponent {
-  render() {
-    return (
-      <section className="StatusBar">
-        <div className="Copyright">&copy; 2017, Keith Irwin</div>
-      </section>
-    )
-  }
-}
-
-class TitleBar extends React.PureComponent {
-
-  render() {
-    const { viewer, logout } = this.props
-    const { email, user } = viewer
-
-    return (
-      <section className="TitleBar">
-        <div className="Title">Administration</div>
-        <div className="Name">
-          {user + ' <' + email + '>'}
-        </div>
-        <div className="Options">
-          <button onClick={logout}>Sign out</button>
-        </div>
-      </section>
-    )
-  }
-}
-
-class WorkArea extends React.PureComponent {
-  render() {
-    return (
-      <section className="WorkArea">
-        { this.props.children }
-      </section>
     )
   }
 }
@@ -322,8 +147,8 @@ class MainPhase extends React.PureComponent {
     return (
       <Router>
         <section className="App">
-          <TitleBar viewer={viewer} logout={logout}/>
-          <StatusBar/>
+          <TitleBar title="Webl Manager" user={viewer.email} logout={logout}/>
+          <StatusBar year="2017" copyright="Keith Irwin"/>
           <Switch>
             <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} dispatch={this.dispatch}/>
             <Redirect to="/admin/home"/>
