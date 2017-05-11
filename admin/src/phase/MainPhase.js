@@ -5,6 +5,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 
+import { Icon } from '../component/Icon'
+
 import './MarkdownEditor.css'
 import './StatusBar.css'
 import './Tabular.css'
@@ -121,7 +123,7 @@ class TabularView extends React.PureComponent {
     const headers = (
       <thead>
         <tr>
-          { columns.map(c => <th key={c}>{ c }</th>) }
+          { columns.map(c => <th key={Math.random()}>{ c }</th>) }
         </tr>
       </thead>
     );
@@ -154,15 +156,24 @@ class Posts extends React.PureComponent {
     const renderPost = p => {
       return (
         <tr key={p.uuid}>
-          <td className={p.status}>{p.status}</td>
-          <td><a>{p.slugline}</a></td>
-          <td><DateShow date={p.dateCreated}/></td>
-          <td><DateShow date={p.dateUpdated}/></td>
+          <td width="1%">
+            <Icon type={p.status} color={p.status}/>
+          </td>
+          <td width="40%"><a>{p.slugline}</a></td>
+          <td width="29%"><DateShow date={p.dateCreated}/></td>
+          <td width="29%"><DateShow date={p.dateUpdated}/></td>
+          <td width="1%">
+            <center>
+              <Icon type="edit" color="blue"/>
+              <span> </span>
+              <Icon type="delete" color="blue"/>
+            </center>
+          </td>
         </tr>
       )
     }
 
-    const cols = ["status", "slugline", "created", "updated"]
+    const cols = [null, "slugline", "created", "updated", null]
 
     return (
       <TabularView columns={cols} data={posts} render={renderPost}/>
