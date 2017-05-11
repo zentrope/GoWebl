@@ -2,7 +2,47 @@
 
 Learning golang.
 
-## Notes
+## Goal
+
+A single binary (except the Postgres database) that can render blog posts via cacheable server-side templates (to allow for search engines) as well as create and edit them via an interactive single-page client app. Normally, you'd serve both client and API via a web-proxy, etc, etc, but I want to see how close I can get to the JVM world's `uberjar` concept.
+
+## Quick Start
+
+Assuming you've got a database going using the defaults (see below):
+
+    $ make build
+    $ ./webl
+
+And if you want to point to a configuration file:
+
+    $ ./webl -c /path/to/config.json
+
+The config file should be a sparse version of what you can see in `./resources/config.json`. The default looks like:
+
+```javascript
+{
+  "storage": {
+    "user" : "blogsvc",
+    "password": "wanheda",
+    "database": "blogdb",
+    "host": "localhost",
+    "port": "5432"
+  },
+  "web": {
+    "port": "8080"
+  }
+}
+```
+
+By "sparse" I mean that if you just want to change the web port, you can create a file with only that setting in it:
+
+```javascript
+{ "web": { "port" : "3001" } }
+```
+
+And the app will merge that into the defaults. No need to copy the defaults and tweak. Just change the ones you need to change and omit the rest.
+
+## Database Notes
 
 **Default (dev) database params**
 
