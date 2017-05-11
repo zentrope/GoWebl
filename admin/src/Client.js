@@ -5,6 +5,19 @@
 const fl = (s) =>
   s.replace(/\s+/g, " ")
 
+const setPostStatusQL = (uuid, isPublished) => {
+  const q = fl(`mutation
+    SetPostStatus($uuid: String!, $isPublished: Boolean!) {
+      setPostStatus(uuid: $uuid, isPublished: $isPublished) {
+        uuid slugline status dateCreated dateUpdated text}}`)
+
+  return {
+    query: q,
+    operationName: "SetPostStatus",
+    variables: { uuid: uuid, isPublished: isPublished }
+  }
+}
+
 const createPostQL = (slugline, status, text) => {
   const q = fl(`mutation
     CreatePost($slugline: String! $status: String! $text: String! $token: String) {
@@ -116,6 +129,9 @@ class Client {
     this.__doQuery(createPostQL(slugline, status, text), callback)
   }
 
+  setPostStatus(uuid, isPublished, callback) {
+    this.__doQuery(setPostStatusQL(uuid, isPublished), callback)
+  }
 }
 
 export { Client }

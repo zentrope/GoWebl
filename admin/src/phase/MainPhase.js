@@ -5,6 +5,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 
+import { Action } from '../component/Action'
 import { DateShow } from '../component/DateShow'
 import { Icon } from '../component/Icon'
 import { MarkdownEditor } from '../component/MarkdownEditor'
@@ -16,13 +17,21 @@ import { WorkArea } from '../component/WorkArea'
 class Posts extends React.PureComponent {
 
   render() {
-    const { posts } = this.props
+    const { posts, dispatch } = this.props
+
+    const toggleStatus = (post) => () => {
+      let t = post.status === "published" ? "draft" : "published"
+      if (window.confirm("Set '" + post.slugline + "' status to '" + t + "'?")) {
+        const msg = {uuid: post.uuid, isPublished: post.status === "draft"}
+        dispatch("post/status", msg)
+      }
+    }
 
     const renderPost = p => {
       return (
         <tr key={p.uuid}>
           <td width="1%">
-            <Icon type={p.status} color={p.status}/>
+            <Action type={p.status} color={p.status} onClick={toggleStatus(p)}/>
           </td>
           <td width="40%"><a>{p.slugline}</a></td>
           <td width="29%"><DateShow date={p.dateCreated}/></td>
@@ -84,7 +93,7 @@ class Home extends React.PureComponent {
   }
 
   render() {
-    const { viewer } = this.props
+    const { viewer, dispatch } = this.props
     const { showEditor } = this.state
 
     const editor = showEditor === true ? (
@@ -99,7 +108,7 @@ class Home extends React.PureComponent {
       <WorkArea>
         <h1>{viewer.user}'s posts</h1>
         {editor}
-        <Posts posts={viewer.posts}/>
+        <Posts posts={viewer.posts} dispatch={dispatch}/>
       </WorkArea>
     )
   }
@@ -112,9 +121,14 @@ class MainPhase extends React.PureComponent {
     this.state = {viewer: {}}
 
     this.dispatch = this.dispatch.bind(this)
+    this.refresh = this.refresh.bind(this)
   }
 
   componentWillMount() {
+    this.refresh()
+  }
+
+  refresh() {
     const { client } = this.props
     client.viewerData(response => {
       const data = response.data.viewer
@@ -123,6 +137,7 @@ class MainPhase extends React.PureComponent {
   }
 
   dispatch(event, data) {
+    const { client } = this.props
     console.log("event>", event)
     switch (event) {
       case 'post/add':
@@ -131,8 +146,19 @@ class MainPhase extends React.PureComponent {
         this.setState({viewer: viewer})
         this.forceUpdate() // yikes!
         break
+      case 'post/status':
+        client.setPostStatus(data.uuid, data.isPublished, (response) => {
+          const updated = response.data.setPostStatus
+          const errors = response.errors
+          if (updated) {
+            this.refresh() // should fold into existing data
+          } else {
+            console.log(errors)
+          }
+        })
+        break
       default:
-        console.log("Unable to handle event.")
+        console.log("Unable to handle event.", data)
     }
   }
 

@@ -1,0 +1,7 @@
+.Action {
+  cursor: pointer;
+}
+
+.Action:active {
+  opacity: 0.5;
+}

@@ -212,6 +212,29 @@ func (conn *Database) Post(uuid string) (*Post, error) {
 	return posts[0], nil
 }
 
+type PostStatus int
+
+const (
+	PS_Published PostStatus = iota
+	PS_Draft
+)
+
+func (conn *Database) SetPostStatus(uuid, author string, status PostStatus) (*Post, error) {
+	s := "draft"
+	if status == PS_Published {
+		s = "published"
+	}
+
+	q := "update post set status=$1 where uuid=$2 and author=$3"
+
+	_, err := conn.db.Exec(q, s, uuid, author)
+	if err != nil {
+		return nil, err
+	}
+
+	return conn.Post(uuid)
+}
+
 //-----------------------------------------------------------------------------
 // Support
 //-----------------------------------------------------------------------------

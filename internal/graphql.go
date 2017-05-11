@@ -42,10 +42,8 @@ const Schema = `
  }
 
  type Mutation {
-
 	 createPost(slugline: String! status: String! text: String! token: String): Post!
-		 #
-		 # If token not present, consults context for JWT token
+	 setPostStatus(uuid: String! isPublished: Boolean!): Post!
  }
 
  type Viewer {
@@ -333,6 +331,29 @@ func (r *Resolver) CreatePost(ctx context.Context, args *struct {
 	}
 
 	post, err := r.Database.Post(uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &postResolver{r.Database, post}, nil
+}
+
+func (r *Resolver) SetPostStatus(ctx context.Context, args *struct {
+	Uuid        string
+	IsPublished bool
+}) (*postResolver, error) {
+
+	claims, err := findAuthClaims(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	status := PS_Draft
+	if args.IsPublished {
+		status = PS_Published
+	}
+
+	post, err := r.Database.SetPostStatus(args.Uuid, claims.User, status)
 	if err != nil {
 		return nil, err
 	}
