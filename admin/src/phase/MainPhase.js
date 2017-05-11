@@ -25,6 +25,7 @@ class MarkdownEditor extends React.PureComponent {
     this.handleChange = this.handleChange.bind(this)
     this.togglePreview = this.togglePreview.bind(this)
     this.isSubmittable = this.isSubmittable.bind(this)
+    this.savePost = this.savePost.bind(this)
   }
 
   handleChange(event) {
@@ -44,8 +45,13 @@ class MarkdownEditor extends React.PureComponent {
     return (s.length >= 3) && (t.length >= 3)
   }
 
+  savePost() {
+    const { onSave } = this.props
+    onSave(this.state.slugline, this.state.text)
+  }
+
   render() {
-    const { onSave, onCancel, onPublish } = this.props
+    const { onCancel, onPublish } = this.props
     const { slugline, text, showPreview } = this.state
 
     const html = showPreview ? markdown.render(text) : ""
@@ -77,7 +83,8 @@ class MarkdownEditor extends React.PureComponent {
           { preview }
         </div>
         <div className="Controls">
-          <button disabled={!this.isSubmittable()} onClick={onSave}>
+          <button disabled={!this.isSubmittable()}
+                  onClick={this.savePost}>
             Save draft
           </button>
           <button  disabled={!this.isSubmittable()} onClick={onPublish}>
@@ -176,8 +183,16 @@ class Home extends React.PureComponent {
     this.showEditor = this.showEditor.bind(this)
   }
 
-  savePost() {
-    console.log("save draft of post -> not implemented")
+  savePost(slugline, text) {
+    const { client, dispatch } = this.props
+    client.savePost(slugline, text, "draft", (data) => {
+      const newPost = data.data.createPost
+      if (newPost) {
+        dispatch('post/add', newPost)
+      } else {
+        console.error(data)
+      }
+    })
   }
 
   publishPost() {
@@ -259,6 +274,8 @@ class MainPhase extends React.PureComponent {
   constructor(props) {
     super(props)
     this.state = {viewer: {}}
+
+    this.dispatch = this.dispatch.bind(this)
   }
 
   componentWillMount() {
@@ -269,8 +286,22 @@ class MainPhase extends React.PureComponent {
     })
   }
 
+  dispatch(event, data) {
+    console.log("event>", event)
+    switch (event) {
+      case 'post/add':
+        const viewer = this.state.viewer;
+        viewer.posts.push(data)
+        this.setState({viewer: viewer})
+        this.forceUpdate() // yikes!
+        break
+      default:
+        console.log("Unable to handle event.")
+    }
+  }
+
   render() {
-    const { logout } = this.props
+    const { logout, client } = this.props
     const { viewer } = this.state
 
     const PropRoute = ({component: Component, path: Path, ...rest}) => (
@@ -279,11 +310,11 @@ class MainPhase extends React.PureComponent {
 
     return (
       <Router>
-        <section>
+        <section className="App">
           <TitleBar viewer={viewer} logout={logout}/>
           <StatusBar/>
           <Switch>
-            <PropRoute path="/admin/home" component={Home} viewer={viewer}/>
+            <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} dispatch={this.dispatch}/>
             <Redirect to="/admin/home"/>
           </Switch>
         </section>

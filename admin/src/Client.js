@@ -5,6 +5,23 @@
 const fl = (s) =>
   s.replace(/\s+/g, " ")
 
+const createPostQL = (slugline, status, text) => {
+  const q = fl(`mutation
+    CreatePost($slugline: String! $status: String! $text: String! $token: String) {
+      createPost(slugline: $slugline, status: $status, text: $text, token: $token) {
+        uuid slugline status dateCreated dateUpdated text }}`)
+
+  return {
+    query: q,
+    operationName: "CreatePost",
+    variables: {
+      slugline: slugline,
+      status: status,
+      text: text,
+    }
+  }
+}
+
 const validateQL = (token) => {
   return {
     query: "query Validate($token: String!) { validate(token: $token) }",
@@ -27,7 +44,7 @@ const loginQL = (user, pass) => {
 const viewerQL = () => {
   const q = fl(`query {
     viewer { id user type email
-      posts { uuid status slugline dateCreated dateUpdated } } }
+      posts { uuid status slugline dateCreated dateUpdated text } } }
   `)
   return { query: q }
 }
@@ -93,6 +110,10 @@ class Client {
 
   viewerData(callback) {
     this.__doQuery(viewerQL(), callback)
+  }
+
+  savePost(slugline, text, status, callback) {
+    this.__doQuery(createPostQL(slugline, status, text), callback)
   }
 
 }
