@@ -4,6 +4,8 @@
 
 import React from 'react';
 
+import './MarkdownEditor.css'
+
 const markdown = require('markdown-it')()
   .use(require('markdown-it-footnote'))
 
