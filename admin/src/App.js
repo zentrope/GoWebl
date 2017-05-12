@@ -45,10 +45,13 @@ class App extends React.PureComponent {
     var token = "" + localStorage.getItem("auth-token")
 
     this.client.validate(token, result => {
-      if (! result.data.validate)
+      if (! result.data.validate) {
+        console.log(result.errors)
         this.onLogout()
-      else
+
+      } else {
         this.onLogin(token)
+      }
     })
   }
 

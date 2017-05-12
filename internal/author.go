@@ -6,9 +6,11 @@ package internal
 
 import (
 	"database/sql"
+	"encoding/hex"
 	"errors"
 
 	_ "github.com/lib/pq"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Author struct {
@@ -19,11 +21,8 @@ type Author struct {
 }
 
 func (conn *Database) Authentic(handle, password string) (*Author, error) {
-
-	const q = `select handle, email, type, status from author
-							where lower(handle)=lower($1) and password=$2`
-
-	rows, err := conn.db.Query(q, handle, password)
+	const query = "select password from author where lower(handle)=lower($1)"
+	rows, err := conn.db.Query(query, handle)
 
 	defer rows.Close()
 
@@ -35,7 +34,23 @@ func (conn *Database) Authentic(handle, password string) (*Author, error) {
 		return nil, errors.New("User not found.")
 	}
 
-	return rowToAuthor(rows)
+	var hash string
+	err = rows.Scan(&hash)
+	if err != nil {
+		return nil, err
+	}
+
+	decoded, err := hex.DecodeString(hash)
+	if err != nil {
+		return nil, err
+	}
+
+	err = bcrypt.CompareHashAndPassword(decoded, []byte(password))
+	if err != nil {
+		return nil, err
+	}
+
+	return conn.Author(handle)
 }
 
 func (conn *Database) Author(handle string) (*Author, error) {

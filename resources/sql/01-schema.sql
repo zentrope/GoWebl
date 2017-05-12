@@ -13,9 +13,11 @@ create table if not exists author (
 );
 
 insert into author (email, handle, password)
-  values ('keith@example.com', 'keith', 'test1234');
+  values ('keith@example.com', 'keith',
+    '243261243130244676522f2f447452782e5036687451506b302f45684f65384a417a597853356e2f646a554237386358374e4c71635674574d47724f');
 insert into author (email, handle, password)
-  values ('xan@example.com', 'xan', 'test1234');
+  values ('xan@example.com', 'xan',
+    '24326124313024626a654965535441306c37756b6f7474496c6952757579773036556b7a5a76416445795735465855574175587a5451656155777147');
 
 create type post_status as enum ('published', 'draft');
 
@@ -36,60 +38,15 @@ insert into post (author, uuid, status, slugline, text) values ('keith',
 'Xena of Amphipolous',
 '# Xena of Amphipolous
 
-Xena is a fictional
-character from Robert Tapert''s Xena: Warrior Princess
-franchise. Co-created by Tapert and John Schulian, she first appeared
-in the 1995–1999 television series Hercules: The Legendary Journeys,
-before going on to appear in Xena: Warrior Princess TV show and
-subsequent comic book of the same name. The Warrior Princess has also
-appeared in the spin-off animated movie The Battle for Mount Olympus,
-as well as numerous non-canon expanded universe material, such as
-books and video games. Xena was played by New Zealand actress Lucy
-Lawless.
-
-Xena is the protagonist of the story, and the series depicts her on a
-quest to redeem herself for her dark past by using her formidable
-fighting skills to help people. Xena was raised as the daughter of
-Cyrene and Atrius in Amphipolis, though the episode "The Furies"
-raised the possibility that Ares might be Xena''s biological father,
-but it is never pursued further. She had two brothers, the younger of
-whom is dead; she visits his grave to speak with him in "Sins of the
-Past." In Hercules: The Legendary Journeys, during her two first
-episodes, Xena was a villain, but in the third episode she appears in,
-she joins Hercules to defeat Darphus, who had taken her army. Aware
-that the character of Xena had been very successful with the public in
-the three Hercules: The Legendary Journeys episodes, the producers of
-the series decided to create a spin-off series based on her
-adventures. Later in Xena: Warrior Princess she is joined by
-Gabrielle, a small town bard. Together they go up against ruthless
-warlords and gods in the ancient mythological world.
-
-> Xena has been credited by many, including Buffy the Vampire Slayer
-  creator Joss Whedon, with blazing the trail for a new generation of
-  female action heroes such as Buffy, Max of Dark Angel, Sydney
-  Bristow of Alias, and Beatrix Kiddo a.k.a. the Bride in Quentin
-  Tarantino''s Kill Bill. The director Quentin Tarantino is also a
-  fan of Xena. It is interesting to note that after serving as Lucy
-  Lawless'' stunt double on Xena, stunt woman Zoë E. Bell was recruited
-  to be Uma Thurman''s stunt double in Tarantino''s Kill Bill. By
-  helping to pave the way for female action heroes in television and
-  film, "Xena" also strengthened the stunt woman profession. David
-  Eick, one of the co-developers of the Xena series, was also the
-  executive producer of Battlestar Galactica,] which also features
-  strong female characters, and Lucy Lawless in a recurring role.
-
-The character Gabrielle, introduced in the first episode, becomes
-Xena''s greatest ally, best friend, and soulmate. Gabrielle came from a
-small village in Greece called Potidaea. She craved to escape from the
-boring and dull village. She latched onto Xena in episode 1 as a way
-of leaving the village, to travel on adventures. Her initial naïveté
-for the first 3 seasons and her talkative nature helped to balance
-Xena''s pessimistic mentality. While Xena''s character to an extent
-alters subtly through the series, Gabrielle''s character goes through
-substantial development and change especially in seasons 3 and
-4. Through their friendship/relationship Xena recognizes the value of
-the "greater good" and the sacrifices that must be made to accomplish
-it (a central theme in the series in later seasons).  ' );
+Xena is a fictional character from Robert Tapert''s Xena: Warrior
+Princess franchise. Co-created by Tapert and John Schulian, she first
+appeared in the 1995–1999 television series Hercules: The Legendary
+Journeys, before going on to appear in Xena: Warrior Princess TV show
+and subsequent comic book of the same name. The Warrior Princess has
+also appeared in the spin-off animated movie The Battle for Mount
+Olympus, as well as numerous non-canon expanded universe material,
+such as books and video games. Xena was played by New Zealand actress
+Lucy Lawless.' );
 
 insert into
        post (author, uuid, status, slugline, text) values ('xan',
@@ -106,42 +63,7 @@ Parmenides, Plato describes a visit to Athens by Zeno and Parmenides,
 at a time when Parmenides is "about 65," Zeno is "nearly 40" and
 Socrates is "a very young man". Assuming an age for Socrates of
 around 20, and taking the date of Socrates'' birth as 469 BC gives an
-approximate date of birth for Zeno of 490 BC. Plato says that Zeno was
-"tall and fair to look upon" and was "in the days of his youth ...
-reported to have been beloved by Parmenides."
-
-Other perhaps less reliable details of Zeno''s life are given by
-Diogenes Laërtius in his Lives and Opinions of Eminent
-Philosophers,[6] where it is reported that he was the son of
-Teleutagoras, but the adopted son of Parmenides, was "skilled to argue
-both sides of any question, the universal critic," and that he was
-arrested and perhaps killed at the hands of a tyrant of Elea.
-
-- This is just to say
-- That I''ve added a list
-- In this document to
-- See what it looks like when
-- Interpreted
-
-According to Diogenes Laertius, Zeno conspired to overthrow Nearchus
-the tyrant.[9] Eventually, Zeno was arrested and tortured.
-According to Valerius Maximus, when he was tortured to reveal the name
-of his colleagues in conspiracy, Zeno refused to reveal their names,
-although he said he did have a secret that would be advantageous for
-Nearchus to hear. When Nearchus leaned in to listen to the secret,
-Zeno bit his ear. He "did not let go until he lost his life and the
-tyrant lost that part of his body." Within Men of the Same
-Name, Demetrius said it was the nose that was bit off instead.
-
-Zeno may have also interacted with other tyrants. According to
-Laertius, Heraclides Lembus, within his Satyrus, said these events
-occurred against Diomedon instead of Nearchus. Valerius Maximus
-recounts a conspiracy against the tyrant Phalaris, but this would be
-impossible as Phalaris had died before Zeno was even born.
-According to Plutarch, Zeno attempted to kill the tyrant
-Demylus. After failing, he had, "with his own teeth bit off his
-tongue, he spit it in the tyrant’s face."
-');
+approximate date of birth for Zeno of 490 BC."');
 
 -- To view all the enums
 create or replace view vw_enums as
