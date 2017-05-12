@@ -9,7 +9,7 @@ const moment = require('moment')
 class DateShow extends React.PureComponent {
   render () {
     const { date } = this.props
-    const show = moment(date).format("D MMM YY - hh:mm A")
+    const show = moment(date).format("DD MMM YY - hh:mm A")
 
     return (
       <span className="DateShow">{ show }</span>
