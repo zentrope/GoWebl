@@ -5,6 +5,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 
+import { Map, fromJS } from 'immutable'
+
 import { Action } from '../component/Action'
 import { DateShow } from '../component/DateShow'
 import { Icon } from '../component/Icon'
@@ -20,22 +22,24 @@ class Posts extends React.PureComponent {
     const { posts, dispatch } = this.props
 
     const toggleStatus = (post) => () => {
-      let t = post.status === "published" ? "draft" : "published"
-      if (window.confirm("Set '" + post.slugline + "' status to '" + t + "'?")) {
-        const msg = {uuid: post.uuid, isPublished: post.status === "draft"}
+      const { status, uuid, slugline } = post.toJS()
+      let t = status === "published" ? "draft" : "published"
+      if (window.confirm("Set '" + slugline + "' status to '" + t + "'?")) {
+        const msg = {uuid: uuid, isPublished: status === "draft"}
         dispatch("post/status", msg)
       }
     }
 
     const renderPost = p => {
+      const { status, uuid, slugline, dateCreated, dateUpdated } = p.toJS()
       return (
-        <tr key={p.uuid}>
+        <tr key={uuid}>
           <td width="1%">
-            <Action type={p.status} color={p.status} onClick={toggleStatus(p)}/>
+            <Action type={status} color={status} onClick={toggleStatus(p)}/>
           </td>
-          <td width="40%"><a>{p.slugline}</a></td>
-          <td width="29%"><DateShow date={p.dateCreated}/></td>
-          <td width="29%"><DateShow date={p.dateUpdated}/></td>
+          <td width="40%"><a>{slugline}</a></td>
+          <td width="29%"><DateShow date={dateCreated}/></td>
+          <td width="29%"><DateShow date={dateUpdated}/></td>
           <td width="1%">
             <center>
               <Icon type="edit" color="blue"/>
@@ -104,11 +108,16 @@ class Home extends React.PureComponent {
       <button onClick={this.showEditor}>New post</button>
     )
 
+    let posts
+    if (! viewer.isEmpty()) {
+      posts = viewer.get("posts").sortBy(p => p.get("dateCreated")).reverse()
+    }
+
     return (
       <WorkArea>
-        <h1>{viewer.user}'s posts</h1>
+        <h1>{viewer.get("user")}'s posts</h1>
         {editor}
-        <Posts posts={viewer.posts} dispatch={dispatch}/>
+        <Posts posts={posts} dispatch={dispatch}/>
       </WorkArea>
     )
   }
@@ -118,7 +127,7 @@ class MainPhase extends React.PureComponent {
 
   constructor(props) {
     super(props)
-    this.state = {viewer: {}}
+    this.state = {viewer: Map({})}
 
     this.dispatch = this.dispatch.bind(this)
     this.refresh = this.refresh.bind(this)
@@ -131,8 +140,8 @@ class MainPhase extends React.PureComponent {
   refresh() {
     const { client } = this.props
     client.viewerData(response => {
-      const data = response.data.viewer
-      this.setState({viewer: data ? data : {}})
+      const data = fromJS(response.data.viewer)
+      this.setState({viewer: data})
     })
   }
 
@@ -141,10 +150,11 @@ class MainPhase extends React.PureComponent {
     console.log("event>", event)
     switch (event) {
       case 'post/add':
-        const viewer = this.state.viewer;
-        viewer.posts.push(data)
-        this.setState({viewer: viewer})
-        this.forceUpdate() // yikes!
+        console.log("post/add is broken at the moment")
+        /* const viewer = this.state.viewer;
+         * viewer.posts.push(data)
+         * this.setState({viewer: viewer})
+         * this.forceUpdate() // yikes!*/
         break
       case 'post/status':
         client.setPostStatus(data.uuid, data.isPublished, (response) => {
@@ -173,7 +183,7 @@ class MainPhase extends React.PureComponent {
     return (
       <Router>
         <section className="App">
-          <TitleBar title="Webl Manager" user={viewer.email} logout={logout}/>
+          <TitleBar title="Webl Manager" user={viewer.get("email")} logout={logout}/>
           <StatusBar year="2017" copyright="Keith Irwin"/>
           <Switch>
             <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} dispatch={this.dispatch}/>
