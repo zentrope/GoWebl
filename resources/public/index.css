@@ -130,10 +130,12 @@ hr {
 div.postbody {
   font-size: 12pt;
   color: #0df;
+  color: #eee;
 }
 
 div.postbody h1 {
   color: Lime;
+  color: #0df;
 }
 
 div.postbody p {
@@ -141,6 +143,6 @@ div.postbody p {
 }
 
 div.postbody blockquote {
-  border-left: 1px dotted DodgerBlue;
+  border-left: 1px dotted #369;
   padding-left: 1em;
 }
