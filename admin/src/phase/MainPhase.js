@@ -150,11 +150,9 @@ class MainPhase extends React.PureComponent {
     console.log("event>", event)
     switch (event) {
       case 'post/add':
-        console.log("post/add is broken at the moment")
-        /* const viewer = this.state.viewer;
-         * viewer.posts.push(data)
-         * this.setState({viewer: viewer})
-         * this.forceUpdate() // yikes!*/
+        const v = this.state.viewer.update("posts", ps => ps.push(fromJS(data)))
+        this.setState({viewer: v})
+        this.refresh()
         break
       case 'post/status':
         client.setPostStatus(data.uuid, data.isPublished, (response) => {
