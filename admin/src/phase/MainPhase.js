@@ -26,7 +26,14 @@ class Posts extends React.PureComponent {
       let t = status === "published" ? "draft" : "published"
       if (window.confirm("Set '" + slugline + "' status to '" + t + "'?")) {
         const msg = {uuid: uuid, isPublished: status === "draft"}
-        dispatch("post/status", msg)
+        dispatch('post/status', msg)
+      }
+    }
+
+    const deletePost = (post) => () => {
+      const { uuid, slugline } = post.toJS()
+      if (window.confirm("Delete '" + slugline + "' for all time?")) {
+        dispatch('post/delete', {uuid: uuid})
       }
     }
 
@@ -44,7 +51,7 @@ class Posts extends React.PureComponent {
             <center>
               <Icon type="edit" color="blue"/>
               <span> </span>
-              <Icon type="delete" color="blue"/>
+              <Action type="delete" color="blue" onClick={deletePost(p)}/>
             </center>
           </td>
         </tr>
@@ -148,12 +155,32 @@ class MainPhase extends React.PureComponent {
   dispatch(event, data) {
     const { client } = this.props
     console.log("event>", event)
+
     switch (event) {
+
       case 'post/add':
         const v = this.state.viewer.update("posts", ps => ps.push(fromJS(data)))
         this.setState({viewer: v})
         this.refresh()
         break
+
+      case 'post/delete':
+        client.deletePost(data.uuid, (response) => {
+          const uuid = response.data.deletePost
+          if (uuid) {
+            const posts = this.state.viewer
+                             .get("posts")
+                             .filter(p => p.get("uuid") !== uuid)
+            this.setState({viewer: this.state.viewer.set("posts", posts)})
+          } else {
+            console.error(response.errors)
+          }
+
+          console.log(response.data)
+          this.refresh()
+        })
+        break
+
       case 'post/status':
         client.setPostStatus(data.uuid, data.isPublished, (response) => {
           const updated = response.data.setPostStatus

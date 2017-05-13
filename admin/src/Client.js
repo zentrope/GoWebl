@@ -5,6 +5,17 @@
 const fl = (s) =>
   s.replace(/\s+/g, " ")
 
+const deletePostQL = (uuid) => {
+  const q = fl(`mutation
+    DeletePost($uuid: String!) {
+      deletePost(uuid: $uuid)}`)
+  return {
+    query: q,
+    operationName: "DeletePost",
+    variables: { uuid: uuid }
+  }
+}
+
 const setPostStatusQL = (uuid, isPublished) => {
   const q = fl(`mutation
     SetPostStatus($uuid: String!, $isPublished: Boolean!) {
@@ -127,6 +138,10 @@ class Client {
 
   savePost(slugline, text, status, callback) {
     this.__doQuery(createPostQL(slugline, status, text), callback)
+  }
+
+  deletePost(uuid, callback) {
+    this.__doQuery(deletePostQL(uuid), callback)
   }
 
   setPostStatus(uuid, isPublished, callback) {

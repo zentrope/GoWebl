@@ -24,25 +24,14 @@ const Schema = `
  }
 
  type Query {
-
 	 validate(token: String!): Boolean!
-		 #
-		 # Client can verify the token it's using is still
-		 # good and can consider the user logged in.
-
 	 authenticate(user: String! pass: String!): String!
-		 #
-		 # If user/pass are valid, return an auth-token.
-
 	 viewer(token: String): Viewer!
-		 #
-		 # Token is optional. Will retrieve from authorization header
-		 # (via context) if not provided. This is so we can run queries
-		 # outside the app.
  }
 
  type Mutation {
 	 createPost(slugline: String! status: String! text: String! token: String): Post!
+	 deletePost(uuid: String!): String!
 	 setPostStatus(uuid: String! isPublished: Boolean!): Post!
  }
 
@@ -336,6 +325,19 @@ func (r *Resolver) CreatePost(ctx context.Context, args *struct {
 	}
 
 	return &postResolver{r.Database, post}, nil
+}
+
+func (r *Resolver) DeletePost(ctx context.Context, args *struct{ Uuid string }) (string, error) {
+
+	claims, err := findAuthClaims(ctx, nil)
+	if err != nil {
+		return "", err
+	}
+
+	if err := r.Database.DeletePost(args.Uuid, claims.User); err != nil {
+		return "", err
+	}
+	return args.Uuid, nil
 }
 
 func (r *Resolver) SetPostStatus(ctx context.Context, args *struct {
