@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 import React from 'react';
-import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
+import { Router, Route, Redirect, Switch } from 'react-router-dom'
 
 import { Map, fromJS } from 'immutable'
 
@@ -15,6 +15,8 @@ import { StatusBar } from '../component/StatusBar'
 import { Tabular } from '../component/Tabular'
 import { TitleBar } from '../component/TitleBar'
 import { WorkArea } from '../component/WorkArea'
+
+import createBrowserHistory from 'history/createBrowserHistory'
 
 class Posts extends React.PureComponent {
 
@@ -66,65 +68,50 @@ class Posts extends React.PureComponent {
   }
 }
 
+// /admin/home
 class Home extends React.PureComponent {
-
-  constructor(props) {
-    super(props)
-
-    this.state = { showEditor: false }
-
-    this.savePost = this.savePost.bind(this)
-    this.publishPost = this.publishPost.bind(this)
-    this.hideEditor = this.hideEditor.bind(this)
-    this.showEditor = this.showEditor.bind(this)
-  }
-
-  savePost(slugline, text) {
-    const { client, dispatch } = this.props
-    client.savePost(slugline, text, "draft", (data) => {
-      const newPost = data.data.createPost
-      if (newPost) {
-        dispatch('post/add', newPost)
-      } else {
-        console.error(data)
-      }
-    })
-  }
-
-  publishPost() {
-    console.log("publish post -> not implemented")
-  }
-
-  showEditor() {
-    this.setState({showEditor: true})
-  }
-
-  hideEditor() {
-    this.setState({showEditor: false})
-  }
 
   render() {
     const { viewer, dispatch } = this.props
-    const { showEditor } = this.state
-
-    const editor = showEditor === true ? (
-      <MarkdownEditor onPublish={this.publishPost}
-                      onCancel={this.hideEditor}
-                      onSave={this.savePost}/>
-    ) : (
-      <button onClick={this.showEditor}>New post</button>
-    )
 
     let posts
     if (! viewer.isEmpty()) {
       posts = viewer.get("posts").sortBy(p => p.get("dateCreated")).reverse()
     }
 
+    const newPost = () => {
+      const { history } = this.props
+      history.push("/admin/post/new")
+    }
+
     return (
       <WorkArea>
         <h1>{viewer.get("user")}'s posts</h1>
-        {editor}
+        <button onClick={newPost}>New post</button>
         <Posts posts={posts} dispatch={dispatch}/>
+      </WorkArea>
+    )
+  }
+}
+
+// /admin/post/new
+class NewPost extends React.PureComponent {
+
+  render() {
+    const { dispatch, history } = this.props
+
+    const onCancel = () => {
+      history.push("/admin/home")
+    }
+
+    const onSave = (slugline, text) => {
+      dispatch('post/save', {slugline: slugline, text: text})
+    }
+
+    return (
+      <WorkArea>
+        <h1>New post</h1>
+        <MarkdownEditor onCancel={onCancel} onSave={onSave}/>
       </WorkArea>
     )
   }
@@ -135,7 +122,7 @@ class MainPhase extends React.PureComponent {
   constructor(props) {
     super(props)
     this.state = {viewer: Map({})}
-
+    this.history = createBrowserHistory()
     this.dispatch = this.dispatch.bind(this)
     this.refresh = this.refresh.bind(this)
   }
@@ -158,10 +145,17 @@ class MainPhase extends React.PureComponent {
 
     switch (event) {
 
-      case 'post/add':
-        const v = this.state.viewer.update("posts", ps => ps.push(fromJS(data)))
-        this.setState({viewer: v})
-        this.refresh()
+      case 'post/save':
+        client.savePost(data.slugline, data.text, "draft", (response) => {
+          const newPost = response.data.createPost
+          if (newPost) {
+            const v = this.state.viewer.update("posts", ps => ps.push(fromJS(newPost)))
+            this.setState({viewer: v})
+            this.history.push('/admin/home')
+            return
+          }
+          console.error(response.errors)
+        })
         break
 
       case 'post/delete':
@@ -169,15 +163,12 @@ class MainPhase extends React.PureComponent {
           const uuid = response.data.deletePost
           if (uuid) {
             const posts = this.state.viewer
-                             .get("posts")
-                             .filter(p => p.get("uuid") !== uuid)
+                              .get("posts")
+                              .filter(p => p.get("uuid") !== uuid)
             this.setState({viewer: this.state.viewer.set("posts", posts)})
-          } else {
-            console.error(response.errors)
+            return
           }
-
-          console.log(response.data)
-          this.refresh()
+          console.error(response.errors)
         })
         break
 
@@ -206,12 +197,13 @@ class MainPhase extends React.PureComponent {
     )
 
     return (
-      <Router>
+      <Router history={this.history}>
         <section className="App">
           <TitleBar title="Webl Manager" user={viewer.get("email")} logout={logout}/>
           <StatusBar year="2017" copyright="Keith Irwin"/>
           <Switch>
             <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} dispatch={this.dispatch}/>
+            <PropRoute path="/admin/post/new" component={NewPost} dispatch={this.dispatch}/>
             <Redirect to="/admin/home"/>
           </Switch>
         </section>
