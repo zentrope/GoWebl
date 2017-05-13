@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/zentrope/webl/internal"
 )
@@ -103,9 +104,10 @@ func mkServer(config *internal.AppConfig, app *http.ServeMux) *http.Server {
 //-----------------------------------------------------------------------------
 
 func blockUntilShutdownThenDo(fn func()) {
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt)
-	<-sigChan
+	sigChan := make(chan os.Signal)
+	signal.Notify(sigChan, os.Kill, os.Interrupt, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGHUP)
+	v := <-sigChan
+	log.Printf("Signal: %v\n", v)
 	fn()
 }
 
@@ -134,7 +136,6 @@ func main() {
 	notify(config)
 
 	blockUntilShutdownThenDo(func() {
-		log.Println("^C")
 		log.Println("Shutdown")
 		log.Println("- Server shutdown.")
 		server.Close()
