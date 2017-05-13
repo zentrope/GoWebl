@@ -1,10 +1,10 @@
 # Web Log
 
-Learning golang.
+Learning Golang.
 
 ## Goal
 
-A single binary (except the Postgres database) that can render blog posts via cacheable server-side templates (to allow for search engines) as well as create and edit them via an interactive single-page client app. Normally, you'd serve both client and API via a web-proxy, etc, etc, but I want to see how close I can get to the JVM world's `uberjar` concept.
+The goal of this learning project is to produce a single binary (except the Postgres database) that can render blog posts via cacheable server-side templates (to allow for search engines) as well as create and edit them via an interactive single-page client app. Normally, you'd serve both client and API via a web-proxy, etc, etc, but I want to see how close I can get to the JVM world's `uberjar` concept.
 
 ## Quick Start
 
@@ -41,6 +41,28 @@ By "sparse" I mean that if you just want to change the web port, you can create 
 ```
 
 And the app will merge that into the defaults. No need to copy the defaults and tweak. Just change the ones you need to change and omit the rest.
+
+## Development
+
+I work on the project using two terminals:
+
+In one, I start up the `yarn` process for working with the React-based admin app.
+
+    $ cd webl/admin
+    $ yarn start
+
+In another terminal, I start the server process itself:
+
+    $ make init
+    $ go run main.go
+
+And that's it. The admin app will reload when you make changes. You'll have to `^C` the server process, then up arrow and return to cycle it.
+
+## Docker
+
+Running, building, docker-composering: I've just not gotten to it yet. If you want to try this application out, I'd recommend going with stock Homebrew (or whatever) installs of Golang, Postgres and Yarn and leave it at that.
+
+However, I do plan to create some scripts that allow for building the app without having to install any of the dependencies (build or otherwise).
 
 ## Database Notes
 

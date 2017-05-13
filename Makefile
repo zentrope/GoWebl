@@ -33,7 +33,7 @@ build-admin: ## Build the admin client
 
 build: init build-admin ## Build webl into a local binary ./webl.
 	cd internal ; rm -f rice-box.go ;  rice -v embed-go
-	go build
+	go build -o webl
 
 clean: ## Clean build artifacts.
 	rm -f internal/rice-box.go
