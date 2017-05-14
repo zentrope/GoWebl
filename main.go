@@ -81,12 +81,18 @@ func mkWebApp(resources *internal.Resources, database *internal.Database,
 	post := http.HandlerFunc(internal.PostPage(database, resources))
 	static := http.HandlerFunc(internal.StaticPage(resources))
 
-	service.Handle("/archive", archive)
+	// GraphQL
 	service.Handle("/graphql", gql)
+	service.Handle("/static/", static)
+	service.Handle("/vendor/", static)
+
+	// Admin Post Manager
+	service.Handle("/admin/", admin)
+
+	// public blog routes
+	service.Handle("/archive", archive)
 	service.Handle("/query", api)
 	service.Handle("/post/", post)
-	service.Handle("/static/", static)
-	service.Handle("/admin/", admin)
 	service.Handle("/", home)
 
 	return service
