@@ -44,10 +44,11 @@ type TemplateArchiveEntry struct {
 }
 
 func xformArchiveEntry(e *ArchiveEntry) *TemplateArchiveEntry {
+	fmt := "02-Jan-2006"
 	return &TemplateArchiveEntry{
 		e.UUID,
-		e.DateCreated.Format("Jan 2, 2006"),
-		e.DateUpdated.Format("Jan 2, 2006"),
+		e.DateCreated.Format(fmt),
+		e.DateUpdated.Format(fmt),
 		e.Slugline,
 		e.Author,
 	}

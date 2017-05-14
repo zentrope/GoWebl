@@ -1,19 +1,19 @@
 html, body {
-  color: white;
-  background-color: #181818;
+  color: black;
+  background-color: white;
   margin: 0;
   padding: 0;
   font-family: system, -apple-system, BlinkMacSystemFont, HelveticaNeue, LucidaGrande, sans-serif;
 }
 
 a {
-  color: MediumSeaGreen;
+  color: #369;
   text-decoration: none;
   cursor: pointer;
 }
 
 a:hover {
-  color: Lime;
+  color: DarkRed;
 }
 
 a:active {
@@ -22,7 +22,12 @@ a:active {
 
 hr {
   border: none;
-  border-top: 2px solid Black;
+  border-top: 1px dotted silver;
+  margin-bottom: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #888;
 }
 
 /*******/
@@ -31,7 +36,8 @@ hr {
   color: #444;
   display: flex;
   padding: 5px;
-  background-color: black;
+  background-color: #e6e6e6;
+  border-bottom: 1px solid #d8d8d8;
 }
 
 .NavBar .Links {
@@ -40,14 +46,9 @@ hr {
 }
 
 .NavBar .Links a {
-  color: MediumSeaGreen;
   font-size: 10pt;
   padding-right: 10px;
   padding-left: 10px;
-}
-
-.NavBar .Links a:hover {
-  color: Lime;
 }
 
 /*******/
@@ -55,29 +56,34 @@ hr {
 .Content {
   width: 650px;
   margin: auto;
+  padding-top: 30px;
 }
 
 .Content article {
   margin-top: 24pt;
   margin-bottom: 48pt;
+  position: relative;
+}
+
+.Content .ArticleSeparator {
+  text-align: left;
+  font-size: 15pt;
+  position: absolute;
+  top: 0px;
+  left: -40px;
+  color: #369;
+  opacity: 0.5;
 }
 
 /*******/
 
 .MetaBar {
-  margin-top: 15pt;
+  margin-top: 25pt;
   display: flex;
-  background-color: black;
+  background-color: #f8f8f8;
   padding: 5px;
-  color: MediumSeaGreen;
-}
-
-.MetaBar a {
-  color: MediumSeaGreen;
-}
-
-.MetaBar a:hover {
-  color: Lime;
+  border-top: 1px solid #d8d8d8;
+  padding-top: 0;
 }
 
 .MetaBar .Permalink {
@@ -90,6 +96,7 @@ hr {
   flex: 1;
   font-size: 10pt;
   text-align: right;
+  color: black;
 }
 
 /*******/
@@ -117,29 +124,29 @@ hr {
   color: #666;
 }
 
-.TableOfContents a {
-  color: MediumSeaGreen;
+/*******/
+
+.Continuation {
+  margin-bottom: 4em;
+  margin-bottom: 4em;
 }
 
-.TableOfContents a:hover {
-  color: Lime;
+.Continuation p {
+  padding: 0;
+  margin:0;
+  font-size: 10pt;
+  text-align: right;
 }
 
 /*******/
 
 div.postbody {
-  font-size: 12pt;
-  color: #0df;
-  color: #eee;
-}
-
-div.postbody h1 {
-  color: Lime;
-  color: #0df;
 }
 
 div.postbody p, div.postbody li {
   line-height: 17pt;
+  font-size: 12pt;
+  color: #000;
 }
 
 div.postbody ul {
@@ -149,4 +156,10 @@ div.postbody ul {
 div.postbody blockquote {
   border-left: 1px dotted #369;
   padding-left: 1em;
+}
+
+div.postbody img {
+  box-shadow: 0 8px 6px -6px black;
+  border: 1px solid #888;
+  border-radius: 2px;
 }

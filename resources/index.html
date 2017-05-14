@@ -15,9 +15,11 @@
       </div>
     </section>
     <section class="Content">
-      <h1>Webl Webl</h1>
       {{ range .Posts }}
       <article id={{.UUID}}>
+        <div class='ArticleSeparator'>
+          <a href="/post/{{ .UUID }}">&#x2742;</a>
+        </div>
         <div class='postbody'>
           {{ .Text }}
         </div>
@@ -31,11 +33,9 @@
         </div>
       </article>
       {{ end }}
-      <hr/>
-      <p style="text-align: right; font-size: 10pt;">
-        <a href="/archive">Check the archive for more.</a>
-      </p>
-      <p>&nbsp;</p>
+      <div class="Continuation">
+        <p><a href="/archive">Check the archive for more &#x25B6;</a></p>
+      </div>
     </section>
   </body>
 </html>
