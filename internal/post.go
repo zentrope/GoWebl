@@ -226,13 +226,26 @@ const (
 	PS_Draft
 )
 
+// Update a post, assuming the uuid and author match the same post.
+func (conn *Database) UpdatePost(uuid, slugline, text, author string) (*Post, error) {
+	q := `update post set slugline=$1, text=$2, date_updated=now() where uuid=$3
+					 and lower(author) = lower($4)`
+
+	_, err := conn.db.Exec(q, slugline, text, uuid, author)
+	if err != nil {
+		return nil, err
+	}
+
+	return conn.Post(uuid)
+}
+
 func (conn *Database) SetPostStatus(uuid, author string, status PostStatus) (*Post, error) {
 	s := "draft"
 	if status == PS_Published {
 		s = "published"
 	}
 
-	q := "update post set status=$1 where uuid=$2 and author=$3"
+	q := "update post set status=$1, date_updated=now() where uuid=$2 and author=$3"
 
 	_, err := conn.db.Exec(q, s, uuid, author)
 	if err != nil {

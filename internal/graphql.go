@@ -31,6 +31,7 @@ const Schema = `
 
  type Mutation {
 	 createPost(slugline: String! status: String! text: String! token: String): Post!
+	 updatePost(uuid: String! slugline: String! text: String!): Post!
 	 deletePost(uuid: String!): String!
 	 setPostStatus(uuid: String! isPublished: Boolean!): Post!
  }
@@ -320,6 +321,25 @@ func (r *Resolver) CreatePost(ctx context.Context, args *struct {
 	}
 
 	post, err := r.Database.Post(uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &postResolver{r.Database, post}, nil
+}
+
+func (r *Resolver) UpdatePost(ctx context.Context, args *struct {
+	Uuid     string
+	Slugline string
+	Text     string
+}) (*postResolver, error) {
+
+	claims, err := findAuthClaims(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	post, err := r.Database.UpdatePost(args.Uuid, args.Slugline, args.Text, claims.User)
 	if err != nil {
 		return nil, err
 	}

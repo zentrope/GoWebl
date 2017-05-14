@@ -14,7 +14,7 @@ class MarkdownEditor extends React.PureComponent {
   constructor(props) {
     super(props)
 
-    this.state = {slugline: "", text: "", showPreview : false}
+    this.state = {uuid: "", slugline: "", text: "", showPreview : false, dirty: false}
 
     this.handleChange = this.handleChange.bind(this)
     this.togglePreview = this.togglePreview.bind(this)
@@ -22,10 +22,19 @@ class MarkdownEditor extends React.PureComponent {
     this.savePost = this.savePost.bind(this)
   }
 
+  componentWillReceiveProps(props) {
+    const { uuid, slugline, text } = props
+    let u = uuid ? uuid : ""
+    let s = slugline ? slugline : ""
+    let t = text ? text : ""
+
+    this.state = {uuid: u, slugline: s, text: t}
+  }
+
   handleChange(event) {
     const name = event.target.name
     const value = event.target.value
-    this.setState({[name]: value})
+    this.setState({[name]: value, dirty: true})
   }
 
   togglePreview() {
@@ -41,12 +50,17 @@ class MarkdownEditor extends React.PureComponent {
 
   savePost() {
     const { onSave } = this.props
-    onSave(this.state.slugline, this.state.text)
+    const { uuid, slugline, text} = this.state
+    if (uuid) {
+      onSave(uuid, slugline, text)
+    } else {
+      onSave(slugline, text)
+    }
   }
 
   render() {
-    const { onCancel, onPublish } = this.props
-    const { slugline, text, showPreview } = this.state
+    const { onCancel } = this.props
+    const { slugline, text, showPreview, dirty } = this.state
 
     const html = showPreview ? markdown.render(text) : ""
 
@@ -79,16 +93,13 @@ class MarkdownEditor extends React.PureComponent {
         <div className="Controls">
           <button disabled={!this.isSubmittable()}
                   onClick={this.savePost}>
-            Save draft
-          </button>
-          <button  disabled={!this.isSubmittable()} onClick={onPublish}>
-            Publish
+            Save
           </button>
           <button onClick={this.togglePreview}>
             { showPreview ? "Hide Preview" : "Show Preview" }
           </button>
           <button onClick={onCancel}>
-            Cancel
+            { dirty ? "Cancel" : "Done" }
           </button>
         </div>
       </section>

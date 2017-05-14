@@ -11,6 +11,7 @@ import { StatusBar } from '../component/StatusBar'
 import { TitleBar } from '../component/TitleBar'
 
 // Routes
+import { EditPost } from '../route/EditPost'
 import { Home } from '../route/Home'
 import { NewPost } from '../route/NewPost'
 
@@ -24,10 +25,45 @@ class MainPhase extends React.PureComponent {
     this.history = createBrowserHistory()
     this.dispatch = this.dispatch.bind(this)
     this.refresh = this.refresh.bind(this)
+
+    this.savePost = this.savePost.bind(this)
+    this.updatePost = this.updatePost.bind(this)
   }
 
   componentWillMount() {
     this.refresh()
+  }
+
+  updatePost(data) {
+    const { uuid, slugline, text } = data
+    const { client } = this.props
+
+    client.updatePost(uuid, slugline, text, (response) => {
+      const post = response.data.updatePost
+      if (post) {
+        const posts = this.state.viewer
+                          .get("posts")
+                          .filter(p => p.get("uuid") !== uuid)
+                          .push(fromJS(post))
+        this.setState({viewer: this.state.viewer.set("posts", posts)})
+        return
+      }
+      console.error(response.errors)
+    })
+  }
+
+  savePost(data) {
+    const { client } = this.props
+    client.savePost(data.slugline, data.text, "draft", (response) => {
+      const newPost = response.data.createPost
+      if (newPost) {
+        const v = this.state.viewer.update("posts", ps => ps.push(fromJS(newPost)))
+        this.setState({viewer: v})
+        this.history.push('/admin/home')
+        return
+      }
+      console.error(response.errors)
+    })
   }
 
   refresh() {
@@ -38,23 +74,26 @@ class MainPhase extends React.PureComponent {
     })
   }
 
-  dispatch(event, data) {
+  dispatch(event, data, callback) {
     const { client } = this.props
     console.log("event>", event)
 
     switch (event) {
 
+      case 'post/get':
+        if (callback) {
+          callback(this.state.viewer.get("posts")
+                       .filter(p => p.get("uuid") === data.uuid)
+                       .first())
+        }
+        break
+
       case 'post/save':
-        client.savePost(data.slugline, data.text, "draft", (response) => {
-          const newPost = response.data.createPost
-          if (newPost) {
-            const v = this.state.viewer.update("posts", ps => ps.push(fromJS(newPost)))
-            this.setState({viewer: v})
-            this.history.push('/admin/home')
-            return
-          }
-          console.error(response.errors)
-        })
+        this.savePost(data)
+        break
+
+      case 'post/update':
+        this.updatePost(data)
         break
 
       case 'post/delete':
@@ -103,6 +142,7 @@ class MainPhase extends React.PureComponent {
           <Switch>
             <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} dispatch={this.dispatch}/>
             <PropRoute path="/admin/post/new" component={NewPost} dispatch={this.dispatch}/>
+            <PropRoute path="/admin/post/:id" component={EditPost} dispatch={this.dispatch}/>
             <Redirect to="/admin/home"/>
           </Switch>
         </section>

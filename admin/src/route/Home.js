@@ -4,9 +4,10 @@
 
 import React from 'react';
 
+import { Link } from 'react-router-dom'
+
 import { Action } from '../component/Action'
 import { DateShow } from '../component/DateShow'
-import { Icon } from '../component/Icon'
 import { Tabular } from '../component/Tabular'
 import { WorkArea } from '../component/WorkArea'
 
@@ -38,15 +39,11 @@ class Posts extends React.PureComponent {
           <td width="1%">
             <Action type={status} color={status} onClick={toggleStatus(p)}/>
           </td>
-          <td width="40%"><a>{slugline}</a></td>
+          <td width="40%"><Link to={"/admin/post/" + uuid}>{slugline}</Link></td>
           <td width="29%"><DateShow date={dateCreated}/></td>
           <td width="29%"><DateShow date={dateUpdated}/></td>
           <td width="1%">
-            <center>
-              <Icon type="edit" color="blue"/>
-              <span> </span>
               <Action type="delete" color="blue" onClick={deletePost(p)}/>
-            </center>
           </td>
         </tr>
       )
@@ -78,7 +75,7 @@ class Home extends React.PureComponent {
 
     return (
       <WorkArea>
-        <h1>{viewer.get("user")}'s posts</h1>
+        <h1>Posts</h1>
         <button onClick={newPost}>New post</button>
         <Posts posts={posts} dispatch={dispatch}/>
       </WorkArea>
