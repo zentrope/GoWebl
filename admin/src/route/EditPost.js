@@ -18,7 +18,6 @@ class EditPost extends React.PureComponent {
   componentDidMount() {
     const { dispatch, match, history } = this.props
     dispatch('post/get', {uuid: match.params.id}, (data) => {
-      console.log(data)
       if (! data) {
         history.push('/admin/home')
         return
