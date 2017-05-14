@@ -138,8 +138,12 @@ div.postbody h1 {
   color: #0df;
 }
 
-div.postbody p {
+div.postbody p, div.postbody li {
   line-height: 17pt;
+}
+
+div.postbody ul {
+  margin-bottom: 1em;
 }
 
 div.postbody blockquote {
