@@ -31,6 +31,10 @@ init: vendor ricebox ## Make sure everything is set up properly for dev.
 build-admin: ## Build the admin client
 	cd admin; yarn ; yarn build
 
+build-freebsd: init build-admin ## Build a version for FreeBSD
+	cd internal ; rm -f rice-box.go ;  rice -v embed-go
+	GOOS=freebsd GOARCH=amd64 go build -o webl
+
 build: init build-admin ## Build webl into a local binary ./webl.
 	cd internal ; rm -f rice-box.go ;  rice -v embed-go
 	go build -o webl
