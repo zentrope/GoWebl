@@ -184,6 +184,12 @@
 			"revisionTime": "2017-05-12T12:41:09Z"
 		},
 		{
+			"checksumSHA1": "JsJdKXhz87gWenMwBeejTOeNE7k=",
+			"path": "golang.org/x/crypto/blowfish",
+			"revision": "ab89591268e0c8b748cbe4047b00197516011af5",
+			"revisionTime": "2017-05-12T12:41:09Z"
+		},
+		{
 			"checksumSHA1": "N9/rBjQ7Srw2cLmjw94JCWw08mg=",
 			"path": "golang.org/x/net/context",
 			"revision": "feeb485667d1fdabe727840fe00adc22431bc86e",
