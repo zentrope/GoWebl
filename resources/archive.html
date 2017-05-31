@@ -3,16 +3,17 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webl - Archives</title>
+    <title>{{ .Config.Title }} - Archives</title>
     <link rel="stylesheet" href="../index.css" type="text/css"/>
   </head>
 
   <body>
     <section class="NavBar">
+      <div class="Title">
+        {{ .Config.Title }}
+      </div>
       <div class="Links">
         <a href="/">Home</a>
-        <a href="/admin/">Admin</a>
-        <a href="/graphql">GraphQL</a>
       </div>
     </section>
 

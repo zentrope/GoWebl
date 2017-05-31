@@ -67,18 +67,24 @@ func mkGraphAPI(database *internal.Database) *internal.GraphAPI {
 	return api
 }
 
-func mkWebApp(resources *internal.Resources, database *internal.Database,
-	graphapi *internal.GraphAPI) *http.ServeMux {
+func mkWebApp(
+	config *internal.AppConfig,
+	resources *internal.Resources,
+	database *internal.Database,
+	graphapi *internal.GraphAPI,
+) *http.ServeMux {
 	log.Println("Constructing web app.")
 
 	service := http.NewServeMux()
 
+	webConfig := config.Web
+
 	admin := http.HandlerFunc(internal.AdminPage(resources))
 	api := http.HandlerFunc(internal.QueryAPI(graphapi))
-	archive := http.HandlerFunc(internal.ArchivePage(database, resources))
+	archive := http.HandlerFunc(internal.ArchivePage(webConfig, database, resources))
+	home := http.HandlerFunc(internal.HomePage(webConfig, database, resources))
+	post := http.HandlerFunc(internal.PostPage(webConfig, database, resources))
 	gql := http.HandlerFunc(internal.GraphQlClientPage(resources))
-	home := http.HandlerFunc(internal.HomePage(database, resources))
-	post := http.HandlerFunc(internal.PostPage(database, resources))
 	static := http.HandlerFunc(internal.StaticPage(resources))
 
 	// GraphQL
@@ -118,10 +124,10 @@ func blockUntilShutdownThenDo(fn func()) {
 }
 
 func notify(config *internal.AppConfig) {
-	p := config.Web.Port
-	log.Printf("Web access -> http://localhost:%s/\n", p)
-	log.Printf("GraphQL explorer access -> http://localhost:%s/graphql\n", p)
-	log.Printf("Query API access -> http://localhost:%s/query\n", p)
+	// p := config.Web.Port
+	log.Printf("Web access -> %s\n", config.Web.BaseURL)
+	// log.Printf("GraphQL explorer access -> http://localhost:%s/graphql\n", p)
+	// log.Printf("Query API access -> http://localhost:%s/query\n", p)
 }
 
 func main() {
@@ -134,7 +140,7 @@ func main() {
 	database.MustRunMigrations(resources)
 
 	graphapi := mkGraphAPI(database)
-	app := mkWebApp(resources, database, graphapi)
+	app := mkWebApp(config, resources, database, graphapi)
 	server := mkServer(config, app)
 
 	go server.ListenAndServe()

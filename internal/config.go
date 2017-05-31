@@ -24,7 +24,9 @@ type StorageConfig struct {
 }
 
 type WebConfig struct {
-	Port string `json:"port,omitempty"`
+	Port    string `json:"port,omitempty"`
+	Title   string `json:"title,omitempty"`
+	BaseURL string `json:"base-url,omitempty"`
 }
 
 type AppConfig struct {

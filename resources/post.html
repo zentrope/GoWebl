@@ -3,29 +3,30 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webl - {{ .Slugline }}</title>
+    <title>{{ .Config.Title }} - {{ .Post.Slugline }}</title>
     <link rel="stylesheet" href="../index.css" type="text/css"/>
   </head>
   <body>
     <section class="NavBar">
+      <div class="Title">
+        {{ .Config.Title }}
+      </div>
       <div class="Links">
         <a href="/">Home</a>
         <a href="/archive">Archive</a>
-        <a href="/admin/">Admin</a>
-        <a href="/graphql">GraphQL</a>
       </div>
     </section>
     <section class="Content">
-      <article id={{.UUID}}>
+      <article id={{.Post.UUID}}>
         <div class='postbody'>
-          {{ .Text }}
+          {{ .Post.Text }}
         </div>
         <div class="MetaBar">
           <div class="Permalink">
-            <a href="/post/{{ .UUID }}">permalink</a>
+            <a href="/post/{{ .Post.UUID }}">permalink</a>
           </div>
           <div class="Author">
-            <i>By {{ .Author }}</i> on <i>{{ .DateCreated }}</i>
+            <i>By {{ .Post.Author }}</i> on <i>{{ .Post.DateCreated }}</i>
           </div>
         </div>
       </article>

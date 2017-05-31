@@ -17,11 +17,18 @@ import (
 )
 
 type HomeData struct {
-	Posts []*TemplatePost
+	Posts  []*TemplatePost
+	Config WebConfig
 }
 
 type ArchiveData struct {
 	Entries []*TemplateArchiveEntry
+	Config  WebConfig
+}
+
+type PostData struct {
+	Post   *TemplatePost
+	Config WebConfig
 }
 
 type TemplatePost struct {
@@ -156,7 +163,7 @@ func AdminPage(resources *Resources) http.HandlerFunc {
 	}
 }
 
-func HomePage(database *Database, resources *Resources) http.HandlerFunc {
+func HomePage(config WebConfig, database *Database, resources *Resources) http.HandlerFunc {
 
 	page, err := resources.ResolveTemplate("index.html")
 
@@ -186,7 +193,7 @@ func HomePage(database *Database, resources *Resources) http.HandlerFunc {
 			rPosts = append(rPosts, xformTemplatePost(p))
 		}
 
-		data := &HomeData{rPosts}
+		data := &HomeData{Config: config, Posts: rPosts}
 
 		if err := page.Execute(w, data); err != nil {
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
@@ -195,7 +202,7 @@ func HomePage(database *Database, resources *Resources) http.HandlerFunc {
 	}
 }
 
-func PostPage(database *Database, resources *Resources) http.HandlerFunc {
+func PostPage(config WebConfig, database *Database, resources *Resources) http.HandlerFunc {
 	page, err := resources.ResolveTemplate("post.html")
 
 	if err != nil {
@@ -214,7 +221,7 @@ func PostPage(database *Database, resources *Resources) http.HandlerFunc {
 			return
 		}
 
-		data := xformTemplatePost(post)
+		data := &PostData{Post: xformTemplatePost(post), Config: config}
 
 		if err := page.Execute(w, data); err != nil {
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
@@ -223,7 +230,7 @@ func PostPage(database *Database, resources *Resources) http.HandlerFunc {
 	}
 }
 
-func ArchivePage(database *Database, resources *Resources) http.HandlerFunc {
+func ArchivePage(config WebConfig, database *Database, resources *Resources) http.HandlerFunc {
 
 	page, err := resources.ResolveTemplate("archive.html")
 	if err != nil {
@@ -244,7 +251,7 @@ func ArchivePage(database *Database, resources *Resources) http.HandlerFunc {
 			data = append(data, xformArchiveEntry(e))
 		}
 
-		values := &ArchiveData{data}
+		values := &ArchiveData{Entries: data, Config: config}
 
 		if err := page.Execute(w, values); err != nil {
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)

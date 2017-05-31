@@ -40,6 +40,14 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom: 1px solid #d8d8d8;
 }
 
+.NavBar .Title {
+  flex: 1;
+  color: #369;
+  padding-left: 15px;
+  font-weight: bold;
+  font-size: 12pt;
+}
+
 .NavBar .Links {
   flex: 1;
   text-align: right;
