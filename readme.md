@@ -30,6 +30,8 @@ The config file should be a sparse version of what you can see in `./resources/c
   },
   "web": {
     "port": "8080"
+    "title": "Web Log",
+    "base-url": "http://localhost:8080/"
   }
 }
 ```
@@ -82,23 +84,15 @@ This app is set up for a config file to change all these, but I'll document that
 
 Create a user, then a database (owned by the user):
 
-    $ createuser blogsvc -P
-    $ createdb blogdb -O blogsvc
+    $ make db-init
 
 Use `wanheda` as the password (if you want to go with the application defaults). The app itself will take care of populating all the tables.
-
-There's also a script (for Docker):
-
-    ./script/pg
-
-for starting, stopping, cleaning (etc) a Docker postgres image, if that works better.
 
 **Delete database**
 
 Drop the database, then the user:
 
-    $ dropdb blogdb
-    $ dropuser blogsvc
+    $ make db-clean
 
 If something is holding open a connection, just restart the database itself and try again:
 

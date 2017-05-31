@@ -1,6 +1,8 @@
 PACKAGE = github.com/zentrope/webl
 
 .PHONY: build-admin build init govendor vendor vendor-check vendor-unused help
+.PHONY: db-clean db-init
+
 .DEFAULT_GOAL := help
 
 # TO update dependencies, govendor fetch +vendor
@@ -49,6 +51,15 @@ clean: ## Clean build artifacts.
 dist-clean: clean ## Clean everything (vendor, node_modules).
 	rm -rf vendor/*/
 	rm -rf admin/node_modules
+
+db-clean: ## Delete the local dev database
+	dropdb --if-exists blogdb
+	dropuser --if-exists blogsvc
+
+db-init: ## Create the local dev database
+	@echo "Type 'wanheda' for password when prompted."
+	createuser blogsvc -P
+	createdb blogdb -O blogsvc
 
 help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}' | sort
