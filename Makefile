@@ -3,6 +3,8 @@ PACKAGE = github.com/zentrope/webl
 .PHONY: build-admin build init govendor vendor vendor-check vendor-unused help
 .DEFAULT_GOAL := help
 
+# TO update dependencies, govendor fetch +vendor
+
 govendor:
 	@hash govendor > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
 		go get -v -u github.com/kardianos/govendor; \
