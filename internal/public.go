@@ -62,7 +62,23 @@ func xformArchiveEntry(e *ArchiveEntry) *TemplateArchiveEntry {
 }
 
 func toMarkdown(data string) string {
-	return string(blackfriday.MarkdownCommon([]byte(data)))
+	htmlFlags := blackfriday.HTML_USE_XHTML
+	extensions := blackfriday.EXTENSION_NO_INTRA_EMPHASIS |
+		blackfriday.EXTENSION_TABLES |
+		blackfriday.EXTENSION_FENCED_CODE |
+		blackfriday.EXTENSION_AUTOLINK |
+		blackfriday.EXTENSION_STRIKETHROUGH |
+		blackfriday.EXTENSION_SPACE_HEADERS |
+		blackfriday.EXTENSION_HEADER_IDS |
+		blackfriday.EXTENSION_BACKSLASH_LINE_BREAK |
+		blackfriday.EXTENSION_DEFINITION_LISTS |
+		blackfriday.EXTENSION_FOOTNOTES
+	renderer := blackfriday.HtmlRenderer(htmlFlags, "", "")
+	input := []byte(data)
+	options := blackfriday.Options{Extensions: extensions}
+
+	output := blackfriday.MarkdownOptions(input, renderer, options)
+	return string(output)
 }
 
 func xformTemplatePost(p *LatestPost) *TemplatePost {
