@@ -78,7 +78,7 @@ func toMarkdown(data string) string {
 	options := blackfriday.Options{Extensions: extensions}
 
 	output := blackfriday.MarkdownOptions(input, renderer, options)
-	return string(output)
+	return strings.TrimSpace(string(output))
 }
 
 func xformTemplatePost(p *LatestPost) *TemplatePost {
@@ -176,6 +176,29 @@ func AdminPage(resources *Resources) http.HandlerFunc {
 		}
 
 		fmt.Fprintf(w, page)
+	}
+}
+
+func JsonFeed(config WebConfig, database *Database, resources *Resources) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		logRequest(r)
+
+		posts, err := database.LatestPosts(40)
+
+		if err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+
+		feed, err := NewJSONFeed(config, posts)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("content-type", "application/json")
+		fmt.Fprintf(w, feed)
 	}
 }
 

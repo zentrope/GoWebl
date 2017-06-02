@@ -9,6 +9,6 @@
   "web": {
     "port": "8080",
     "title": "Web Log",
-    "base-url": "http://localhost:8080/"
+    "base-url": "http://localhost:8080"
   }
 }

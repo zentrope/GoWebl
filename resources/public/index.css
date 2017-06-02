@@ -31,31 +31,68 @@ h1, h2, h3, h4, h5, h6 {
 .NavBar {
   color: #444;
   display: flex;
-  padding: 5px;
+  padding: 0;
   background-color: #e6e6e6;
   border-bottom: 1px solid #d8d8d8;
+  height: 40px;
 }
 
 .NavBar .Title {
   flex: 1;
+  position: relative;
+}
+
+.NavBar .Title p {
   color: #369;
-  padding-left: 15px;
   font-weight: normal;
   font-size: 17pt;
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
+  left: 15px;
+  margin: 0;
+  padding: 0;
 }
 
 .NavBar .Links {
   flex: 1;
-  text-align: right;
-  padding-top: 5px;
-}
-
-.NavBar .Links a {
-  font-size: 10pt;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
   padding-right: 10px;
-  padding-left: 10px;
 }
 
+.NavBar .Links .Icon {
+  display: inline-block;
+  border-radius: 4px;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  position: relative;
+
+  margin-right: 10px;
+  opacity: 0.75;
+}
+
+.NavBar .Links .Icon img {
+  height: 28px;
+  border-radius: 4px;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  color: #666 !important;
+}
+
+.NavBar .Links .Icon:hover {
+  opacity: 1;
+}
+
+.NavBar .Links .Icon:active {
+  opacity: 0.5;
+}
 
 /*******/
 

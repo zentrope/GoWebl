@@ -5,14 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ .Config.Title }} - Home</title>
     <link rel="stylesheet" href="index.css" type="text/css"/>
+    <link rel="alternate" type="application/json" title="JSON Feed" href="{{.Config.BaseURL}}/feeds/json" />
   </head>
   <body>
     <section class="NavBar">
       <div class="Title">
-        {{ .Config.Title }}
+        <p>{{ .Config.Title }}</p>
       </div>
       <div class="Links">
-        <a href="/archive">Archive</a>
+        <div class="Icon">
+          <a href="{{.Config.BaseURL}}/archive">
+            <img src="{{.Config.BaseURL}}/images/archive.svg"/>
+          </a>
+        </div>
+        <div class="Icon">
+          <a href="{{.Config.BaseURL}}/feeds/json">
+            <img src="{{.Config.BaseURL}}/images/jsonfeed.svg"/>
+          </a>
+        </div>
       </div>
     </section>
     <section class="Content">
