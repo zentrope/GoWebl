@@ -12,22 +12,21 @@
         <a href="/">{{ .Config.Title }}</a>
       </div>
       <div class="Links">
-        <a href="/">Home</a>
         <a href="/archive">Archive</a>
       </div>
     </section>
     <section class="Content">
       <article id={{.Post.UUID}}>
-        <div class='postbody'>
-          {{ .Post.Text }}
-        </div>
         <div class="MetaBar">
-          <div class="Permalink">
-            <a href="/post/{{ .Post.UUID }}">permalink</a>
-          </div>
+          <div class="Permalink">&#x2742;</div>
           <div class="Author">
-            <i>By {{ .Post.Author }}</i> on <i>{{ .Post.DateCreated }}</i>
+            <span class="Date">{{ .Post.DateCreated }}</span>
+            &mdash;
+            <span class="Name">{{ .Post.Author}}</span>
           </div>
+        </div>
+        <div class="PostBody">
+          {{ .Post.Text }}
         </div>
       </article>
     </section>

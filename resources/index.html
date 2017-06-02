@@ -18,19 +18,18 @@
     <section class="Content">
       {{ range .Posts }}
       <article id={{.UUID}}>
-        <div class='ArticleSeparator'>
-          <a href="/post/{{ .UUID }}">&#x2742;</a>
-        </div>
-        <div class='postbody'>
-          {{ .Text }}
-        </div>
         <div class="MetaBar">
           <div class="Permalink">
-            <a href="/post/{{ .UUID }}">permalink</a>
+            <a title="{{ .Slugline }}" href="/post/{{ .UUID }}">&#x2742;</a>
           </div>
           <div class="Author">
-            By <i>{{ .Author }}</i> on <i>{{ .DateCreated }}</i>
+            <span class="Date">{{ .DateCreated }}</span>
+            &mdash;
+            <span class="Name">{{.Author}}</span>
           </div>
+        </div>
+        <div class='PostBody'>
+          {{ .Text }}
         </div>
       </article>
       {{ end }}
