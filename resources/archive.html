@@ -31,13 +31,14 @@
     <section class="Content">
       <h1>Archives</h1>
       <section class="TableOfContents">
+        {{ $url := .Config.BaseURL }}
         {{ range .Entries }}
         <div class="ArchiveEntry">
           <div class="Date">
             {{ .DateCreated }}
           </div>
           <div class="Post">
-            <a href="{{.Config.BaseURL}}/post/{{ .UUID }}">{{ .Slugline }}</a>
+            <a href="{{$url}}/post/{{ .UUID }}">{{ .Slugline }}</a>
           </div>
 
           <div class="Author">
