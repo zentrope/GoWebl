@@ -11,10 +11,12 @@ a {
   color: #369;
   text-decoration: none;
   cursor: pointer;
+  opacity: 0.7;
 }
 
 a:hover {
   color: DarkRed;
+  opacity: 1;
 }
 
 a:active {
@@ -228,6 +230,59 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 8px 6px -6px black;
   border: 1px solid #888;
   border-radius: 2px;
+}
+
+/*******/
+
+.Footer {
+  margin-top: 100px;
+  border-top: 1px solid #d8d8d8;
+  padding-top: 40px;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.Footer .Links {
+  display: flex;
+  text-align: center;
+  width: 200px;
+  margin: auto;
+}
+
+.Footer .Links a {
+  flex: 1;
+  opacity: 0.7;
+}
+
+.Footer .Links a:hover {
+  opacity: 1;
+  color: #369 !important;
+}
+
+.Footer .Links a:active {
+  fill: darkred;
+}
+
+.Footer .Links a img {
+  width: 25px;
+}
+
+.Footer .Links a p {
+  margin: 0;
+  font-size: 10pt;
+}
+
+.Footer .Copyright {
+  margin-top: 60px;
+  font-size: 10pt;
+  text-align: center;
+  color: #369;
+  opacity: 0.7;
+}
+
+.Footer .Copyright p {
+  margin: 0;
+  margin-bottom: 3px;
 }
 
 /*******/

@@ -11,20 +11,7 @@
   <body>
     <section class="NavBar">
       <div class="Title">
-        <p><a href="{{.Config.BaseURL}}/">{{ .Config.Title }}</a></p>
-      </div>
-      <div class="Links">
-        <div class="Icon">
-          <a href="{{.Config.BaseURL}}/feeds/json" title="JSON Feed">
-            <img src="{{.Config.BaseURL}}/images/jsonfeed.svg"/>
-          </a>
-        </div>
-        <div class="Icon">
-          <a href="{{.Config.BaseURL}}/feeds/rss" title="RSS Feed">
-            <img src="{{.Config.BaseURL}}/images/rssfeed.svg"/>
-          </a>
-        </div>
-      </div>
+        <p><a href="{{.Config.BaseURL}}/">&#x2248; {{ .Config.Title }}</a></p>
       </div>
     </section>
 
@@ -40,13 +27,29 @@
           <div class="Post">
             <a href="{{$url}}/post/{{ .UUID }}">{{ .Slugline }}</a>
           </div>
-
-          <div class="Author">
-            {{ .Author }}
-          </div>
         </div>
         {{ end }}
       </section>
+    </section>
+    <section class="Footer">
+      <div class="Links">
+        <a href="{{.Config.BaseURL}}/archive">
+          <img width="20px"  src="{{.Config.BaseURL}}/images/archive.svg"/>
+          <p>Archive</p>
+        </a>
+        <a href="{{.Config.BaseURL}}/feeds/json">
+          <img src="{{.Config.BaseURL}}/images/jsonfeed.svg"/>
+          <p>JSON</p>
+        </a>
+        <a href="{{.Config.BaseURL}}/feeds/rss">
+          <img src="{{.Config.BaseURL}}/images/rssfeed.svg"/>
+          <p>RSS</p>
+        </a>
+      </div>
+      <div class="Copyright">
+        <p>Copyright &copy; 2017 {{ .Config.Title }}</p>
+        <p>Portland, Oregon</p>
+      </div>
     </section>
   </body>
 

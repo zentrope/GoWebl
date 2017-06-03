@@ -11,22 +11,12 @@
   <body>
     <section class="NavBar">
       <div class="Title">
-        <p>{{ .Config.Title }}</p>
+        <p>&#x2248; {{ .Config.Title }}</p>
       </div>
       <div class="Links">
         <div class="Icon">
           <a href="{{.Config.BaseURL}}/archive" title="Post Archive">
             <img src="{{.Config.BaseURL}}/images/archive.svg"/>
-          </a>
-        </div>
-        <div class="Icon">
-          <a href="{{.Config.BaseURL}}/feeds/json" title="JSON Feed">
-            <img src="{{.Config.BaseURL}}/images/jsonfeed.svg"/>
-          </a>
-        </div>
-        <div class="Icon">
-          <a href="{{.Config.BaseURL}}/feeds/rss" title="RSS Feed">
-            <img src="{{.Config.BaseURL}}/images/rssfeed.svg"/>
           </a>
         </div>
       </div>
@@ -41,9 +31,6 @@
           </div>
           <div class="Author">
             <span class="Date">{{ .DateCreated }}</span>
-            &laquo;
-            <span class="Name">{{ .Author}}</span>
-            &raquo;
           </div>
         </div>
         <div class="PostBody">
@@ -52,7 +39,27 @@
       </article>
       {{ end }}
       <div class="Continuation">
-        <p><a href="{{.Config.BaseURL}}/archive">Check the archive for more &#x25B6;</a></p>
+        <p><a href="{{.Config.BaseURL}}/archive">Archive &#x25B6;</a></p>
+      </div>
+    </section>
+    <section class="Footer">
+      <div class="Links">
+        <a href="{{.Config.BaseURL}}/archive">
+          <img width="20px"  src="{{.Config.BaseURL}}/images/archive.svg"/>
+          <p>Archive</p>
+        </a>
+        <a href="{{.Config.BaseURL}}/feeds/json">
+          <img src="{{.Config.BaseURL}}/images/jsonfeed.svg"/>
+          <p>JSON</p>
+        </a>
+        <a href="{{.Config.BaseURL}}/feeds/rss">
+          <img src="{{.Config.BaseURL}}/images/rssfeed.svg"/>
+          <p>RSS</p>
+        </a>
+      </div>
+      <div class="Copyright">
+        <p>Copyright &copy; 2017 {{ .Config.Title }}</p>
+        <p>Portland, Oregon</p>
       </div>
     </section>
   </body>
