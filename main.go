@@ -85,6 +85,7 @@ func mkWebApp(
 	home := http.HandlerFunc(internal.HomePage(webConfig, database, resources))
 	post := http.HandlerFunc(internal.PostPage(webConfig, database, resources))
 	json := http.HandlerFunc(internal.JsonFeed(webConfig, database, resources))
+	rss := http.HandlerFunc(internal.RssFeed(webConfig, database, resources))
 	gql := http.HandlerFunc(internal.GraphQlClientPage(resources))
 	static := http.HandlerFunc(internal.StaticPage(resources))
 
@@ -99,6 +100,8 @@ func mkWebApp(
 	// public blog routes
 	service.Handle("/feeds/json", json)
 	service.Handle("/feeds/json/", json)
+	service.Handle("/feeds/rss", rss)
+	service.Handle("/feeds/rss/", rss)
 	service.Handle("/archive", archive)
 	service.Handle("/query", api)
 	service.Handle("/post/", post)

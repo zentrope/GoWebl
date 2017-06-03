@@ -47,7 +47,7 @@ func NewJSONFeed(config WebConfig, posts []*LatestPost) (string, error) {
 			DatePublished: p.DateCreated.Format(time.RFC3339),
 			DateModified:  p.DateUpdated.Format(time.RFC3339),
 			Author:        ItemAuthor{p.Author},
-			ContentHtml:   toMarkdown(p.Text),
+			ContentHtml:   MarkdownToHtml(p.Text),
 		})
 	}
 

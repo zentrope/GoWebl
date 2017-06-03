@@ -66,16 +66,14 @@ h1, h2, h3, h4, h5, h6 {
   display: inline-block;
   border-radius: 4px;
   width: 30px;
-  height: 30px;
+  height: 20px;
   text-align: center;
   position: relative;
-
-  margin-right: 10px;
-  opacity: 0.75;
+  opacity: 0.66;
 }
 
 .NavBar .Links .Icon img {
-  height: 28px;
+  height: 22px;
   border-radius: 4px;
 
   position: absolute;

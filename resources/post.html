@@ -6,6 +6,7 @@
     <title>{{ .Config.Title }} - {{ .Post.Slugline }}</title>
     <link rel="stylesheet" href="{{.Config.BaseURL}}/index.css" type="text/css"/>
     <link rel="alternate" type="application/json" title="JSON Feed" href="{{.Config.BaseURL}}/feeds/json" />
+    <link rel="alternate" type="text/rss+xml" title="RSS Feed" href="{{.Config.BaseURL}}/feeds/rss" />
   </head>
   <body>
     <section class="NavBar">
@@ -19,20 +20,27 @@
           </a>
         </div>
         <div class="Icon">
-          <a href="{{.Config.BaseURL}}/feeds/json">
+          <a href="{{.Config.BaseURL}}/feeds/json" title="JSON Feed">
             <img src="{{.Config.BaseURL}}/images/jsonfeed.svg"/>
           </a>
         </div>
+        <div class="Icon">
+          <a href="{{.Config.BaseURL}}/feeds/rss" title="RSS Feed">
+            <img src="{{.Config.BaseURL}}/images/rssfeed.svg"/>
+          </a>
+        </div>
+      </div>
       </div>
     </section>
     <section class="Content">
-      <article id={{.Post.UUID}}>
+      <article id="{{.Post.UUID}}">
         <div class="MetaBar">
           <div class="Permalink">&#x2742;</div>
           <div class="Author">
             <span class="Date">{{ .Post.DateCreated }}</span>
-            &mdash;
+            &laquo;
             <span class="Name">{{ .Post.Author}}</span>
+            &raquo;
           </div>
         </div>
         <div class="PostBody">

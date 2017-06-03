@@ -6,6 +6,7 @@
     <title>{{ .Config.Title }} - Home</title>
     <link rel="stylesheet" href="index.css" type="text/css"/>
     <link rel="alternate" type="application/json" title="JSON Feed" href="{{.Config.BaseURL}}/feeds/json" />
+    <link rel="alternate" type="text/rss+xml" title="RSS Feed" href="{{.Config.BaseURL}}/feeds/rss" />
   </head>
   <body>
     <section class="NavBar">
@@ -14,37 +15,44 @@
       </div>
       <div class="Links">
         <div class="Icon">
-          <a href="{{.Config.BaseURL}}/archive">
+          <a href="{{.Config.BaseURL}}/archive" title="Post Archive">
             <img src="{{.Config.BaseURL}}/images/archive.svg"/>
           </a>
         </div>
         <div class="Icon">
-          <a href="{{.Config.BaseURL}}/feeds/json">
+          <a href="{{.Config.BaseURL}}/feeds/json" title="JSON Feed">
             <img src="{{.Config.BaseURL}}/images/jsonfeed.svg"/>
+          </a>
+        </div>
+        <div class="Icon">
+          <a href="{{.Config.BaseURL}}/feeds/rss" title="RSS Feed">
+            <img src="{{.Config.BaseURL}}/images/rssfeed.svg"/>
           </a>
         </div>
       </div>
     </section>
     <section class="Content">
+      {{ $url := .Config.BaseURL }}
       {{ range .Posts }}
-      <article id={{.UUID}}>
+      <article id="{{.UUID}}">
         <div class="MetaBar">
           <div class="Permalink">
-            <a title="{{ .Slugline }}" href="/post/{{ .UUID }}">&#x2742;</a>
+            <a title="{{ .Slugline }}" href="{{$url}}/post/{{ .UUID }}">&#x2742;</a>
           </div>
           <div class="Author">
             <span class="Date">{{ .DateCreated }}</span>
-            &mdash;
-            <span class="Name">{{.Author}}</span>
+            &laquo;
+            <span class="Name">{{ .Author}}</span>
+            &raquo;
           </div>
         </div>
-        <div class='PostBody'>
+        <div class="PostBody">
           {{ .Text }}
         </div>
       </article>
       {{ end }}
       <div class="Continuation">
-        <p><a href="/archive">Check the archive for more &#x25B6;</a></p>
+        <p><a href="{{.Config.BaseURL}}/archive">Check the archive for more &#x25B6;</a></p>
       </div>
     </section>
   </body>

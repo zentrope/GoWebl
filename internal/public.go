@@ -61,8 +61,13 @@ func xformArchiveEntry(e *ArchiveEntry) *TemplateArchiveEntry {
 	}
 }
 
-func toMarkdown(data string) string {
-	htmlFlags := blackfriday.HTML_USE_XHTML
+func MarkdownToHtml(data string) string {
+	htmlFlags := blackfriday.HTML_USE_XHTML |
+		blackfriday.HTML_USE_SMARTYPANTS |
+		blackfriday.HTML_SMARTYPANTS_FRACTIONS |
+		blackfriday.HTML_SMARTYPANTS_DASHES |
+		blackfriday.HTML_SMARTYPANTS_LATEX_DASHES
+
 	extensions := blackfriday.EXTENSION_NO_INTRA_EMPHASIS |
 		blackfriday.EXTENSION_TABLES |
 		blackfriday.EXTENSION_FENCED_CODE |
@@ -90,12 +95,12 @@ func xformTemplatePost(p *LatestPost) *TemplatePost {
 		p.DateUpdated.Format("Jan 2, 2006"),
 		p.Status,
 		p.Slugline,
-		template.HTML(toMarkdown(p.Text)),
+		template.HTML(MarkdownToHtml(p.Text)),
 	}
 }
 
 func logRequest(r *http.Request) {
-	log.Printf("%s %s\n", r.Method, r.URL.Path)
+	// log.Printf("%s %s\n", r.Method, r.URL.Path)
 }
 
 func isIndexPath(prefix string, r *http.Request) bool {
@@ -176,6 +181,29 @@ func AdminPage(resources *Resources) http.HandlerFunc {
 		}
 
 		fmt.Fprintf(w, page)
+	}
+}
+
+func RssFeed(config WebConfig, database *Database, resources *Resources) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		logRequest(r)
+
+		posts, err := database.LatestPosts(40)
+
+		if err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+
+		feed, err := NewRSSFeed(config, posts)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("content-type", "text/xml")
+		fmt.Fprintf(w, feed)
 	}
 }
 
