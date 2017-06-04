@@ -42,7 +42,6 @@ h1, h2, h3, h4, h5, h6 {
 .NavBar .Title {
   flex: 5;
   position: relative;
-  border: 1px solid red;
   white-space: nowrap;
 }
 
