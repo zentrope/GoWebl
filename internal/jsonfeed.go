@@ -33,6 +33,8 @@ type JSONFeed struct {
 	HomePageURL string     `json:"home_page_url"`
 	FeedURL     string     `json:"feed_url"`
 	Author      ItemAuthor `json:"author"`
+	Icon        string     `json:"icon"`
+	Favicon     string     `json:"favicon"`
 	Items       []FeedItem `json:"items"`
 }
 
@@ -58,6 +60,8 @@ func NewJSONFeed(config WebConfig, posts []*LatestPost) (string, error) {
 		HomePageURL: config.BaseURL,
 		FeedURL:     config.BaseURL + "/feeds/json",
 		Author:      ItemAuthor{"Root"},
+		Icon:        config.BaseURL + "/images/apple-touch-icon-180.png",
+		Favicon:     config.BaseURL + "/images/apple-touch-icon-60.png",
 		Items:       items,
 	}
 
