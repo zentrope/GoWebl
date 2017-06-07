@@ -72,49 +72,14 @@ func mkWebApp(
 	resources *internal.Resources,
 	database *internal.Database,
 	graphapi *internal.GraphAPI,
-) *http.ServeMux {
-	log.Println("Constructing web app.")
+) *http.Server {
 
-	service := http.NewServeMux()
+	app := internal.NewWebApplication(config, resources, database, graphapi)
 
-	webConfig := config.Web
-
-	admin := http.HandlerFunc(internal.AdminPage(resources))
-	api := http.HandlerFunc(internal.QueryAPI(graphapi))
-	archive := http.HandlerFunc(internal.ArchivePage(webConfig, database, resources))
-	home := http.HandlerFunc(internal.HomePage(webConfig, database, resources))
-	post := http.HandlerFunc(internal.PostPage(webConfig, database, resources))
-	json := http.HandlerFunc(internal.JsonFeed(webConfig, database, resources))
-	rss := http.HandlerFunc(internal.RssFeed(webConfig, database, resources))
-	gql := http.HandlerFunc(internal.GraphQlClientPage(resources))
-	static := http.HandlerFunc(internal.StaticPage(resources))
-
-	// GraphQL
-	service.Handle("/graphql", gql)
-	service.Handle("/static/", static)
-	service.Handle("/vendor/", static)
-
-	// Admin Post Manager
-	service.Handle("/admin/", admin)
-
-	// public blog routes
-	service.Handle("/feeds/json", json)
-	service.Handle("/feeds/json/", json)
-	service.Handle("/feeds/rss", rss)
-	service.Handle("/feeds/rss/", rss)
-	service.Handle("/archive", archive)
-	service.Handle("/query", api)
-	service.Handle("/post/", post)
-	service.Handle("/", home)
-
-	return service
-}
-
-func mkServer(config *internal.AppConfig, app *http.ServeMux) *http.Server {
-	server := &http.Server{}
-	server.Addr = ":" + config.Web.Port
-	server.Handler = app
-	return server
+	return &http.Server{
+		Addr:    ":" + config.Web.Port,
+		Handler: app,
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -130,10 +95,7 @@ func blockUntilShutdownThenDo(fn func()) {
 }
 
 func notify(config *internal.AppConfig) {
-	// p := config.Web.Port
 	log.Printf("Web access -> %s\n", config.Web.BaseURL)
-	// log.Printf("GraphQL explorer access -> http://localhost:%s/graphql\n", p)
-	// log.Printf("Query API access -> http://localhost:%s/query\n", p)
 }
 
 func main() {
@@ -146,8 +108,8 @@ func main() {
 	database.MustRunMigrations(resources)
 
 	graphapi := mkGraphAPI(database)
-	app := mkWebApp(config, resources, database, graphapi)
-	server := mkServer(config, app)
+	server := mkWebApp(config, resources, database, graphapi)
+	// server := mkServer(config, app)
 
 	go server.ListenAndServe()
 

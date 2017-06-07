@@ -16,17 +16,91 @@ import (
 	"github.com/russross/blackfriday"
 )
 
-type HomeData struct {
+type WebApplication struct {
+	router    *http.ServeMux
+	resources *Resources
+	graphql   *GraphAPI
+	database  *Database
+	config    WebConfig
+}
+
+type ResourceKey string
+
+const DB_KEY = ResourceKey("db")
+const API_KEY = ResourceKey("api")
+const CONF_KEY = ResourceKey("conf")
+const RES_KEY = ResourceKey("res")
+
+func (app *WebApplication) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+	// log.Printf("> %v %v", r.Method, r.URL.String())
+
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers",
+		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+	if r.Method == "OPTIONS" {
+		return
+	}
+
+	ctx1 := context.WithValue(r.Context(), DB_KEY, app.database)
+	ctx2 := context.WithValue(ctx1, API_KEY, app.graphql)
+	ctx3 := context.WithValue(ctx2, CONF_KEY, app.config)
+	ctx4 := context.WithValue(ctx3, RES_KEY, app.resources)
+
+	app.router.ServeHTTP(w, r.WithContext(ctx4))
+}
+
+func NewWebApplication(config *AppConfig, resources *Resources,
+	database *Database, graphapi *GraphAPI) *WebApplication {
+
+	service := http.NewServeMux()
+
+	webConfig := config.Web
+
+	// GraphQL
+	service.HandleFunc("/graphql", graphQlClientPage)
+	service.HandleFunc("/static/", staticPage)
+	service.HandleFunc("/vendor/", staticPage)
+
+	// Admin Post Manager
+	service.HandleFunc("/admin/", adminPage)
+
+	// public blog routes
+
+	service.HandleFunc("/feeds/json", jsonFeed)
+	service.HandleFunc("/feeds/json/", jsonFeed)
+	service.HandleFunc("/feeds/rss", rssFeed)
+	service.HandleFunc("/feeds/rss/", rssFeed)
+
+	service.HandleFunc("/archive", archivePage)
+	service.HandleFunc("/query", queryApi)
+	service.HandleFunc("/post/", postPage)
+	service.HandleFunc("/", homePage)
+
+	return &WebApplication{
+		router:    service,
+		resources: resources,
+		graphql:   graphapi,
+		database:  database,
+		config:    webConfig,
+	}
+}
+
+// ---
+
+type homeData struct {
 	Posts  []*TemplatePost
 	Config WebConfig
 }
 
-type ArchiveData struct {
+type archiveData struct {
 	Entries []*TemplateArchiveEntry
 	Config  WebConfig
 }
 
-type PostData struct {
+type postData struct {
 	Post   *TemplatePost
 	Config WebConfig
 }
@@ -99,242 +173,235 @@ func xformTemplatePost(p *LatestPost) *TemplatePost {
 	}
 }
 
-func logRequest(r *http.Request) {
-	// log.Printf("%s %s\n", r.Method, r.URL.Path)
-}
-
 func isIndexPath(prefix string, r *http.Request) bool {
 	path := r.URL.Path
 	return (path == prefix) || strings.HasSuffix(path, "/index.html")
 }
 
-func QueryAPI(api *GraphAPI) http.HandlerFunc {
+func queryApi(w http.ResponseWriter, r *http.Request) {
 
-	return func(w http.ResponseWriter, r *http.Request) {
-		logRequest(r)
+	api := resolveApi(r)
 
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers",
-			"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-
-		if r.Method == "OPTIONS" {
-			return
-		}
-
-		var params struct {
-			Query         string                 `json:"query"`
-			OperationName string                 `json:"operationName"`
-			Variables     map[string]interface{} `json:"variables"`
-		}
-
-		if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			log.Println(err)
-			return
-		}
-
-		authToken := r.Header.Get("Authorization")
-		if authToken == "" {
-			authToken = "NO_AUTH_TOKEN"
-		} else {
-			authToken = strings.Replace(authToken, "Bearer ", "", 1)
-		}
-
-		authCtx := context.WithValue(r.Context(), AUTH_KEY, authToken)
-
-		response := api.Schema.Exec(authCtx, params.Query, params.OperationName, params.Variables)
-		responseJSON, err := json.Marshal(response)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		w.Write(responseJSON)
+	var params struct {
+		Query         string                 `json:"query"`
+		OperationName string                 `json:"operationName"`
+		Variables     map[string]interface{} `json:"variables"`
 	}
+
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Println(err)
+		return
+	}
+
+	authToken := r.Header.Get("Authorization")
+	if authToken == "" {
+		authToken = "NO_AUTH_TOKEN"
+	} else {
+		authToken = strings.Replace(authToken, "Bearer ", "", 1)
+	}
+
+	authCtx := context.WithValue(r.Context(), AUTH_KEY, authToken)
+
+	response := api.Schema.Exec(authCtx, params.Query, params.OperationName, params.Variables)
+	responseJSON, err := json.Marshal(response)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(responseJSON)
 }
 
-func StaticPage(resources *Resources) http.HandlerFunc {
+func staticPage(w http.ResponseWriter, r *http.Request) {
+	resources := resolveRes(r)
 	fs := resources.AdminFileServer()
-	return func(w http.ResponseWriter, r *http.Request) {
-		logRequest(r)
+	fs.ServeHTTP(w, r)
+}
+
+func adminPage(w http.ResponseWriter, r *http.Request) {
+	resources := resolveRes(r)
+	fs := resources.AdminFileServer()
+
+	if resources.AdminFileExists(r.URL.Path[1:]) {
 		fs.ServeHTTP(w, r)
+		return
 	}
+
+	page, err := resources.Admin.String("index.html")
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+		return
+	}
+
+	fmt.Fprintf(w, page)
 }
 
-func AdminPage(resources *Resources) http.HandlerFunc {
-	fs := resources.AdminFileServer()
+func rssFeed(w http.ResponseWriter, r *http.Request) {
+	config := resolveConf(r)
+	database := resolveDb(r)
 
-	return func(w http.ResponseWriter, r *http.Request) {
-		logRequest(r)
-
-		if resources.AdminFileExists(r.URL.Path[1:]) {
-			fs.ServeHTTP(w, r)
-			return
-		}
-
-		page, err := resources.Admin.String("index.html")
-		if err != nil {
-			http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
-			return
-		}
-
-		fmt.Fprintf(w, page)
-	}
-}
-
-func RssFeed(config WebConfig, database *Database, resources *Resources) http.HandlerFunc {
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		logRequest(r)
-
-		posts, err := database.LatestPosts(40)
-
-		if err != nil {
-			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
-			return
-		}
-
-		feed, err := NewRSSFeed(config, posts)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
-			return
-		}
-
-		w.Header().Set("content-type", "text/xml")
-		fmt.Fprintf(w, feed)
-	}
-}
-
-func JsonFeed(config WebConfig, database *Database, resources *Resources) http.HandlerFunc {
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		logRequest(r)
-
-		posts, err := database.LatestPosts(40)
-
-		if err != nil {
-			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
-			return
-		}
-
-		feed, err := NewJSONFeed(config, posts)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
-			return
-		}
-
-		w.Header().Set("content-type", "application/json")
-		fmt.Fprintf(w, feed)
-	}
-}
-
-func HomePage(config WebConfig, database *Database, resources *Resources) http.HandlerFunc {
-
-	page, err := resources.ResolveTemplate("index.html")
+	posts, err := database.LatestPosts(40)
 
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
 	}
+
+	feed, err := NewRSSFeed(config, posts)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("content-type", "text/xml")
+	fmt.Fprintf(w, feed)
+}
+
+func jsonFeed(w http.ResponseWriter, r *http.Request) {
+	config := resolveConf(r)
+	database := resolveDb(r)
+
+	posts, err := database.LatestPosts(40)
+
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
+	}
+
+	feed, err := NewJSONFeed(config, posts)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("content-type", "application/json")
+	fmt.Fprintf(w, feed)
+}
+
+func homePage(w http.ResponseWriter, r *http.Request) {
+	resources := resolveRes(r)
+	database := resolveDb(r)
+	config := resolveConf(r)
 
 	fs := resources.PublicFileServer()
 
-	return func(w http.ResponseWriter, r *http.Request) {
-		logRequest(r)
-
-		if !isIndexPath("/", r) {
-			fs.ServeHTTP(w, r)
-			return
-		}
-
-		posts, err := database.LatestPosts(40)
-
-		if err != nil {
-			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
-			return
-		}
-
-		rPosts := make([]*TemplatePost, 0)
-		for _, p := range posts {
-			rPosts = append(rPosts, xformTemplatePost(p))
-		}
-
-		data := &HomeData{Config: config, Posts: rPosts}
-
-		if err := page.Execute(w, data); err != nil {
-			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
-			return
-		}
+	if !isIndexPath("/", r) {
+		fs.ServeHTTP(w, r)
+		return
 	}
-}
 
-func PostPage(config WebConfig, database *Database, resources *Resources) http.HandlerFunc {
-	page, err := resources.ResolveTemplate("post.html")
+	page, err := resources.ResolveTemplate("index.html")
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
+	}
+
+	posts, err := database.LatestPosts(40)
 
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	rPosts := make([]*TemplatePost, 0)
+	for _, p := range posts {
+		rPosts = append(rPosts, xformTemplatePost(p))
+	}
 
-		logRequest(r)
+	data := &homeData{Config: config, Posts: rPosts}
 
-		uuid := strings.Split(r.URL.Path, "/")[2]
-
-		post, err := database.FocusPost(uuid)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
-			return
-		}
-
-		data := &PostData{Post: xformTemplatePost(post), Config: config}
-
-		if err := page.Execute(w, data); err != nil {
-			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
-			return
-		}
+	if err := page.Execute(w, data); err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
 	}
 }
 
-func ArchivePage(config WebConfig, database *Database, resources *Resources) http.HandlerFunc {
+func postPage(w http.ResponseWriter, r *http.Request) {
+
+	resources := resolveRes(r)
+	database := resolveDb(r)
+	config := resolveConf(r)
+
+	page, err := resources.ResolveTemplate("post.html")
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
+	}
+
+	uuid := strings.Split(r.URL.Path, "/")[2]
+
+	post, err := database.FocusPost(uuid)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+		return
+	}
+
+	data := &postData{Post: xformTemplatePost(post), Config: config}
+
+	if err := page.Execute(w, data); err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
+	}
+}
+
+func archivePage(w http.ResponseWriter, r *http.Request) {
+
+	resources := resolveRes(r)
+	database := resolveDb(r)
+	config := resolveConf(r)
 
 	page, err := resources.ResolveTemplate("archive.html")
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
-		logRequest(r)
+	entries, err := database.ArchiveEntries()
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
+	}
 
-		entries, err := database.ArchiveEntries()
-		if err != nil {
-			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
-			return
-		}
+	data := make([]*TemplateArchiveEntry, 0)
+	for _, e := range entries {
+		data = append(data, xformArchiveEntry(e))
+	}
 
-		data := make([]*TemplateArchiveEntry, 0)
-		for _, e := range entries {
-			data = append(data, xformArchiveEntry(e))
-		}
+	values := &archiveData{Entries: data, Config: config}
 
-		values := &ArchiveData{Entries: data, Config: config}
-
-		if err := page.Execute(w, values); err != nil {
-			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
-			return
-		}
+	if err := page.Execute(w, values); err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
 	}
 }
 
-func GraphQlClientPage(resources *Resources) http.HandlerFunc {
+func graphQlClientPage(w http.ResponseWriter, r *http.Request) {
+	resources := resolveRes(r)
 	page, err := resources.PrivateString("graphql.html")
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
-		logRequest(r)
-		fmt.Fprintf(w, page)
-	}
+	fmt.Fprintf(w, page)
+}
+
+//----
+
+func resolveDb(r *http.Request) *Database {
+	return r.Context().Value(DB_KEY).(*Database)
+}
+
+func resolveApi(r *http.Request) *GraphAPI {
+	return r.Context().Value(API_KEY).(*GraphAPI)
+}
+
+func resolveConf(r *http.Request) WebConfig {
+	return r.Context().Value(CONF_KEY).(WebConfig)
+}
+
+func resolveRes(r *http.Request) *Resources {
+	return r.Context().Value(RES_KEY).(*Resources)
 }

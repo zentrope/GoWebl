@@ -7,6 +7,7 @@ package internal
 import (
 	"html/template"
 	"net/http"
+	"sync"
 
 	rice "github.com/GeertJohan/go.rice"
 )
@@ -37,14 +38,34 @@ func NewResources() (*Resources, error) {
 	return &Resources{private, public, admin}, nil
 }
 
+var cache = make(map[string]*template.Template, 0)
+var cacheMutex = sync.Mutex{}
+
 func (r *Resources) ResolveTemplate(name string) (*template.Template, error) {
+
+	if cache[name] != nil {
+		return cache[name], nil
+	}
+
+	cacheMutex.Lock()
+	defer cacheMutex.Unlock()
+
+	if cache[name] != nil {
+		return cache[name], nil
+	}
+
 	templateString, err := r.Private.String(name)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return template.New(name).Parse(templateString)
+	t, err := template.New(name).Parse(templateString)
+	if err != nil {
+		return nil, err
+	}
+	cache[name] = t
+	return t, nil
 }
 
 func (r *Resources) AdminFileExists(name string) bool {
