@@ -30,6 +30,7 @@ const DB_KEY = ResourceKey("db")
 const API_KEY = ResourceKey("api")
 const CONF_KEY = ResourceKey("conf")
 const RES_KEY = ResourceKey("res")
+const AUTH_KEY = ResourceKey("auth")
 
 func (app *WebApplication) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 

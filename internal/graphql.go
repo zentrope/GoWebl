@@ -67,10 +67,6 @@ const Schema = `
 // Root Resolver
 //=============================================================================
 
-type AuthKeyContextType string
-
-const AUTH_KEY = AuthKeyContextType("auth-key")
-
 type GraphAPI struct {
 	Schema *graphql.Schema
 }
@@ -92,16 +88,16 @@ func NewApi(database *Database) (*GraphAPI, error) {
 // Auth Tokens (JWT)
 //=============================================================================
 
-// TODO(keith): Grab from env and config
-var SECRET = []byte("thirds-and-fifths")
-
 type ViewerClaims struct {
 	User string `json:"user"`
 	Type string `json:"type"`
 	jwt.StandardClaims
 }
 
-func mkAuthToken(author *Author) (string, error) {
+func mkAuthToken(ctx context.Context, author *Author) (string, error) {
+	config := ctx.Value(CONF_KEY).(WebConfig)
+	secret := []byte(config.JwtKey)
+
 	claims := ViewerClaims{
 		author.Handle, author.Type,
 		jwt.StandardClaims{
@@ -110,7 +106,7 @@ func mkAuthToken(author *Author) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(SECRET)
+	tokenString, err := token.SignedString(secret)
 	if err != nil {
 		return "", err
 	}
@@ -118,16 +114,20 @@ func mkAuthToken(author *Author) (string, error) {
 	return tokenString, nil
 }
 
-func checkAlgKey(token *jwt.Token) (interface{}, error) {
-	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+func checkAlgKey(ctx context.Context) jwt.Keyfunc {
+	config := ctx.Value(CONF_KEY).(WebConfig)
+	secret := []byte(config.JwtKey)
+	return func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+		return secret, nil
 	}
-	return SECRET, nil
 }
 
-func isValidAuthToken(tokenString string) (bool, error) {
+func isValidAuthToken(ctx context.Context, tokenString string) (bool, error) {
 
-	token, err := jwt.ParseWithClaims(tokenString, &ViewerClaims{}, checkAlgKey)
+	token, err := jwt.ParseWithClaims(tokenString, &ViewerClaims{}, checkAlgKey(ctx))
 
 	if err != nil {
 		return false, err
@@ -136,9 +136,9 @@ func isValidAuthToken(tokenString string) (bool, error) {
 	return token.Valid, nil
 }
 
-func decodeAuthToken(tokenString string) (*ViewerClaims, error) {
+func decodeAuthToken(ctx context.Context, tokenString string) (*ViewerClaims, error) {
 
-	token, err := jwt.ParseWithClaims(tokenString, &ViewerClaims{}, checkAlgKey)
+	token, err := jwt.ParseWithClaims(tokenString, &ViewerClaims{}, checkAlgKey(ctx))
 
 	if err != nil {
 		return nil, err
@@ -157,7 +157,7 @@ func findAuthClaims(ctx context.Context, token *string) (*ViewerClaims, error) {
 		auth = *token
 	}
 
-	claims, err := decodeAuthToken(auth)
+	claims, err := decodeAuthToken(ctx, auth)
 	if err != nil {
 		return nil, err
 	}
@@ -169,13 +169,13 @@ func findAuthClaims(ctx context.Context, token *string) (*ViewerClaims, error) {
 // Auth
 //=============================================================================
 
-func (r *Resolver) Validate(args *struct{ Token string }) (bool, error) {
+func (r *Resolver) Validate(ctx context.Context, args *struct{ Token string }) (bool, error) {
 	tokenString := args.Token
 	// TODO: Make sure the user in the token still exists
-	return isValidAuthToken(tokenString)
+	return isValidAuthToken(ctx, tokenString)
 }
 
-func (r *Resolver) Authenticate(args *struct{ User, Pass string }) (string, error) {
+func (r *Resolver) Authenticate(ctx context.Context, args *struct{ User, Pass string }) (string, error) {
 	user := args.User
 	pass := args.Pass
 
@@ -184,7 +184,7 @@ func (r *Resolver) Authenticate(args *struct{ User, Pass string }) (string, erro
 		return "", err
 	}
 
-	return mkAuthToken(author)
+	return mkAuthToken(ctx, author)
 }
 
 //=============================================================================
