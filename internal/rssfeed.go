@@ -38,11 +38,11 @@ type RSSFeed struct {
 	Channel RSSChannel `xml:"channel"`
 }
 
-func NewRSSFeed(config WebConfig, posts []*LatestPost) (string, error) {
+func NewRSSFeed(site SiteConfig, posts []*LatestPost) (string, error) {
 
 	items := make([]RSSItem, 0)
 	for _, post := range posts {
-		link := config.BaseURL + "/post/" + post.UUID
+		link := site.BaseURL + "/post/" + post.UUID
 		items = append(items, RSSItem{
 			Title:       post.Slugline,
 			Link:        link,
@@ -54,9 +54,9 @@ func NewRSSFeed(config WebConfig, posts []*LatestPost) (string, error) {
 	}
 
 	channel := RSSChannel{
-		Title:       config.Title,
-		Link:        config.BaseURL,
-		Description: "Last 40 bloops of " + config.Title,
+		Title:       site.Title,
+		Link:        site.BaseURL,
+		Description: site.Description,
 		Items:       items,
 	}
 

@@ -82,8 +82,16 @@ func mkWebApp(
 	}
 }
 
+func addSiteConfig(config *internal.AppConfig, database *internal.Database) *internal.AppConfig {
+	newConfig, err := database.AppendSiteConfig(config)
+	if err != nil {
+		panic(err)
+	}
+	return newConfig
+}
+
 //-----------------------------------------------------------------------------
-// Boostraap
+// Bootstrap
 //-----------------------------------------------------------------------------
 
 func blockUntilShutdownThenDo(fn func()) {
@@ -106,10 +114,10 @@ func main() {
 	config := mkConfig(resources)
 	database := mkDatabase(config)
 	database.MustRunMigrations(resources)
+	config = addSiteConfig(config, database)
 
 	graphapi := mkGraphAPI(database)
 	server := mkWebApp(config, resources, database, graphapi)
-	// server := mkServer(config, app)
 
 	go server.ListenAndServe()
 

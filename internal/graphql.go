@@ -94,9 +94,13 @@ type ViewerClaims struct {
 	jwt.StandardClaims
 }
 
+func getSecret(ctx context.Context) []byte {
+	site := ctx.Value(SITE_KEY).(SiteConfig)
+	return []byte(site.JwtSecret)
+}
+
 func mkAuthToken(ctx context.Context, author *Author) (string, error) {
-	config := ctx.Value(CONF_KEY).(WebConfig)
-	secret := []byte(config.JwtKey)
+	secret := getSecret(ctx)
 
 	claims := ViewerClaims{
 		author.Handle, author.Type,
@@ -115,8 +119,7 @@ func mkAuthToken(ctx context.Context, author *Author) (string, error) {
 }
 
 func checkAlgKey(ctx context.Context) jwt.Keyfunc {
-	config := ctx.Value(CONF_KEY).(WebConfig)
-	secret := []byte(config.JwtKey)
+	secret := getSecret(ctx)
 	return func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])

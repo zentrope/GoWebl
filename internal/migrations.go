@@ -8,6 +8,7 @@ import "log"
 
 var migrations = []string{
 	"sql/01-schema.sql",
+	"sql/02-schema.sql",
 }
 
 func (conn *Database) MustRunMigrations(resources *Resources) {

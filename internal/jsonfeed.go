@@ -7,7 +7,6 @@ package internal
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"time"
 )
 
@@ -38,13 +37,13 @@ type JSONFeed struct {
 	Items       []FeedItem `json:"items"`
 }
 
-func NewJSONFeed(config WebConfig, posts []*LatestPost) (string, error) {
+func NewJSONFeed(site SiteConfig, posts []*LatestPost) (string, error) {
 
 	items := make([]FeedItem, 0)
 	for _, p := range posts {
 		items = append(items, FeedItem{
-			Id:            config.BaseURL + "/post/" + p.UUID,
-			Url:           config.BaseURL + "/post/" + p.UUID,
+			Id:            site.BaseURL + "/post/" + p.UUID,
+			Url:           site.BaseURL + "/post/" + p.UUID,
 			Title:         p.Slugline,
 			DatePublished: p.DateCreated.Format(time.RFC3339),
 			DateModified:  p.DateUpdated.Format(time.RFC3339),
@@ -55,13 +54,13 @@ func NewJSONFeed(config WebConfig, posts []*LatestPost) (string, error) {
 
 	feed := JSONFeed{
 		Version:     "https://jsonfeed.org/version/1",
-		Title:       config.Title,
-		Description: fmt.Sprintf("Most recent 40 bloops for '%v'.", config.Title),
-		HomePageURL: config.BaseURL,
-		FeedURL:     config.BaseURL + "/feeds/json",
+		Title:       site.Title,
+		Description: site.Description,
+		HomePageURL: site.BaseURL,
+		FeedURL:     site.BaseURL + "/feeds/json",
 		Author:      ItemAuthor{"Root"},
-		Icon:        config.BaseURL + "/images/apple-touch-icon-180.png",
-		Favicon:     config.BaseURL + "/images/apple-touch-icon-60.png",
+		Icon:        site.BaseURL + "/images/apple-touch-icon-180.png",
+		Favicon:     site.BaseURL + "/images/apple-touch-icon-60.png",
 		Items:       items,
 	}
 
