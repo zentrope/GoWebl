@@ -127,18 +127,22 @@ class MainPhase extends React.PureComponent {
   }
 
   render() {
-    const { logout, client } = this.props
+    const { logout, client, site } = this.props
     const { viewer } = this.state
 
     const PropRoute = ({component: Component, path: Path, ...rest}) => (
       <Route exact path={Path} render={(props) => (<Component {...rest} {...props}/> )}/>
     )
 
+    const visit = () => {
+      window.location.href = site.baseUrl
+    }
+
     return (
       <Router history={this.history}>
         <section className="App">
-          <TitleBar title="Webl Manager" user={viewer.get("email")} logout={logout}/>
-          <StatusBar year="2017" copyright="Keith Irwin"/>
+          <TitleBar title={ site.title } user={viewer.get("email")} visit={visit} logout={logout}/>
+          <StatusBar year="2017" copyright={ site.title }/>
           <Switch>
             <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} dispatch={this.dispatch}/>
             <PropRoute path="/admin/post/new" component={NewPost} dispatch={this.dispatch}/>

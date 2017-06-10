@@ -19,7 +19,7 @@ class App extends React.PureComponent {
 
     this.client = new Client(endpoint, this.onError)
 
-    this.state = { loggedIn : 0}
+    this.state = { loggedIn: 0, site: {baseURL: "/", title: "Webl", description: "Webl"}}
 
     this.onLogout = this.onLogout.bind(this)
     this.onLogin = this.onLogin.bind(this)
@@ -44,11 +44,18 @@ class App extends React.PureComponent {
   componentDidMount() {
     var token = "" + localStorage.getItem("auth-token")
 
+    this.client.siteData(result => {
+      if (! result.data.site) {
+        console.log(result.errors)
+        return
+      }
+      this.setState({site: result.data.site})
+    })
+
     this.client.validate(token, result => {
       if (! result.data.validate) {
         console.log(result.errors)
         this.onLogout()
-
       } else {
         this.onLogin(token)
       }
@@ -56,17 +63,17 @@ class App extends React.PureComponent {
   }
 
   render() {
-    const { loggedIn } = this.state
+    const { loggedIn, site } = this.state
 
     switch (loggedIn) {
       case 0:
         return (<LoadingPhase/>)
 
       case -1:
-        return (<LoginPhase client={this.client} login={this.onLogin}/>)
+        return (<LoginPhase site={site} client={this.client} login={this.onLogin}/>)
 
       default:
-        return (<MainPhase client={this.client} logout={this.onLogout}/>)
+        return (<MainPhase site={site} client={this.client} logout={this.onLogout}/>)
     }
   }
 }

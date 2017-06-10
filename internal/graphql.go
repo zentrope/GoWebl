@@ -25,8 +25,9 @@ const Schema = `
 
  type Query {
 	 validate(token: String!): Boolean!
-	 authenticate(user: String! pass: String!): String!
+	 authenticate(user: String! pass: String!): Viewer!
 	 viewer(token: String): Viewer!
+	 site(): Site!
  }
 
  type Mutation {
@@ -41,6 +42,7 @@ const Schema = `
 	 user: String!
 	 email: String!
 	 type: String!
+	 token: String!
 	 posts: [Post]!
 	 site: Site!
  }
@@ -161,11 +163,20 @@ func decodeAuthToken(ctx context.Context, tokenString string) (*ViewerClaims, er
 	return nil, err
 }
 
-func findAuthClaims(ctx context.Context, token *string) (*ViewerClaims, error) {
-	auth := ctx.Value(AUTH_KEY).(string)
+func getAuthToken(ctx context.Context) string {
+	return ctx.Value(AUTH_KEY).(string)
+}
+
+func optionalAuthToken(ctx context.Context, token *string) string {
+	auth := getAuthToken(ctx)
 	if token != nil {
 		auth = *token
 	}
+	return auth
+}
+
+func findAuthClaims(ctx context.Context, token *string) (*ViewerClaims, error) {
+	auth := optionalAuthToken(ctx, token)
 
 	claims, err := decodeAuthToken(ctx, auth)
 	if err != nil {
@@ -185,16 +196,28 @@ func (r *Resolver) Validate(ctx context.Context, args *struct{ Token string }) (
 	return isValidAuthToken(ctx, tokenString)
 }
 
-func (r *Resolver) Authenticate(ctx context.Context, args *struct{ User, Pass string }) (string, error) {
+func (r *Resolver) Authenticate(ctx context.Context, args *struct{ User, Pass string }) (*viewerResolver, error) {
 	user := args.User
 	pass := args.Pass
 
 	author, err := r.Database.Authentic(user, pass)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return mkAuthToken(ctx, author)
+	token, err := mkAuthToken(ctx, author)
+	if err != nil {
+		return nil, err
+	}
+
+	res := viewerResolver{
+		database: r.Database,
+		author:   author,
+		token:    token,
+		site:     ctx.Value(SITE_KEY).(SiteConfig),
+	}
+
+	return &res, nil
 }
 
 //=============================================================================
@@ -211,6 +234,7 @@ type Viewer struct {
 type viewerResolver struct {
 	database *Database
 	author   *Author
+	token    string
 	site     SiteConfig
 }
 
@@ -222,14 +246,18 @@ func (r *Resolver) Viewer(ctx context.Context, args *struct{ Token *string }) (*
 	}
 
 	author, err := r.Database.Author(claims.User)
-
 	if err != nil {
 		return nil, err
 	}
 
 	site := ctx.Value(SITE_KEY).(SiteConfig)
 
-	return &viewerResolver{r.Database, author, site}, nil
+	return &viewerResolver{
+		database: r.Database,
+		author:   author,
+		site:     site,
+		token:    optionalAuthToken(ctx, args.Token),
+	}, nil
 }
 
 func (v *viewerResolver) ID() graphql.ID {
@@ -248,6 +276,10 @@ func (v *viewerResolver) Type() string {
 	return v.author.Type
 }
 
+func (r *viewerResolver) Token() string {
+	return r.token
+}
+
 func (v *viewerResolver) Posts() ([]*postResolver, error) {
 	posts, err := v.database.PostsByAuthor(v.author.Handle)
 	if err != nil {
@@ -260,8 +292,18 @@ func (v *viewerResolver) Posts() ([]*postResolver, error) {
 	return rs, nil
 }
 
+//=============================================================================
+// Site
+//=============================================================================
+
 type siteResolver struct {
 	site SiteConfig
+}
+
+func (r *Resolver) Site(ctx context.Context) siteResolver {
+	return siteResolver{
+		site: ctx.Value(SITE_KEY).(SiteConfig),
+	}
 }
 
 func (r *viewerResolver) Site() siteResolver {

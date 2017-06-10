@@ -70,7 +70,7 @@ const validateQL = (token) => {
 const loginQL = (user, pass) => {
   const q = fl(`query
     Authenticate($user: String! $pass: String!) {
-      authenticate(user: $user pass: $pass) }`)
+      authenticate(user: $user pass: $pass) { token }}`)
   return {
     query: q,
     operationName: "Authenticate",
@@ -81,10 +81,15 @@ const loginQL = (user, pass) => {
 const viewerQL = () => {
   const q = fl(`query {
     viewer { id user type email
+      site { baseUrl title description }
       posts { uuid status slugline dateCreated dateUpdated text } } }
   `)
   return { query: q }
 }
+
+const siteQL = () => { return {
+  query: `query { site { baseUrl title description }}`
+}}
 
 const checkStatus = (response) => {
   if (response.status >= 200 && response.status < 300) {
@@ -147,6 +152,10 @@ class Client {
 
   viewerData(callback) {
     this.__doQuery(viewerQL(), callback)
+  }
+
+  siteData(callback) {
+    this.__doQuery(siteQL(), callback)
   }
 
   savePost(slugline, text, status, callback) {
