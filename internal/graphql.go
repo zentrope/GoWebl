@@ -42,6 +42,7 @@ const Schema = `
 	 email: String!
 	 type: String!
 	 posts: [Post]!
+	 site: Site!
  }
 
  type Author {
@@ -60,6 +61,12 @@ const Schema = `
 	 text: String!
 	 dateCreated: String!
 	 dateUpdated: String!
+ }
+
+ type Site {
+	 baseUrl: String!
+	 title: String!
+	 description: String!
  }
 `
 
@@ -204,6 +211,7 @@ type Viewer struct {
 type viewerResolver struct {
 	database *Database
 	author   *Author
+	site     SiteConfig
 }
 
 func (r *Resolver) Viewer(ctx context.Context, args *struct{ Token *string }) (*viewerResolver, error) {
@@ -219,7 +227,9 @@ func (r *Resolver) Viewer(ctx context.Context, args *struct{ Token *string }) (*
 		return nil, err
 	}
 
-	return &viewerResolver{r.Database, author}, nil
+	site := ctx.Value(SITE_KEY).(SiteConfig)
+
+	return &viewerResolver{r.Database, author, site}, nil
 }
 
 func (v *viewerResolver) ID() graphql.ID {
@@ -248,6 +258,26 @@ func (v *viewerResolver) Posts() ([]*postResolver, error) {
 		rs = append(rs, &postResolver{v.database, p})
 	}
 	return rs, nil
+}
+
+type siteResolver struct {
+	site SiteConfig
+}
+
+func (r *viewerResolver) Site() siteResolver {
+	return siteResolver{site: r.site}
+}
+
+func (r siteResolver) BaseURL() string {
+	return r.site.BaseURL
+}
+
+func (r siteResolver) Title() string {
+	return r.site.Title
+}
+
+func (r siteResolver) Description() string {
+	return r.site.Description
 }
 
 //=============================================================================
