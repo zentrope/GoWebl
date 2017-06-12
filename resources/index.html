@@ -13,14 +13,16 @@
   </head>
   <body>
     <section class="NavBar">
-      <div class="Title">
-        <p>&#x2248; {{ .Site.Title }}</p>
-      </div>
-      <div class="Links">
-        <div class="Icon">
-          <a href="{{.Site.BaseURL}}/archive" title="Post Archive">
-            <img src="{{.Site.BaseURL}}/images/archive.svg"/>
-          </a>
+      <div class="NavItems">
+        <div class="Title">
+          <p>{{ .Site.Title }}</p>
+        </div>
+        <div class="Links">
+          <div class="Icon">
+            <a href="{{.Site.BaseURL}}/archive" title="Post Archive">
+              <img src="{{.Site.BaseURL}}/images/archive.svg"/>
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -30,7 +32,7 @@
       <article id="{{.UUID}}">
         <div class="MetaBar">
           <div class="Permalink">
-            <a title="{{ .Slugline }}" href="{{$url}}/post/{{ .UUID }}">&#x2742;</a>
+            <a title="Permalink &#x261B; {{ .Slugline }}" href="{{$url}}/post/{{ .UUID }}">&#x221e;</a>
           </div>
           <div class="Author">
             <span class="Date">{{ .DateCreated }}</span>
@@ -47,6 +49,10 @@
     </section>
     <section class="Footer">
       <div class="Links">
+        <a href="{{.Site.BaseURL}}/">
+          <img src="{{.Site.BaseURL}}/images/home.svg"/>
+          <p>Home</p>
+        </a>
         <a href="{{.Site.BaseURL}}/archive">
           <img width="20px"  src="{{.Site.BaseURL}}/images/archive.svg"/>
           <p>Archive</p>

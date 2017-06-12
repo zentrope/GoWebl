@@ -13,11 +13,19 @@
   </head>
   <body>
     <section class="NavBar">
-      <div class="Title">
-        <p><a href="{{.Site.BaseURL}}/">&#x2248; {{ .Site.Title }}</a></p>
+      <div class="NavItems">
+        <div class="Title">
+          <p><a href="{{.Site.BaseURL}}/">{{ .Site.Title }}</a></p>
+        </div>
+        <div class="Links">
+          <div class="Icon">
+            <a href="{{.Site.BaseURL}}/">
+              <img src="{{.Site.BaseURL}}/images/home.svg"/>
+            </a>
+          </div>
+        </div>
       </div>
     </section>
-
     <section class="Content">
       <h1>Archives</h1>
       <section class="TableOfContents">
@@ -28,7 +36,7 @@
             {{ .DateCreated }}
           </div>
           <div class="Post">
-            <a href="{{$url}}/post/{{ .UUID }}">{{ .Slugline }}</a>
+            <a title="&#x261B; Permalink" href="{{$url}}/post/{{ .UUID }}">{{ .Slugline }}</a>
           </div>
         </div>
         {{ end }}
@@ -36,6 +44,10 @@
     </section>
     <section class="Footer">
       <div class="Links">
+        <a href="{{.Site.BaseURL}}/">
+          <img src="{{.Site.BaseURL}}/images/home.svg"/>
+          <p>Home</p>
+        </a>
         <a href="{{.Site.BaseURL}}/archive">
           <img width="20px"  src="{{.Site.BaseURL}}/images/archive.svg"/>
           <p>Archive</p>
