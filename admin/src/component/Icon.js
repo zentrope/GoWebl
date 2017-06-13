@@ -14,12 +14,15 @@ const icon = name => (color) => {
 }
 
 const icons = Map({
-  settings:  icon("fa-cogs"),
+  new:       icon("fa-plus"),
+  settings:  icon("fa-cog"),
   delete:    icon("fa-trash-o"),
   draft:     icon("fa-toggle-off"),
   edit:      icon("fa-pencil-square-o"),
   published: icon("fa-toggle-on"),
-  question:  icon("fa-question")
+  question:  icon("fa-question"),
+  visit:     icon("fa-external-link"),
+  signout:   icon("fa-sign-out")
 })
 
 class Icon extends React.PureComponent {

@@ -49,7 +49,7 @@ class Posts extends React.PureComponent {
       )
     }
 
-    const cols = [null, "slugline", "created", "updated", null]
+    const cols = [null, "post", "created", "updated", null]
 
     return (
       <Tabular columns={cols} data={posts} render={renderPost}/>
@@ -68,15 +68,9 @@ class Home extends React.PureComponent {
       posts = viewer.get("posts").sortBy(p => p.get("dateCreated")).reverse()
     }
 
-    const newPost = () => {
-      const { history } = this.props
-      history.push("/admin/post/new")
-    }
 
     return (
       <WorkArea>
-        <h1>Posts</h1>
-        <button onClick={newPost}>New post</button>
         <Posts posts={posts} dispatch={dispatch}/>
       </WorkArea>
     )

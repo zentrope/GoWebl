@@ -12,6 +12,7 @@ import { TitleBar } from '../component/TitleBar'
 
 // Routes
 import { EditPost } from '../route/EditPost'
+import { EditSite } from '../route/EditSite'
 import { Home } from '../route/Home'
 import { NewPost } from '../route/NewPost'
 
@@ -80,6 +81,10 @@ class MainPhase extends React.PureComponent {
 
     switch (event) {
 
+      case 'site/edit':
+        this.history.push("/admin/site/edit")
+        break
+
       case 'post/get':
         if (callback) {
           callback(this.state.viewer.get("posts")
@@ -138,15 +143,26 @@ class MainPhase extends React.PureComponent {
       window.location.href = site.baseUrl
     }
 
+    const editSite = () => {
+      this.dispatch('site/edit', {})
+    }
+
+    const newPost = () => {
+      this.history.push("/admin/post/new")
+    }
+
     return (
       <Router history={this.history}>
         <section className="App">
-          <TitleBar title={ site.title } user={viewer.get("email")} visit={visit} logout={logout}/>
+          <TitleBar title={ site.title } user={viewer.get("email")}
+                    editSite={editSite} visit={visit} logout={logout}
+                    newPost={newPost}/>
           <StatusBar year="2017" copyright={ site.title }/>
           <Switch>
             <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} dispatch={this.dispatch}/>
             <PropRoute path="/admin/post/new" component={NewPost} dispatch={this.dispatch}/>
             <PropRoute path="/admin/post/:id" component={EditPost} dispatch={this.dispatch}/>
+            <PropRoute path="/admin/site/edit" component={EditSite} site={site}/>
             <Redirect to="/admin/home"/>
           </Switch>
         </section>
