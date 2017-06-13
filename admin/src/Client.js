@@ -129,9 +129,9 @@ class Client {
     fetch(this.url, query)
       .then(res => checkStatus(res))
       .then(res => res.json())
-      .then(data => callback(data))
       .catch(err => err.response.json()
                        .then(data => this.errorDelegate(data)))
+      .then(data => callback(data))
   }
 
   setAuthToken(token) {
