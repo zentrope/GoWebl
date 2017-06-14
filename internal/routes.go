@@ -11,6 +11,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/russross/blackfriday"
@@ -34,13 +35,11 @@ const (
 	AUTH_KEY = ResourceKey("auth")
 )
 
-//const DB_KEY = ResourceKey("db")
-
 func (app *WebApplication) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// log.Printf("> %v %v", r.Method, r.URL.String())
 
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	w.Header().Set("Access-Control-Allow-Origin", getOriginDomain(app.site, r))
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers",
 		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
@@ -395,6 +394,25 @@ func graphQlClientPage(w http.ResponseWriter, r *http.Request) {
 }
 
 //----
+
+func getOriginDomain(site SiteConfig, r *http.Request) string {
+
+	pattern := "http://%v:3000"
+	urlhost := strings.ToLower(r.URL.Hostname())
+
+	localhost := fmt.Sprintf(pattern, "localhost")
+	if strings.Contains(urlhost, "localhost") {
+		return localhost
+	}
+
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Printf("Unable to get hostname: ", err)
+		return localhost
+	}
+
+	return strings.ToLower(fmt.Sprintf(pattern, hostname))
+}
 
 func resolveDb(r *http.Request) *Database {
 	return r.Context().Value(DB_KEY).(*Database)
