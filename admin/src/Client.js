@@ -91,6 +91,18 @@ const siteQL = () => { return {
   query: `query { site { baseUrl title description }}`
 }}
 
+const updateSiteQL = (title, description, baseUrl) => {
+  const q = fl(`mutation
+    UpdateSite($t: String! $d: String! $b: String!) {
+      updateSite(title: $t description: $d baseUrl: $b) {
+        title description baseUrl }}`)
+  return {
+    query: q,
+    operationName: "UpdateSite",
+    variables: { t: title, d: description, b: baseUrl}
+  }
+}
+
 const checkStatus = (response) => {
   if (response.status >= 200 && response.status < 300) {
     return response
@@ -156,6 +168,10 @@ class Client {
 
   siteData(callback) {
     this.__doQuery(siteQL(), callback)
+  }
+
+  updateSite(title, description, baseUrl, callback) {
+    this.__doQuery(updateSiteQL(title, description, baseUrl), callback)
   }
 
   savePost(slugline, text, status, callback) {

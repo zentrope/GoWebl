@@ -73,13 +73,12 @@ func LoadConfigFile(pathToOverride string, resources *Resources) (*AppConfig, er
 	return &override, nil
 }
 
-func (conn *Database) AppendSiteConfig(config *AppConfig) (*AppConfig, error) {
-
+func (conn *Database) GetSiteConfig() (SiteConfig, error) {
 	q := "select key, value from config"
 
 	rows, err := conn.db.Query(q)
 	if err != nil {
-		return nil, err
+		return SiteConfig{}, err
 	}
 
 	defer rows.Close()
@@ -92,19 +91,54 @@ func (conn *Database) AppendSiteConfig(config *AppConfig) (*AppConfig, error) {
 
 		err := rows.Scan(&key, &value)
 		if err != nil {
-			return nil, err
+			return SiteConfig{}, err
 		}
 
 		site[key] = value
 	}
 
-	config.Site = SiteConfig{
+	return SiteConfig{
 		BaseURL:     site[SITE_BASEURL],
 		JwtSecret:   site[SITE_JWT_SECRET],
 		Title:       site[SITE_TITLE],
 		Description: site[SITE_DESCRIPTION],
+	}, nil
+}
+
+func (conn *Database) UpdateSite(title, description, url string) (SiteConfig, error) {
+	kvs := make(map[string]string, 0)
+
+	kvs["webl.title"] = title
+	kvs["webl.description"] = description
+	kvs["webl.baseurl"] = url
+
+	tx, err := conn.db.Begin()
+	if err != nil {
+		return SiteConfig{}, nil
 	}
 
+	q := "update config set value=$1 where key=$2"
+
+	for k, v := range kvs {
+		_, err := conn.db.Exec(q, v, k)
+		if err != nil {
+			tx.Rollback()
+			return SiteConfig{}, err
+		}
+	}
+
+	tx.Commit()
+
+	return conn.GetSiteConfig()
+}
+
+func (conn *Database) AppendSiteConfig(config *AppConfig) (*AppConfig, error) {
+	site, err := conn.GetSiteConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	config.Site = site
 	return config, nil
 }
 

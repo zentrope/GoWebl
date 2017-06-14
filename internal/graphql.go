@@ -35,6 +35,7 @@ const Schema = `
 	 updatePost(uuid: String! slugline: String! text: String!): Post!
 	 deletePost(uuid: String!): String!
 	 setPostStatus(uuid: String! isPublished: Boolean!): Post!
+	 updateSite(baseUrl: String! description: String! title: String!): Site!
  }
 
  type Viewer {
@@ -298,6 +299,25 @@ func (v *viewerResolver) Posts() ([]*postResolver, error) {
 
 type siteResolver struct {
 	site SiteConfig
+}
+
+func (r *Resolver) UpdateSite(ctx context.Context, args *struct {
+	Title       string
+	Description string
+	BaseURL     string
+}) (*siteResolver, error) {
+
+	_, err := findAuthClaims(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	site, err := r.Database.UpdateSite(args.Title, args.Description, args.BaseURL)
+	if err != nil {
+		return nil, err
+	}
+
+	return &siteResolver{site}, nil
 }
 
 func (r *Resolver) Site(ctx context.Context) siteResolver {

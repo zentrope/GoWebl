@@ -48,9 +48,16 @@ func (app *WebApplication) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	site, err := app.database.GetSiteConfig()
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	ctx1 := context.WithValue(r.Context(), DB_KEY, app.database)
 	ctx2 := context.WithValue(ctx1, API_KEY, app.graphql)
-	ctx3 := context.WithValue(ctx2, SITE_KEY, app.site)
+	ctx3 := context.WithValue(ctx2, SITE_KEY, site)
 	ctx4 := context.WithValue(ctx3, RES_KEY, app.resources)
 
 	app.router.ServeHTTP(w, r.WithContext(ctx4))

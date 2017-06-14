@@ -22,7 +22,8 @@ class MainPhase extends React.PureComponent {
 
   constructor(props) {
     super(props)
-    this.state = {viewer: Map({})}
+
+    this.state = {viewer: Map({}), site: props.site}
     this.history = createBrowserHistory()
     this.dispatch = this.dispatch.bind(this)
     this.refresh = this.refresh.bind(this)
@@ -85,6 +86,18 @@ class MainPhase extends React.PureComponent {
         this.history.push("/admin/site/edit")
         break
 
+      case 'site/update':
+        client.updateSite(data.title, data.description, data.baseUrl, (response) => {
+          console.log(response)
+          if (response.errors) {
+            console.error(response.errors)
+          } else {
+            this.setState({ site : response.data.updateSite })
+          }
+          this.history.push("/admin/home")
+        })
+        break
+
       case 'post/get':
         if (callback) {
           callback(this.state.viewer.get("posts")
@@ -132,8 +145,8 @@ class MainPhase extends React.PureComponent {
   }
 
   render() {
-    const { logout, client, site } = this.props
-    const { viewer } = this.state
+    const { logout, client } = this.props
+    const { viewer, site } = this.state
 
     const PropRoute = ({component: Component, path: Path, ...rest}) => (
       <Route exact path={Path} render={(props) => (<Component {...rest} {...props}/> )}/>
@@ -145,6 +158,10 @@ class MainPhase extends React.PureComponent {
 
     const editSite = () => {
       this.dispatch('site/edit', {})
+    }
+
+    const saveSite = (siteData) => {
+      this.dispatch('site/update', siteData)
     }
 
     const newPost = () => {
@@ -162,7 +179,7 @@ class MainPhase extends React.PureComponent {
             <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} dispatch={this.dispatch}/>
             <PropRoute path="/admin/post/new" component={NewPost} dispatch={this.dispatch}/>
             <PropRoute path="/admin/post/:id" component={EditPost} dispatch={this.dispatch}/>
-            <PropRoute path="/admin/site/edit" component={EditSite} site={site}/>
+            <PropRoute path="/admin/site/edit" component={EditSite} site={site} onSave={saveSite}/>
             <Redirect to="/admin/home"/>
           </Switch>
         </section>

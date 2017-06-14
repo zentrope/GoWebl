@@ -34,7 +34,7 @@ class EditSite extends React.PureComponent {
   }
 
   saveSite() {
-    console.log(this.state)
+    this.props.onSave(this.state)
   }
 
   render() {
@@ -47,15 +47,11 @@ class EditSite extends React.PureComponent {
     return (
       <WorkArea>
         <Form>
-          <FormTitle>
-            Edit site
-          </FormTitle>
+          <FormTitle>Edit site</FormTitle>
           <FormWidgets>
 
             <FormWidget>
-              <FormLabel>
-                Title
-              </FormLabel>
+              <FormLabel>Title</FormLabel>
               <input name="title"
                      value={title}
                      autoFocus={true}
@@ -64,9 +60,7 @@ class EditSite extends React.PureComponent {
             </FormWidget>
 
             <FormWidget>
-              <FormLabel>
-                Description
-              </FormLabel>
+              <FormLabel>Description</FormLabel>
               <textarea name="description"
                         placeholder="Site description"
                         value={description}
@@ -74,9 +68,7 @@ class EditSite extends React.PureComponent {
             </FormWidget>
 
             <FormWidget>
-              <FormLabel>
-                Base URL
-              </FormLabel>
+              <FormLabel>Base URL</FormLabel>
               <input name="baseUrl"
                      placeholder="Base URL"
                      value={baseUrl}
