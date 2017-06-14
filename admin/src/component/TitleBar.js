@@ -22,17 +22,16 @@ class TitleBar extends React.PureComponent {
         <div className="Name">{user}</div>
         <div className="Options">
           <button onClick={newPost}>
-            <Icon type="new"/> &nbsp;Post
+            <Icon type="new"/> Post
           </button>
           <button onClick={editSite}>
-            <Icon type="settings"/> &nbsp;Site
+            <Icon type="settings"/> Site
           </button>
           <button onClick={visit}>
-            <Icon type="visit" /> &nbsp;Site
+            <Icon type="visit" /> Site
           </button>
           <button onClick={logout}>
-            <Icon type="signout"/>
-      &nbsp;Sign out
+            <Icon type="signout"/>&nbsp;Bye
           </button>
         </div>
       </section>
