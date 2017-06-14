@@ -4,6 +4,10 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: Georgia, system, -apple-system, BlinkMacSystemFont, HelveticaNeue, LucidaGrande, sans-serif;
+}
+
+* {
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -123,25 +127,24 @@ h1, h2, h3, h4, h5, h6 {
 
 .MetaBar {
   margin-top: 25pt;
-  display: flex;
   padding-top: 0;
-  font-family: system, -apple-system, BlinkMacSystemFont, HelveticaNeue, LucidaGrande, sans-serif;
+
+  display: flex;
+  align-items: center;
 }
 
 .MetaBar .Permalink {
   flex: 1;
   font-size: 19pt;
   text-align: left;
-  align-self: flex-end;
   color: #666;
 }
 
 .MetaBar .Author {
   flex: 1;
-  font-size: 10pt;
+  font-size: 11pt;
   color: black;
   text-align: right;
-  align-self: flex-end;
   color: #666;
 }
 
