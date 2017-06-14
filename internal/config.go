@@ -31,10 +31,8 @@ type StorageConfig struct {
 }
 
 type WebConfig struct {
-	Port    string `json:"port,omitempty"`
-	Title   string `json:"title,omitempty"`
-	BaseURL string `json:"base-url,omitempty"`
-	JwtKey  string `json:"jwt-key,omitempty"`
+	Port   string `json:"port,omitempty"`
+	Listen string `json:"listen,omitempty"`
 }
 
 type SiteConfig struct {

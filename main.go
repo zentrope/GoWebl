@@ -76,8 +76,15 @@ func mkWebApp(
 
 	app := internal.NewWebApplication(config, resources, database, graphapi)
 
+	listen := config.Web.Listen
+	if listen == "" {
+		listen = "127.0.0.1"
+	}
+
+	addr := listen + ":" + config.Web.Port
+
 	return &http.Server{
-		Addr:    ":" + config.Web.Port,
+		Addr:    addr,
 		Handler: app,
 	}
 }
@@ -103,7 +110,11 @@ func blockUntilShutdownThenDo(fn func()) {
 }
 
 func notify(config *internal.AppConfig) {
-	log.Printf("Web access -> %s\n", config.Web.BaseURL)
+	url := "http://localhost:8080"
+	if config.Site.BaseURL != "" {
+		url = config.Site.BaseURL
+	}
+	log.Printf("Web access -> %s\n", url)
 }
 
 func main() {
