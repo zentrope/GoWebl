@@ -39,7 +39,7 @@ func (app *WebApplication) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// log.Printf("> %v %v", r.Method, r.URL.String())
 
-	w.Header().Set("Access-Control-Allow-Origin", getOriginDomain(app.site, r))
+	w.Header().Set("Access-Control-Allow-Origin", getOriginDomain(r))
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers",
 		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
@@ -395,11 +395,11 @@ func graphQlClientPage(w http.ResponseWriter, r *http.Request) {
 
 //----
 
-func getOriginDomain(site SiteConfig, r *http.Request) string {
+func getOriginDomain(r *http.Request) string {
 
 	pattern := "http://%v:3000"
-	urlhost := strings.ToLower(r.URL.Hostname())
 
+	urlhost := strings.ToLower(r.Host)
 	localhost := fmt.Sprintf(pattern, "localhost")
 	if strings.Contains(urlhost, "localhost") {
 		return localhost
