@@ -200,8 +200,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .PostBody p, .PostBody li {
-  line-height: 20pt;
-  font-size: 13pt;
+  line-height: 21pt;
+  font-size: 14pt;
   color: #000;
 }
 
@@ -226,6 +226,7 @@ h1, h2, h3, h4, h5, h6 {
   padding-top: 8px;
 }
 
+/* Footnotes */
 .PostBody ol li {
   font-size: 11pt;
   line-height: 13pt;
