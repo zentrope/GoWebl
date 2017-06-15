@@ -3,7 +3,11 @@ html, body {
   background-color: white;
   margin: 0;
   padding: 0;
-  font-family: system, -apple-system, BlinkMacSystemFont, HelveticaNeue, LucidaGrande, sans-serif;
+  font-family: Georgia, system, -apple-system, BlinkMacSystemFont, HelveticaNeue, LucidaGrande, sans-serif;
+}
+
+* {
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -32,10 +36,17 @@ h1, h2, h3, h4, h5, h6 {
 
 .NavBar {
   color: #444;
-  display: flex;
   padding: 0;
   background-color: #e6e6e6;
   border-bottom: 1px solid #d8d8d8;
+  height: 40px;
+  font-family: system, -apple-system, BlinkMacSystemFont, HelveticaNeue, LucidaGrande, sans-serif;
+}
+
+.NavItems {
+  width: 650px;
+  margin: auto;
+  display: flex;
   height: 40px;
 }
 
@@ -52,7 +63,7 @@ h1, h2, h3, h4, h5, h6 {
   position: absolute;
   top: 50%;
   transform: translate(0, -50%);
-  left: 15px;
+  left: 0;
   margin: 0;
   padding: 0;
 }
@@ -62,7 +73,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding-right: 10px;
+  padding-right: 0;
 }
 
 .NavBar .Links .Icon {
@@ -116,24 +127,24 @@ h1, h2, h3, h4, h5, h6 {
 
 .MetaBar {
   margin-top: 25pt;
-  display: flex;
   padding-top: 0;
+
+  display: flex;
+  align-items: center;
 }
 
 .MetaBar .Permalink {
   flex: 1;
   font-size: 19pt;
   text-align: left;
-  align-self: flex-end;
   color: #666;
 }
 
 .MetaBar .Author {
   flex: 1;
-  font-size: 10pt;
+  font-size: 11pt;
   color: black;
   text-align: right;
-  align-self: flex-end;
   color: #666;
 }
 
@@ -189,8 +200,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .PostBody p, .PostBody li {
-  line-height: 18pt;
-  font-size: 12pt;
+  line-height: 21pt;
+  font-size: 14pt;
   color: #000;
 }
 
@@ -215,9 +226,10 @@ h1, h2, h3, h4, h5, h6 {
   padding-top: 8px;
 }
 
+/* Footnotes */
 .PostBody ol li {
-  font-size: 10pt;
-  line-height: 12pt;
+  font-size: 11pt;
+  line-height: 13pt;
   margin-bottom: .8em;
   color: #666;
 }
@@ -238,15 +250,16 @@ h1, h2, h3, h4, h5, h6 {
 .Footer {
   margin-top: 100px;
   border-top: 1px solid #d8d8d8;
-  padding-top: 40px;
+  padding-top: 50px;
   text-align: center;
   margin-bottom: 50px;
+  font-family: system, -apple-system, BlinkMacSystemFont, HelveticaNeue, LucidaGrande, sans-serif;
 }
 
 .Footer .Links {
   display: flex;
   text-align: center;
-  width: 200px;
+  width: 300px;
   margin: auto;
 }
 
@@ -274,7 +287,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .Footer .Copyright {
-  margin-top: 60px;
+  margin-top: 50px;
   font-size: 10pt;
   text-align: center;
   color: #369;
@@ -289,8 +302,12 @@ h1, h2, h3, h4, h5, h6 {
 /*******/
 
 @media (max-width: 736px) {
-
   .Content {
+    margin-left: 15px;
+    margin-right: 15px;
+    width: unset;
+  }
+  .NavItems {
     margin-left: 15px;
     margin-right: 15px;
     width: unset;

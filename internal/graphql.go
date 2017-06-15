@@ -25,15 +25,18 @@ const Schema = `
 
  type Query {
 	 validate(token: String!): Boolean!
-	 authenticate(user: String! pass: String!): String!
+	 authenticate(user: String! pass: String!): Viewer!
 	 viewer(token: String): Viewer!
+	 site(): Site!
  }
 
  type Mutation {
+	 // TODO: Should take objects to allow for easier (and sparse) extension.
 	 createPost(slugline: String! status: String! text: String! token: String): Post!
 	 updatePost(uuid: String! slugline: String! text: String!): Post!
 	 deletePost(uuid: String!): String!
 	 setPostStatus(uuid: String! isPublished: Boolean!): Post!
+	 updateSite(baseUrl: String! description: String! title: String!): Site!
  }
 
  type Viewer {
@@ -41,7 +44,9 @@ const Schema = `
 	 user: String!
 	 email: String!
 	 type: String!
+	 token: String!
 	 posts: [Post]!
+	 site: Site!
  }
 
  type Author {
@@ -61,15 +66,17 @@ const Schema = `
 	 dateCreated: String!
 	 dateUpdated: String!
  }
+
+ type Site {
+	 baseUrl: String!
+	 title: String!
+	 description: String!
+ }
 `
 
 //=============================================================================
 // Root Resolver
 //=============================================================================
-
-type AuthKeyContextType string
-
-const AUTH_KEY = AuthKeyContextType("auth-key")
 
 type GraphAPI struct {
 	Schema *graphql.Schema
@@ -92,16 +99,20 @@ func NewApi(database *Database) (*GraphAPI, error) {
 // Auth Tokens (JWT)
 //=============================================================================
 
-// TODO(keith): Grab from env and config
-var SECRET = []byte("thirds-and-fifths")
-
 type ViewerClaims struct {
 	User string `json:"user"`
 	Type string `json:"type"`
 	jwt.StandardClaims
 }
 
-func mkAuthToken(author *Author) (string, error) {
+func getSecret(ctx context.Context) []byte {
+	site := ctx.Value(SITE_KEY).(*SiteConfig)
+	return []byte(site.JwtSecret)
+}
+
+func mkAuthToken(ctx context.Context, author *Author) (string, error) {
+	secret := getSecret(ctx)
+
 	claims := ViewerClaims{
 		author.Handle, author.Type,
 		jwt.StandardClaims{
@@ -110,7 +121,7 @@ func mkAuthToken(author *Author) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(SECRET)
+	tokenString, err := token.SignedString(secret)
 	if err != nil {
 		return "", err
 	}
@@ -118,16 +129,19 @@ func mkAuthToken(author *Author) (string, error) {
 	return tokenString, nil
 }
 
-func checkAlgKey(token *jwt.Token) (interface{}, error) {
-	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+func checkAlgKey(ctx context.Context) jwt.Keyfunc {
+	secret := getSecret(ctx)
+	return func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+		return secret, nil
 	}
-	return SECRET, nil
 }
 
-func isValidAuthToken(tokenString string) (bool, error) {
+func isValidAuthToken(ctx context.Context, tokenString string) (bool, error) {
 
-	token, err := jwt.ParseWithClaims(tokenString, &ViewerClaims{}, checkAlgKey)
+	token, err := jwt.ParseWithClaims(tokenString, &ViewerClaims{}, checkAlgKey(ctx))
 
 	if err != nil {
 		return false, err
@@ -136,9 +150,9 @@ func isValidAuthToken(tokenString string) (bool, error) {
 	return token.Valid, nil
 }
 
-func decodeAuthToken(tokenString string) (*ViewerClaims, error) {
+func decodeAuthToken(ctx context.Context, tokenString string) (*ViewerClaims, error) {
 
-	token, err := jwt.ParseWithClaims(tokenString, &ViewerClaims{}, checkAlgKey)
+	token, err := jwt.ParseWithClaims(tokenString, &ViewerClaims{}, checkAlgKey(ctx))
 
 	if err != nil {
 		return nil, err
@@ -151,13 +165,22 @@ func decodeAuthToken(tokenString string) (*ViewerClaims, error) {
 	return nil, err
 }
 
-func findAuthClaims(ctx context.Context, token *string) (*ViewerClaims, error) {
-	auth := ctx.Value(AUTH_KEY).(string)
+func getAuthToken(ctx context.Context) string {
+	return ctx.Value(AUTH_KEY).(string)
+}
+
+func optionalAuthToken(ctx context.Context, token *string) string {
+	auth := getAuthToken(ctx)
 	if token != nil {
 		auth = *token
 	}
+	return auth
+}
 
-	claims, err := decodeAuthToken(auth)
+func findAuthClaims(ctx context.Context, token *string) (*ViewerClaims, error) {
+	auth := optionalAuthToken(ctx, token)
+
+	claims, err := decodeAuthToken(ctx, auth)
 	if err != nil {
 		return nil, err
 	}
@@ -169,22 +192,34 @@ func findAuthClaims(ctx context.Context, token *string) (*ViewerClaims, error) {
 // Auth
 //=============================================================================
 
-func (r *Resolver) Validate(args *struct{ Token string }) (bool, error) {
+func (r *Resolver) Validate(ctx context.Context, args *struct{ Token string }) (bool, error) {
 	tokenString := args.Token
 	// TODO: Make sure the user in the token still exists
-	return isValidAuthToken(tokenString)
+	return isValidAuthToken(ctx, tokenString)
 }
 
-func (r *Resolver) Authenticate(args *struct{ User, Pass string }) (string, error) {
+func (r *Resolver) Authenticate(ctx context.Context, args *struct{ User, Pass string }) (*viewerResolver, error) {
 	user := args.User
 	pass := args.Pass
 
 	author, err := r.Database.Authentic(user, pass)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return mkAuthToken(author)
+	token, err := mkAuthToken(ctx, author)
+	if err != nil {
+		return nil, err
+	}
+
+	res := viewerResolver{
+		database: r.Database,
+		author:   author,
+		token:    token,
+		site:     ctx.Value(SITE_KEY).(*SiteConfig),
+	}
+
+	return &res, nil
 }
 
 //=============================================================================
@@ -201,6 +236,8 @@ type Viewer struct {
 type viewerResolver struct {
 	database *Database
 	author   *Author
+	token    string
+	site     *SiteConfig
 }
 
 func (r *Resolver) Viewer(ctx context.Context, args *struct{ Token *string }) (*viewerResolver, error) {
@@ -211,12 +248,18 @@ func (r *Resolver) Viewer(ctx context.Context, args *struct{ Token *string }) (*
 	}
 
 	author, err := r.Database.Author(claims.User)
-
 	if err != nil {
 		return nil, err
 	}
 
-	return &viewerResolver{r.Database, author}, nil
+	site := ctx.Value(SITE_KEY).(*SiteConfig)
+
+	return &viewerResolver{
+		database: r.Database,
+		author:   author,
+		site:     site,
+		token:    optionalAuthToken(ctx, args.Token),
+	}, nil
 }
 
 func (v *viewerResolver) ID() graphql.ID {
@@ -235,6 +278,10 @@ func (v *viewerResolver) Type() string {
 	return v.author.Type
 }
 
+func (r *viewerResolver) Token() string {
+	return r.token
+}
+
 func (v *viewerResolver) Posts() ([]*postResolver, error) {
 	posts, err := v.database.PostsByAuthor(v.author.Handle)
 	if err != nil {
@@ -245,6 +292,55 @@ func (v *viewerResolver) Posts() ([]*postResolver, error) {
 		rs = append(rs, &postResolver{v.database, p})
 	}
 	return rs, nil
+}
+
+//=============================================================================
+// Site
+//=============================================================================
+
+type siteResolver struct {
+	site *SiteConfig
+}
+
+func (r *Resolver) UpdateSite(ctx context.Context, args *struct {
+	Title       string
+	Description string
+	BaseURL     string
+}) (*siteResolver, error) {
+
+	_, err := findAuthClaims(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	site, err := r.Database.UpdateSite(args.Title, args.Description, args.BaseURL)
+	if err != nil {
+		return nil, err
+	}
+
+	return &siteResolver{site}, nil
+}
+
+func (r *Resolver) Site(ctx context.Context) siteResolver {
+	return siteResolver{
+		site: ctx.Value(SITE_KEY).(*SiteConfig),
+	}
+}
+
+func (r *viewerResolver) Site() siteResolver {
+	return siteResolver{site: r.site}
+}
+
+func (r siteResolver) BaseURL() string {
+	return r.site.BaseURL
+}
+
+func (r siteResolver) Title() string {
+	return r.site.Title
+}
+
+func (r siteResolver) Description() string {
+	return r.site.Description
 }
 
 //=============================================================================
@@ -427,5 +523,3 @@ func (r *postResolver) DateCreated() string {
 func (r *postResolver) DateUpdated() string {
 	return r.post.DateUpdated.Format(time.RFC3339)
 }
-
-//=============================================================================

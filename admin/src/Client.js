@@ -70,7 +70,7 @@ const validateQL = (token) => {
 const loginQL = (user, pass) => {
   const q = fl(`query
     Authenticate($user: String! $pass: String!) {
-      authenticate(user: $user pass: $pass) }`)
+      authenticate(user: $user pass: $pass) { token }}`)
   return {
     query: q,
     operationName: "Authenticate",
@@ -81,9 +81,26 @@ const loginQL = (user, pass) => {
 const viewerQL = () => {
   const q = fl(`query {
     viewer { id user type email
+      site { baseUrl title description }
       posts { uuid status slugline dateCreated dateUpdated text } } }
   `)
   return { query: q }
+}
+
+const siteQL = () => { return {
+  query: `query { site { baseUrl title description }}`
+}}
+
+const updateSiteQL = (title, description, baseUrl) => {
+  const q = fl(`mutation
+    UpdateSite($t: String! $d: String! $b: String!) {
+      updateSite(title: $t description: $d baseUrl: $b) {
+        title description baseUrl }}`)
+  return {
+    query: q,
+    operationName: "UpdateSite",
+    variables: { t: title, d: description, b: baseUrl}
+  }
 }
 
 const checkStatus = (response) => {
@@ -124,9 +141,9 @@ class Client {
     fetch(this.url, query)
       .then(res => checkStatus(res))
       .then(res => res.json())
-      .then(data => callback(data))
       .catch(err => err.response.json()
                        .then(data => this.errorDelegate(data)))
+      .then(data => callback(data))
   }
 
   setAuthToken(token) {
@@ -147,6 +164,14 @@ class Client {
 
   viewerData(callback) {
     this.__doQuery(viewerQL(), callback)
+  }
+
+  siteData(callback) {
+    this.__doQuery(siteQL(), callback)
+  }
+
+  updateSite(title, description, baseUrl, callback) {
+    this.__doQuery(updateSiteQL(title, description, baseUrl), callback)
   }
 
   savePost(slugline, text, status, callback) {

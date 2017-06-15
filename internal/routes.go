@@ -11,6 +11,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/russross/blackfriday"
@@ -21,21 +22,23 @@ type WebApplication struct {
 	resources *Resources
 	graphql   *GraphAPI
 	database  *Database
-	config    WebConfig
 }
 
 type ResourceKey string
 
-const DB_KEY = ResourceKey("db")
-const API_KEY = ResourceKey("api")
-const CONF_KEY = ResourceKey("conf")
-const RES_KEY = ResourceKey("res")
+const (
+	DB_KEY   = ResourceKey("db")
+	API_KEY  = ResourceKey("api")
+	SITE_KEY = ResourceKey("conf")
+	RES_KEY  = ResourceKey("res")
+	AUTH_KEY = ResourceKey("auth")
+)
 
 func (app *WebApplication) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// log.Printf("> %v %v", r.Method, r.URL.String())
 
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	w.Header().Set("Access-Control-Allow-Origin", getOriginDomain(r))
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers",
 		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
@@ -44,9 +47,16 @@ func (app *WebApplication) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	site, err := app.database.GetSiteConfig()
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	ctx1 := context.WithValue(r.Context(), DB_KEY, app.database)
 	ctx2 := context.WithValue(ctx1, API_KEY, app.graphql)
-	ctx3 := context.WithValue(ctx2, CONF_KEY, app.config)
+	ctx3 := context.WithValue(ctx2, SITE_KEY, site)
 	ctx4 := context.WithValue(ctx3, RES_KEY, app.resources)
 
 	app.router.ServeHTTP(w, r.WithContext(ctx4))
@@ -57,8 +67,6 @@ func NewWebApplication(config *AppConfig, resources *Resources,
 
 	service := http.NewServeMux()
 
-	webConfig := config.Web
-
 	// GraphQL
 	service.HandleFunc("/graphql", graphQlClientPage)
 	service.HandleFunc("/static/", staticPage)
@@ -67,13 +75,11 @@ func NewWebApplication(config *AppConfig, resources *Resources,
 	// Admin Post Manager
 	service.HandleFunc("/admin/", adminPage)
 
-	// public blog routes
-
+	// Public Blog Routes
 	service.HandleFunc("/feeds/json", jsonFeed)
 	service.HandleFunc("/feeds/json/", jsonFeed)
 	service.HandleFunc("/feeds/rss", rssFeed)
 	service.HandleFunc("/feeds/rss/", rssFeed)
-
 	service.HandleFunc("/archive", archivePage)
 	service.HandleFunc("/query", queryApi)
 	service.HandleFunc("/post/", postPage)
@@ -84,25 +90,22 @@ func NewWebApplication(config *AppConfig, resources *Resources,
 		resources: resources,
 		graphql:   graphapi,
 		database:  database,
-		config:    webConfig,
 	}
 }
 
-// ---
-
 type homeData struct {
-	Posts  []*TemplatePost
-	Config WebConfig
+	Posts []*TemplatePost
+	Site  *SiteConfig
 }
 
 type archiveData struct {
 	Entries []*TemplateArchiveEntry
-	Config  WebConfig
+	Site    *SiteConfig
 }
 
 type postData struct {
-	Post   *TemplatePost
-	Config WebConfig
+	Post *TemplatePost
+	Site *SiteConfig
 }
 
 type TemplatePost struct {
@@ -239,7 +242,7 @@ func adminPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func rssFeed(w http.ResponseWriter, r *http.Request) {
-	config := resolveConf(r)
+	site := resolveSite(r)
 	database := resolveDb(r)
 
 	posts, err := database.LatestPosts(40)
@@ -249,7 +252,7 @@ func rssFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	feed, err := NewRSSFeed(config, posts)
+	feed, err := NewRSSFeed(site, posts)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
@@ -260,7 +263,7 @@ func rssFeed(w http.ResponseWriter, r *http.Request) {
 }
 
 func jsonFeed(w http.ResponseWriter, r *http.Request) {
-	config := resolveConf(r)
+	site := resolveSite(r)
 	database := resolveDb(r)
 
 	posts, err := database.LatestPosts(40)
@@ -270,7 +273,7 @@ func jsonFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	feed, err := NewJSONFeed(config, posts)
+	feed, err := NewJSONFeed(site, posts)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
@@ -283,7 +286,7 @@ func jsonFeed(w http.ResponseWriter, r *http.Request) {
 func homePage(w http.ResponseWriter, r *http.Request) {
 	resources := resolveRes(r)
 	database := resolveDb(r)
-	config := resolveConf(r)
+	site := resolveSite(r)
 
 	fs := resources.PublicFileServer()
 
@@ -310,7 +313,7 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 		rPosts = append(rPosts, xformTemplatePost(p))
 	}
 
-	data := &homeData{Config: config, Posts: rPosts}
+	data := &homeData{Site: site, Posts: rPosts}
 
 	if err := page.Execute(w, data); err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
@@ -322,7 +325,7 @@ func postPage(w http.ResponseWriter, r *http.Request) {
 
 	resources := resolveRes(r)
 	database := resolveDb(r)
-	config := resolveConf(r)
+	site := resolveSite(r)
 
 	page, err := resources.ResolveTemplate("post.html")
 	if err != nil {
@@ -338,7 +341,7 @@ func postPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &postData{Post: xformTemplatePost(post), Config: config}
+	data := &postData{Post: xformTemplatePost(post), Site: site}
 
 	if err := page.Execute(w, data); err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
@@ -350,7 +353,7 @@ func archivePage(w http.ResponseWriter, r *http.Request) {
 
 	resources := resolveRes(r)
 	database := resolveDb(r)
-	config := resolveConf(r)
+	site := resolveSite(r)
 
 	page, err := resources.ResolveTemplate("archive.html")
 	if err != nil {
@@ -369,7 +372,7 @@ func archivePage(w http.ResponseWriter, r *http.Request) {
 		data = append(data, xformArchiveEntry(e))
 	}
 
-	values := &archiveData{Entries: data, Config: config}
+	values := &archiveData{Entries: data, Site: site}
 
 	if err := page.Execute(w, values); err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
@@ -390,6 +393,25 @@ func graphQlClientPage(w http.ResponseWriter, r *http.Request) {
 
 //----
 
+func getOriginDomain(r *http.Request) string {
+
+	pattern := "http://%v:3000"
+
+	urlhost := strings.ToLower(r.Host)
+	localhost := fmt.Sprintf(pattern, "localhost")
+	if strings.Contains(urlhost, "localhost") {
+		return localhost
+	}
+
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Printf("Unable to get hostname: ", err)
+		return localhost
+	}
+
+	return strings.ToLower(fmt.Sprintf(pattern, hostname))
+}
+
 func resolveDb(r *http.Request) *Database {
 	return r.Context().Value(DB_KEY).(*Database)
 }
@@ -398,8 +420,8 @@ func resolveApi(r *http.Request) *GraphAPI {
 	return r.Context().Value(API_KEY).(*GraphAPI)
 }
 
-func resolveConf(r *http.Request) WebConfig {
-	return r.Context().Value(CONF_KEY).(WebConfig)
+func resolveSite(r *http.Request) *SiteConfig {
+	return r.Context().Value(SITE_KEY).(*SiteConfig)
 }
 
 func resolveRes(r *http.Request) *Resources {

@@ -15,6 +15,13 @@ import (
 // Exports
 //-----------------------------------------------------------------------------
 
+const (
+	SITE_BASEURL     = "webl.baseurl"
+	SITE_TITLE       = "webl.title"
+	SITE_DESCRIPTION = "webl.description"
+	SITE_JWT_SECRET  = "webl.jtw.secret"
+)
+
 type StorageConfig struct {
 	User     string `json:"user,omitempty"`
 	Password string `json:"password,omitempty"`
@@ -24,9 +31,15 @@ type StorageConfig struct {
 }
 
 type WebConfig struct {
-	Port    string `json:"port,omitempty"`
-	Title   string `json:"title,omitempty"`
-	BaseURL string `json:"base-url,omitempty"`
+	Port   string `json:"port,omitempty"`
+	Listen string `json:"listen,omitempty"`
+}
+
+type SiteConfig struct {
+	BaseURL     string
+	Title       string
+	Description string
+	JwtSecret   string
 }
 
 type AppConfig struct {
@@ -57,6 +70,65 @@ func LoadConfigFile(pathToOverride string, resources *Resources) (*AppConfig, er
 	}
 
 	return &override, nil
+}
+
+func (conn *Database) GetSiteConfig() (*SiteConfig, error) {
+	q := "select key, value from config"
+
+	rows, err := conn.db.Query(q)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	site := make(map[string]string, 0)
+
+	for rows.Next() {
+		var key string
+		var value string
+
+		err := rows.Scan(&key, &value)
+		if err != nil {
+			return nil, err
+		}
+
+		site[key] = value
+	}
+
+	return &SiteConfig{
+		BaseURL:     site[SITE_BASEURL],
+		JwtSecret:   site[SITE_JWT_SECRET],
+		Title:       site[SITE_TITLE],
+		Description: site[SITE_DESCRIPTION],
+	}, nil
+}
+
+func (conn *Database) UpdateSite(title, description, url string) (*SiteConfig, error) {
+	kvs := make(map[string]string, 0)
+
+	kvs["webl.title"] = title
+	kvs["webl.description"] = description
+	kvs["webl.baseurl"] = url
+
+	tx, err := conn.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+
+	q := "update config set value=$1 where key=$2"
+
+	for k, v := range kvs {
+		_, err := conn.db.Exec(q, v, k)
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+
+	tx.Commit()
+
+	return conn.GetSiteConfig()
 }
 
 //-----------------------------------------------------------------------------

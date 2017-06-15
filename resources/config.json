@@ -8,7 +8,6 @@
   },
   "web": {
     "port": "8080",
-    "title": "Web Log",
-    "base-url": "http://localhost:8080"
+    "listen": "0.0.0.0"
   }
 }

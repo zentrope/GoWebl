@@ -1,3 +1,7 @@
+# Copyright 2017 Keith Irwin. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
 PACKAGE = github.com/zentrope/webl
 
 .PHONY: build-admin build init govendor vendor vendor-check vendor-unused help
@@ -5,7 +9,7 @@ PACKAGE = github.com/zentrope/webl
 
 .DEFAULT_GOAL := help
 
-# TO update dependencies, govendor fetch +vendor
+# To update dependency versions, govendor fetch +vendor
 
 govendor:
 	@hash govendor > /dev/null 2>&1; if [ $$? -ne 0 ]; then \

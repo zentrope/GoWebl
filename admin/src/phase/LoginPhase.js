@@ -25,11 +25,12 @@ class LoginForm extends React.PureComponent {
     const { client, login } = this.props
 
     client.login(user, pass, (result) => {
-      let token = result.data.authenticate
-      if (! token) {
+      let okay = result.data.authenticate !== null
+      if (! okay) {
         this.setState({error: "Unable to sign in."})
         document.getElementById("user").focus()
       } else {
+        let token = result.data.authenticate.token
         login(token)
       }
     })
@@ -68,6 +69,7 @@ class LoginForm extends React.PureComponent {
   }
 
   render() {
+    const { site } = this.props
     var { user, pass, error } = this.state
 
     const submit = this.isSubmittable() ? (
@@ -80,7 +82,7 @@ class LoginForm extends React.PureComponent {
       <section className="LoginForm">
 
         <section className="LoginPanel">
-          <h1>Sign in to Webl</h1>
+          <h1>Sign in to { site.title }</h1>
 
           <div className="Error">
             { error }
@@ -114,6 +116,10 @@ class LoginForm extends React.PureComponent {
             </div>
           </div>
 
+          <div className="VisitLink">
+            <p><a href={ site.baseUrl }>Visit { site.title }</a></p>
+          </div>
+
         </section>
       </section>
     )
@@ -123,10 +129,10 @@ class LoginForm extends React.PureComponent {
 class LoginPhase extends React.PureComponent {
 
   render() {
-    const { client, login } = this.props
+    const { client, login, site } = this.props
 
     return (
-      <LoginForm login={login} client={client}/>
+      <LoginForm login={login} client={client} site={site}/>
     )
   }
 }

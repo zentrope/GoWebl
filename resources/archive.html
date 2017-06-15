@@ -3,32 +3,40 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ .Config.Title }} - Archives</title>
-    <link rel="icon" href="{{.Config.BaseURL}}/images/apple-touch-icon-60.png" />
-    <link rel="shortcut icon" src="{{.Config.BaseURL}}/images/apple-touch-icon-60.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="{{.Config.BaseURL}}/images/apple-touch-icon-180.png"/>
-    <link rel="stylesheet" href="{{.Config.BaseURL}}/index.css" type="text/css"/>
-    <link rel="alternate" type="application/json" title="JSON Feed" href="{{.Config.BaseURL}}/feeds/json" />
-    <link rel="alternate" type="text/rss+xml" title="RSS Feed" href="{{.Config.BaseURL}}/feeds/rss" />
+    <title>{{ .Site.Title }} - Archives</title>
+    <link rel="icon" href="{{.Site.BaseURL}}/images/apple-touch-icon-60.png" />
+    <link rel="shortcut icon" src="{{.Site.BaseURL}}/images/apple-touch-icon-60.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{.Site.BaseURL}}/images/apple-touch-icon-180.png"/>
+    <link rel="stylesheet" href="{{.Site.BaseURL}}/index.css" type="text/css"/>
+    <link rel="alternate" type="application/json" title="JSON Feed" href="{{.Site.BaseURL}}/feeds/json" />
+    <link rel="alternate" type="text/rss+xml" title="RSS Feed" href="{{.Site.BaseURL}}/feeds/rss" />
   </head>
   <body>
     <section class="NavBar">
-      <div class="Title">
-        <p><a href="{{.Config.BaseURL}}/">&#x2248; {{ .Config.Title }}</a></p>
+      <div class="NavItems">
+        <div class="Title">
+          <p><a href="{{.Site.BaseURL}}/">{{ .Site.Title }}</a></p>
+        </div>
+        <div class="Links">
+          <div class="Icon">
+            <a href="{{.Site.BaseURL}}/">
+              <img src="{{.Site.BaseURL}}/images/home.svg"/>
+            </a>
+          </div>
+        </div>
       </div>
     </section>
-
     <section class="Content">
       <h1>Archives</h1>
       <section class="TableOfContents">
-        {{ $url := .Config.BaseURL }}
+        {{ $url := .Site.BaseURL }}
         {{ range .Entries }}
         <div class="ArchiveEntry">
           <div class="Date">
             {{ .DateCreated }}
           </div>
           <div class="Post">
-            <a href="{{$url}}/post/{{ .UUID }}">{{ .Slugline }}</a>
+            <a title="&#x261B; Permalink" href="{{$url}}/post/{{ .UUID }}">{{ .Slugline }}</a>
           </div>
         </div>
         {{ end }}
@@ -36,21 +44,25 @@
     </section>
     <section class="Footer">
       <div class="Links">
-        <a href="{{.Config.BaseURL}}/archive">
-          <img width="20px"  src="{{.Config.BaseURL}}/images/archive.svg"/>
+        <a href="{{.Site.BaseURL}}/">
+          <img src="{{.Site.BaseURL}}/images/home.svg"/>
+          <p>Home</p>
+        </a>
+        <a href="{{.Site.BaseURL}}/archive">
+          <img width="20px"  src="{{.Site.BaseURL}}/images/archive.svg"/>
           <p>Archive</p>
         </a>
-        <a href="{{.Config.BaseURL}}/feeds/json">
-          <img src="{{.Config.BaseURL}}/images/jsonfeed.svg"/>
+        <a href="{{.Site.BaseURL}}/feeds/json">
+          <img src="{{.Site.BaseURL}}/images/jsonfeed.svg"/>
           <p>JSON</p>
         </a>
-        <a href="{{.Config.BaseURL}}/feeds/rss">
-          <img src="{{.Config.BaseURL}}/images/rssfeed.svg"/>
+        <a href="{{.Site.BaseURL}}/feeds/rss">
+          <img src="{{.Site.BaseURL}}/images/rssfeed.svg"/>
           <p>RSS</p>
         </a>
       </div>
       <div class="Copyright">
-        <p>Copyright &copy; 2017 {{ .Config.Title }}</p>
+        <p>Copyright &copy; 2017 {{ .Site.Title }}</p>
         <p>Portland, Oregon</p>
       </div>
     </section>

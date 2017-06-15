@@ -76,14 +76,21 @@ func mkWebApp(
 
 	app := internal.NewWebApplication(config, resources, database, graphapi)
 
+	listen := config.Web.Listen
+	if listen == "" {
+		listen = "127.0.0.1"
+	}
+
+	addr := listen + ":" + config.Web.Port
+
 	return &http.Server{
-		Addr:    ":" + config.Web.Port,
+		Addr:    addr,
 		Handler: app,
 	}
 }
 
 //-----------------------------------------------------------------------------
-// Boostraap
+// Bootstrap
 //-----------------------------------------------------------------------------
 
 func blockUntilShutdownThenDo(fn func()) {
@@ -95,7 +102,7 @@ func blockUntilShutdownThenDo(fn func()) {
 }
 
 func notify(config *internal.AppConfig) {
-	log.Printf("Web access -> %s\n", config.Web.BaseURL)
+	log.Printf("Ready on port %v.", config.Web.Port)
 }
 
 func main() {
@@ -109,7 +116,6 @@ func main() {
 
 	graphapi := mkGraphAPI(database)
 	server := mkWebApp(config, resources, database, graphapi)
-	// server := mkServer(config, app)
 
 	go server.ListenAndServe()
 
