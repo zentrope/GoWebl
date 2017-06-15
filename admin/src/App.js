@@ -50,6 +50,7 @@ class App extends React.PureComponent {
         return
       }
       this.setState({site: result.data.site})
+      this.forceUpdate()
     })
 
     this.client.validate(token, result => {

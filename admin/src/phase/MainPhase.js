@@ -32,7 +32,7 @@ class MainPhase extends React.PureComponent {
     this.updatePost = this.updatePost.bind(this)
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.refresh()
   }
 
@@ -72,7 +72,7 @@ class MainPhase extends React.PureComponent {
     const { client } = this.props
     client.viewerData(response => {
       const data = fromJS(response.data.viewer)
-      this.setState({viewer: data})
+      this.setState({viewer: data, site: response.data.viewer.site})
     })
   }
 
@@ -88,7 +88,6 @@ class MainPhase extends React.PureComponent {
 
       case 'site/update':
         client.updateSite(data.title, data.description, data.baseUrl, (response) => {
-          console.log(response)
           if (response.errors) {
             console.error(response.errors)
           } else {
