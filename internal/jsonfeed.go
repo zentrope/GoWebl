@@ -37,7 +37,7 @@ type JSONFeed struct {
 	Items       []FeedItem `json:"items"`
 }
 
-func NewJSONFeed(site SiteConfig, posts []*LatestPost) (string, error) {
+func NewJSONFeed(site *SiteConfig, posts []*LatestPost) (string, error) {
 
 	items := make([]FeedItem, 0)
 	for _, p := range posts {

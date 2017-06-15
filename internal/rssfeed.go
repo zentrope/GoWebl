@@ -38,7 +38,7 @@ type RSSFeed struct {
 	Channel RSSChannel `xml:"channel"`
 }
 
-func NewRSSFeed(site SiteConfig, posts []*LatestPost) (string, error) {
+func NewRSSFeed(site *SiteConfig, posts []*LatestPost) (string, error) {
 
 	items := make([]RSSItem, 0)
 	for _, post := range posts {

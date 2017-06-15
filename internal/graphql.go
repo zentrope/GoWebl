@@ -31,6 +31,7 @@ const Schema = `
  }
 
  type Mutation {
+	 // TODO: Should take objects to allow for easier (and sparse) extension.
 	 createPost(slugline: String! status: String! text: String! token: String): Post!
 	 updatePost(uuid: String! slugline: String! text: String!): Post!
 	 deletePost(uuid: String!): String!
@@ -105,7 +106,7 @@ type ViewerClaims struct {
 }
 
 func getSecret(ctx context.Context) []byte {
-	site := ctx.Value(SITE_KEY).(SiteConfig)
+	site := ctx.Value(SITE_KEY).(*SiteConfig)
 	return []byte(site.JwtSecret)
 }
 
@@ -215,7 +216,7 @@ func (r *Resolver) Authenticate(ctx context.Context, args *struct{ User, Pass st
 		database: r.Database,
 		author:   author,
 		token:    token,
-		site:     ctx.Value(SITE_KEY).(SiteConfig),
+		site:     ctx.Value(SITE_KEY).(*SiteConfig),
 	}
 
 	return &res, nil
@@ -236,7 +237,7 @@ type viewerResolver struct {
 	database *Database
 	author   *Author
 	token    string
-	site     SiteConfig
+	site     *SiteConfig
 }
 
 func (r *Resolver) Viewer(ctx context.Context, args *struct{ Token *string }) (*viewerResolver, error) {
@@ -251,7 +252,7 @@ func (r *Resolver) Viewer(ctx context.Context, args *struct{ Token *string }) (*
 		return nil, err
 	}
 
-	site := ctx.Value(SITE_KEY).(SiteConfig)
+	site := ctx.Value(SITE_KEY).(*SiteConfig)
 
 	return &viewerResolver{
 		database: r.Database,
@@ -298,7 +299,7 @@ func (v *viewerResolver) Posts() ([]*postResolver, error) {
 //=============================================================================
 
 type siteResolver struct {
-	site SiteConfig
+	site *SiteConfig
 }
 
 func (r *Resolver) UpdateSite(ctx context.Context, args *struct {
@@ -322,7 +323,7 @@ func (r *Resolver) UpdateSite(ctx context.Context, args *struct {
 
 func (r *Resolver) Site(ctx context.Context) siteResolver {
 	return siteResolver{
-		site: ctx.Value(SITE_KEY).(SiteConfig),
+		site: ctx.Value(SITE_KEY).(*SiteConfig),
 	}
 }
 
@@ -522,5 +523,3 @@ func (r *postResolver) DateCreated() string {
 func (r *postResolver) DateUpdated() string {
 	return r.post.DateUpdated.Format(time.RFC3339)
 }
-
-//=============================================================================

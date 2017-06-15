@@ -89,14 +89,6 @@ func mkWebApp(
 	}
 }
 
-func addSiteConfig(config *internal.AppConfig, database *internal.Database) *internal.AppConfig {
-	newConfig, err := database.AppendSiteConfig(config)
-	if err != nil {
-		panic(err)
-	}
-	return newConfig
-}
-
 //-----------------------------------------------------------------------------
 // Bootstrap
 //-----------------------------------------------------------------------------
@@ -110,11 +102,7 @@ func blockUntilShutdownThenDo(fn func()) {
 }
 
 func notify(config *internal.AppConfig) {
-	url := "http://localhost:8080"
-	if config.Site.BaseURL != "" {
-		url = config.Site.BaseURL
-	}
-	log.Printf("Web access -> %s\n", url)
+	log.Printf("Ready on port %v.", config.Web.Port)
 }
 
 func main() {
@@ -125,7 +113,6 @@ func main() {
 	config := mkConfig(resources)
 	database := mkDatabase(config)
 	database.MustRunMigrations(resources)
-	config = addSiteConfig(config, database)
 
 	graphapi := mkGraphAPI(database)
 	server := mkWebApp(config, resources, database, graphapi)

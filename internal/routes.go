@@ -22,7 +22,6 @@ type WebApplication struct {
 	resources *Resources
 	graphql   *GraphAPI
 	database  *Database
-	site      SiteConfig
 }
 
 type ResourceKey string
@@ -68,9 +67,6 @@ func NewWebApplication(config *AppConfig, resources *Resources,
 
 	service := http.NewServeMux()
 
-	//webConfig := config.Web
-	site := config.Site
-
 	// GraphQL
 	service.HandleFunc("/graphql", graphQlClientPage)
 	service.HandleFunc("/static/", staticPage)
@@ -79,13 +75,11 @@ func NewWebApplication(config *AppConfig, resources *Resources,
 	// Admin Post Manager
 	service.HandleFunc("/admin/", adminPage)
 
-	// public blog routes
-
+	// Public Blog Routes
 	service.HandleFunc("/feeds/json", jsonFeed)
 	service.HandleFunc("/feeds/json/", jsonFeed)
 	service.HandleFunc("/feeds/rss", rssFeed)
 	service.HandleFunc("/feeds/rss/", rssFeed)
-
 	service.HandleFunc("/archive", archivePage)
 	service.HandleFunc("/query", queryApi)
 	service.HandleFunc("/post/", postPage)
@@ -96,25 +90,22 @@ func NewWebApplication(config *AppConfig, resources *Resources,
 		resources: resources,
 		graphql:   graphapi,
 		database:  database,
-		site:      site,
 	}
 }
 
-// ---
-
 type homeData struct {
 	Posts []*TemplatePost
-	Site  SiteConfig
+	Site  *SiteConfig
 }
 
 type archiveData struct {
 	Entries []*TemplateArchiveEntry
-	Site    SiteConfig
+	Site    *SiteConfig
 }
 
 type postData struct {
 	Post *TemplatePost
-	Site SiteConfig
+	Site *SiteConfig
 }
 
 type TemplatePost struct {
@@ -429,8 +420,8 @@ func resolveApi(r *http.Request) *GraphAPI {
 	return r.Context().Value(API_KEY).(*GraphAPI)
 }
 
-func resolveSite(r *http.Request) SiteConfig {
-	return r.Context().Value(SITE_KEY).(SiteConfig)
+func resolveSite(r *http.Request) *SiteConfig {
+	return r.Context().Value(SITE_KEY).(*SiteConfig)
 }
 
 func resolveRes(r *http.Request) *Resources {

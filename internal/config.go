@@ -45,7 +45,6 @@ type SiteConfig struct {
 type AppConfig struct {
 	Storage StorageConfig `json:"storage,omitempty"`
 	Web     WebConfig     `json:"web,omitempty"`
-	Site    SiteConfig
 }
 
 const DefaultConfigFile = "resources/config.json"
@@ -73,12 +72,12 @@ func LoadConfigFile(pathToOverride string, resources *Resources) (*AppConfig, er
 	return &override, nil
 }
 
-func (conn *Database) GetSiteConfig() (SiteConfig, error) {
+func (conn *Database) GetSiteConfig() (*SiteConfig, error) {
 	q := "select key, value from config"
 
 	rows, err := conn.db.Query(q)
 	if err != nil {
-		return SiteConfig{}, err
+		return nil, err
 	}
 
 	defer rows.Close()
@@ -91,13 +90,13 @@ func (conn *Database) GetSiteConfig() (SiteConfig, error) {
 
 		err := rows.Scan(&key, &value)
 		if err != nil {
-			return SiteConfig{}, err
+			return nil, err
 		}
 
 		site[key] = value
 	}
 
-	return SiteConfig{
+	return &SiteConfig{
 		BaseURL:     site[SITE_BASEURL],
 		JwtSecret:   site[SITE_JWT_SECRET],
 		Title:       site[SITE_TITLE],
@@ -105,7 +104,7 @@ func (conn *Database) GetSiteConfig() (SiteConfig, error) {
 	}, nil
 }
 
-func (conn *Database) UpdateSite(title, description, url string) (SiteConfig, error) {
+func (conn *Database) UpdateSite(title, description, url string) (*SiteConfig, error) {
 	kvs := make(map[string]string, 0)
 
 	kvs["webl.title"] = title
@@ -114,7 +113,7 @@ func (conn *Database) UpdateSite(title, description, url string) (SiteConfig, er
 
 	tx, err := conn.db.Begin()
 	if err != nil {
-		return SiteConfig{}, nil
+		return nil, err
 	}
 
 	q := "update config set value=$1 where key=$2"
@@ -123,23 +122,13 @@ func (conn *Database) UpdateSite(title, description, url string) (SiteConfig, er
 		_, err := conn.db.Exec(q, v, k)
 		if err != nil {
 			tx.Rollback()
-			return SiteConfig{}, err
+			return nil, err
 		}
 	}
 
 	tx.Commit()
 
 	return conn.GetSiteConfig()
-}
-
-func (conn *Database) AppendSiteConfig(config *AppConfig) (*AppConfig, error) {
-	site, err := conn.GetSiteConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	config.Site = site
-	return config, nil
 }
 
 //-----------------------------------------------------------------------------
