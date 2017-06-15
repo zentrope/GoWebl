@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/russross/blackfriday"
 )
@@ -127,12 +128,21 @@ type TemplateArchiveEntry struct {
 	Author      string
 }
 
+func westCoastTZ(date time.Time) time.Time {
+	loc, err := time.LoadLocation("America/Los_Angeles")
+	if err != nil {
+		log.Println("Error", err)
+		return date
+	}
+	return date.In(loc)
+}
+
 func xformArchiveEntry(e *ArchiveEntry) *TemplateArchiveEntry {
 	fmt := "02-Jan-2006"
 	return &TemplateArchiveEntry{
 		e.UUID,
-		e.DateCreated.Format(fmt),
-		e.DateUpdated.Format(fmt),
+		westCoastTZ(e.DateCreated).Format(fmt),
+		westCoastTZ(e.DateUpdated).Format(fmt),
 		e.Slugline,
 		e.Author,
 	}
@@ -168,8 +178,8 @@ func xformTemplatePost(p *LatestPost) *TemplatePost {
 		p.UUID,
 		p.Author,
 		p.Email,
-		p.DateCreated.Format("Jan 2, 2006"),
-		p.DateUpdated.Format("Jan 2, 2006"),
+		westCoastTZ(p.DateCreated).Format("Jan 2, 2006"),
+		westCoastTZ(p.DateUpdated).Format("Jan 2, 2006"),
 		p.Status,
 		p.Slugline,
 		template.HTML(MarkdownToHtml(p.Text)),
