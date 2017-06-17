@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <title>{{ .Site.Title }} - Archives</title>
     <link rel="icon" href="{{.Site.BaseURL}}/images/apple-touch-icon-60.png" />
     <link rel="shortcut icon" src="{{.Site.BaseURL}}/images/apple-touch-icon-60.png" />
@@ -28,18 +30,22 @@
     </section>
     <section class="Content">
       <h1>Archives</h1>
+
       <section class="TableOfContents">
         {{ $url := .Site.BaseURL }}
-        {{ range .Entries }}
-        <div class="ArchiveEntry">
-          <div class="Date">
-            {{ .DateCreated }}
-          </div>
-          <div class="Post">
-            <a title="&#x261B; Permalink" href="{{$url}}/post/{{ .UUID }}">{{ .Slugline }}</a>
-          </div>
-        </div>
-        {{ end }}
+        <ul>
+          {{ range .Entries }}
+          <li>
+            <span class="Article">
+              <a title="&#x261B; Permalink" href="{{$url}}/post/{{ .UUID }}">{{ .Slugline }}</a>
+            </span>
+            &mdash;
+            <span class="Date">
+              {{ .DateCreated }}
+            </span>
+          </li>
+          {{ end }}
+        </ul>
       </section>
     </section>
     <section class="Footer">

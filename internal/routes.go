@@ -138,7 +138,7 @@ func westCoastTZ(date time.Time) time.Time {
 }
 
 func xformArchiveEntry(e *ArchiveEntry) *TemplateArchiveEntry {
-	fmt := "02-Jan-2006"
+	fmt := "January 2, 2006"
 	return &TemplateArchiveEntry{
 		e.UUID,
 		westCoastTZ(e.DateCreated).Format(fmt),
@@ -178,8 +178,8 @@ func xformTemplatePost(p *LatestPost) *TemplatePost {
 		p.UUID,
 		p.Author,
 		p.Email,
-		westCoastTZ(p.DateCreated).Format("Jan 2, 2006"),
-		westCoastTZ(p.DateUpdated).Format("Jan 2, 2006"),
+		westCoastTZ(p.DateCreated).Format("January 2, 2006"),
+		westCoastTZ(p.DateUpdated).Format("January 2, 2006"),
 		p.Status,
 		p.Slugline,
 		template.HTML(MarkdownToHtml(p.Text)),

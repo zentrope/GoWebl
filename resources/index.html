@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <title>{{ .Site.Title }}</title>
     <link rel="stylesheet" href="index.css" type="text/css"/>
     <link rel="icon" href="{{.Site.BaseURL}}/images/apple-touch-icon-60.png" />
@@ -30,15 +32,15 @@
       {{ $url := .Site.BaseURL }}
       {{ range .Posts }}
       <article id="{{.UUID}}">
-        <div class="MetaBar">
-          <div class="Permalink">
-            <a title="Permalink &#x261B; {{ .Slugline }}" href="{{$url}}/post/{{ .UUID }}">&#x221e;</a>
-          </div>
-          <div class="Author">
-            <span class="Date">{{ .DateCreated }}</span>
-          </div>
-        </div>
         <div class="PostBody">
+          <div class="Meta">
+            <span class="Date">
+              {{ .DateCreated }}
+            </span>
+            <span class="Permalink">
+              <a title="Permalink &#x261B; {{ .Slugline }}" href="{{$url}}/post/{{ .UUID }}">&#x221e;</a>
+            </span>
+          </div>
           {{ .Text }}
         </div>
       </article>

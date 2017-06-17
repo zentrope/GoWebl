@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <title>{{ .Site.Title }} - {{ .Post.Slugline }}</title>
     <link rel="icon" href="{{.Site.BaseURL}}/images/apple-touch-icon-60.png" />
     <link rel="shortcut icon" src="{{.Site.BaseURL}}/images/apple-touch-icon-60.png" />
@@ -33,13 +35,11 @@
     </section>
     <section class="Content">
       <article id="{{.Post.UUID}}">
-        <div class="MetaBar">
-          <div class="Permalink">&#x2248;</div>
-          <div class="Author">
-            <span class="Date">{{ .Post.DateCreated }}</span>
-          </div>
-        </div>
         <div class="PostBody">
+          <div class="Meta">
+            <span class="Date">{{ .Post.DateCreated }}</span>
+            <span class="Permalink">&#x2248;</span>
+          </div>
           {{ .Post.Text }}
         </div>
       </article>
