@@ -39,10 +39,8 @@ class EditSite extends React.PureComponent {
 
   render() {
 
-    const { history } = this.props
+    const { onCancel } = this.props
     const { title, baseUrl, description } = this.state
-
-    const onCancel = () => history.push("/admin/home")
 
     return (
       <WorkArea>

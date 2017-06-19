@@ -11,11 +11,7 @@ import { WorkArea } from '../component/WorkArea'
 class NewPost extends React.PureComponent {
 
   render() {
-    const { dispatch, history } = this.props
-
-    const onCancel = () => {
-      history.push("/admin/home")
-    }
+    const { dispatch, onCancel } = this.props
 
     const onSave = (slugline, text) => {
       dispatch('post/save', {slugline: slugline, text: text})

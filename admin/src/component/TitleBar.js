@@ -11,22 +11,15 @@ import './TitleBar.css'
 class TitleBar extends React.PureComponent {
 
   render() {
-    const { user, logout, title, visit, editSite, newPost } = this.props
-
-    // TODO: Figure out how to hide new post and edit site when either
-    //       one is current active. Or at least ignore clicks.
+    const { user, logout, title, visit } = this.props
 
     return (
       <section className="TitleBar">
-        <div className="Title">{title}</div>
-        <div className="Name">{user}</div>
+        <div className="Meta">
+          <div className="Title">{title}</div>
+          <div className="Name">{user}</div>
+        </div>
         <div className="Options">
-          <button onClick={newPost}>
-            <Icon type="new"/> Post
-          </button>
-          <button onClick={editSite}>
-            <Icon type="settings"/> Site
-          </button>
           <button onClick={visit}>
             <Icon type="visit" /> Site
           </button>

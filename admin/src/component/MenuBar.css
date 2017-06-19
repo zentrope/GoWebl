@@ -1,0 +1,56 @@
+/*
+** Copyright 2017 Keith Irwin. All rights reserved.
+** Use of this source code is governed by a BSD-style
+** license that can be found in the LICENSE file.
+*/
+
+.MenuBar {
+  position: fixed;
+  top: 60px;
+  bottom: 30px;
+  width: 150px;
+  border-right: 1px solid orange;
+  display: flex;
+  flex-flow: column;
+  background-color: #f2f2f2;
+}
+
+.MenuBar .MenuItem {
+  height: 35px;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid silver;
+  cursor: pointer;
+  padding-left: 15px;
+  display: flex;
+  font-size: 11pt;
+}
+
+.MenuBar .MenuItem:active {
+}
+
+.MenuBar .MenuItem:active {
+  color: DarkRed;
+  background-color: #d8d8d8;
+}
+
+.MenuBar .MenuItem .Icon {
+  flex: 1;
+  align-self: center;
+  color: #369;
+  pointer-events: none;
+  opacity: 0.70;
+}
+
+.MenuBar .MenuItem .Name {
+  flex: 5;
+  align-self: center;
+  pointer-events: none;
+}
+
+.MenuBar .MenuItem.Focus .Name {
+  color: DarkRed;
+}
+
+.MenuBar .MenuItem.Focus .Icon {
+  opacity: 1;
+}

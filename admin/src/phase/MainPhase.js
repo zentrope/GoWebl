@@ -7,6 +7,7 @@ import { Router, Route, Redirect, Switch } from 'react-router-dom'
 
 import { Map, fromJS } from 'immutable'
 
+import { MenuBar } from '../component/MenuBar'
 import { StatusBar } from '../component/StatusBar'
 import { TitleBar } from '../component/TitleBar'
 
@@ -23,7 +24,7 @@ class MainPhase extends React.PureComponent {
   constructor(props) {
     super(props)
 
-    this.state = {viewer: Map({}), site: props.site}
+    this.state = {viewer: Map({}), site: props.site, menu: "list-posts"}
     this.history = createBrowserHistory()
     this.dispatch = this.dispatch.bind(this)
     this.refresh = this.refresh.bind(this)
@@ -82,10 +83,6 @@ class MainPhase extends React.PureComponent {
 
     switch (event) {
 
-      case 'site/edit':
-        this.history.push("/admin/site/edit")
-        break
-
       case 'site/update':
         client.updateSite(data.title, data.description, data.baseUrl, (response) => {
           if (response.errors) {
@@ -93,6 +90,7 @@ class MainPhase extends React.PureComponent {
           } else {
             this.setState({ site : response.data.updateSite })
           }
+          this.setState({menu: "list-posts"})
           this.history.push("/admin/home")
         })
         break
@@ -145,7 +143,7 @@ class MainPhase extends React.PureComponent {
 
   render() {
     const { logout, client } = this.props
-    const { viewer, site } = this.state
+    const { viewer, site, menu } = this.state
 
     const PropRoute = ({component: Component, path: Path, ...rest}) => (
       <Route exact path={Path} render={(props) => (<Component {...rest} {...props}/> )}/>
@@ -155,30 +153,46 @@ class MainPhase extends React.PureComponent {
       window.location.href = site.baseUrl
     }
 
-    const editSite = () => {
-      this.dispatch('site/edit', {})
-    }
-
     const saveSite = (siteData) => {
       this.dispatch('site/update', siteData)
     }
 
-    const newPost = () => {
-      this.history.push("/admin/post/new")
+    const onCancel = () => {
+      this.setState({menu: "list-posts"})
+      this.history.push("/admin/home")
+    }
+
+    const onMenuClick = (event) => {
+      switch (event) {
+        case "list-posts":
+          this.setState({menu: event})
+          this.history.push("/admin/home")
+          break;
+        case "new-post":
+          this.setState({menu: event})
+          this.history.push("/admin/post/new")
+          break;
+        case "edit-site":
+          this.setState({menu: event})
+          this.history.push("/admin/site/edit")
+          break;
+        default:
+          console.log("Unknown menu event:", event);
+      }
     }
 
     return (
       <Router history={this.history}>
         <section className="App">
           <TitleBar title={ site.title } user={viewer.get("email")}
-                    editSite={editSite} visit={visit} logout={logout}
-                    newPost={newPost}/>
+                    visit={visit} logout={logout}/>
+          <MenuBar onClick={onMenuClick} selected={menu}/>
           <StatusBar year="2017" copyright={ site.title }/>
           <Switch>
             <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} dispatch={this.dispatch}/>
-            <PropRoute path="/admin/post/new" component={NewPost} dispatch={this.dispatch}/>
+            <PropRoute path="/admin/post/new" component={NewPost} dispatch={this.dispatch} onCancel={onCancel}/>
             <PropRoute path="/admin/post/:id" component={EditPost} dispatch={this.dispatch}/>
-            <PropRoute path="/admin/site/edit" component={EditSite} site={site} onSave={saveSite}/>
+            <PropRoute path="/admin/site/edit" component={EditSite} site={site} onSave={saveSite} onCancel={onCancel}/>
             <Redirect to="/admin/home"/>
           </Switch>
         </section>
