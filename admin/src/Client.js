@@ -67,20 +67,20 @@ const validateQL = (token) => {
   }
 }
 
-const loginQL = (user, pass) => {
+const loginQL = (email, pass) => {
   const q = fl(`query
-    Authenticate($user: String! $pass: String!) {
-      authenticate(user: $user pass: $pass) { token }}`)
+    Authenticate($email: String! $pass: String!) {
+      authenticate(email: $email pass: $pass) { token }}`)
   return {
     query: q,
     operationName: "Authenticate",
-    variables: {user: user, pass: pass}
+    variables: {email: email, pass: pass}
   }
 }
 
 const viewerQL = () => {
   const q = fl(`query {
-    viewer { id user type email
+    viewer { id name type email
       site { baseUrl title description }
       posts { uuid status slugline dateCreated dateUpdated text } } }
   `)
@@ -154,8 +154,8 @@ class Client {
     this.authToken = "no-auth"
   }
 
-  login(user, pass, callback) {
-    this.__doQuery(loginQL(user, pass), callback)
+  login(email, pass, callback) {
+    this.__doQuery(loginQL(email, pass), callback)
   }
 
   validate(token, callback) {

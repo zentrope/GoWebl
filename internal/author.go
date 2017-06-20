@@ -14,15 +14,16 @@ import (
 )
 
 type Author struct {
-	Handle string
+	Uuid   string
+	Name   string
 	Email  string
 	Type   string
 	Status string
 }
 
-func (conn *Database) Authentic(handle, password string) (*Author, error) {
-	const query = "select password from author where lower(handle)=lower($1)"
-	rows, err := conn.db.Query(query, handle)
+func (conn *Database) Authentic(email, password string) (*Author, error) {
+	const query = "select uuid, password from author where lower(email)=lower($1)"
+	rows, err := conn.db.Query(query, email)
 
 	defer rows.Close()
 
@@ -35,7 +36,8 @@ func (conn *Database) Authentic(handle, password string) (*Author, error) {
 	}
 
 	var hash string
-	err = rows.Scan(&hash)
+	var authorUuid string
+	err = rows.Scan(&authorUuid, &hash)
 	if err != nil {
 		return nil, err
 	}
@@ -50,12 +52,12 @@ func (conn *Database) Authentic(handle, password string) (*Author, error) {
 		return nil, err
 	}
 
-	return conn.Author(handle)
+	return conn.Author(authorUuid)
 }
 
-func (conn *Database) Author(handle string) (*Author, error) {
-	const query = "select handle, email, type, status from author where lower(handle)=lower($1)"
-	rows, err := conn.db.Query(query, handle)
+func (conn *Database) Author(authorUuid string) (*Author, error) {
+	const query = "select uuid, name, email, type, status from author where uuid=$1"
+	rows, err := conn.db.Query(query, authorUuid)
 
 	defer rows.Close()
 
@@ -68,7 +70,7 @@ func (conn *Database) Author(handle string) (*Author, error) {
 }
 
 func (conn *Database) Authors() ([]*Author, error) {
-	rows, err := conn.db.Query("select handle, email, type, status from author")
+	rows, err := conn.db.Query("select uuid, name, email, type, status from author")
 	defer rows.Close()
 
 	if err != nil {
@@ -90,7 +92,7 @@ func (conn *Database) Authors() ([]*Author, error) {
 
 func rowToAuthor(rows *sql.Rows) (*Author, error) {
 	var a Author
-	err := rows.Scan(&a.Handle, &a.Email, &a.Status, &a.Type)
+	err := rows.Scan(&a.Uuid, &a.Name, &a.Email, &a.Status, &a.Type)
 	if err != nil {
 		return nil, err
 	}

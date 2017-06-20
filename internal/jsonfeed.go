@@ -47,7 +47,7 @@ func NewJSONFeed(site *SiteConfig, posts []*LatestPost) (string, error) {
 			Title:         p.Slugline,
 			DatePublished: p.DateCreated.Format(time.RFC3339),
 			DateModified:  p.DateUpdated.Format(time.RFC3339),
-			Author:        ItemAuthor{p.Author},
+			Author:        ItemAuthor{"-"},
 			ContentHtml:   MarkdownToHtml(p.Text),
 		})
 	}

@@ -9,6 +9,7 @@ import "log"
 var migrations = []string{
 	"sql/01-schema.sql",
 	"sql/02-schema.sql",
+	"sql/03-schema.sql",
 }
 
 func (conn *Database) MustRunMigrations(resources *Resources) {
@@ -16,6 +17,9 @@ func (conn *Database) MustRunMigrations(resources *Resources) {
 	conn.createMigrationTable()
 
 	applied, err := conn.findAppliedMigrations()
+	if err != nil {
+		panic(err)
+	}
 
 	for _, migration := range migrations {
 		run := applied[migration]
@@ -23,15 +27,13 @@ func (conn *Database) MustRunMigrations(resources *Resources) {
 		if !run {
 			ddl, err := resources.PrivateString(migration)
 			if err != nil {
+				log.Printf("- Unable to apply: %s.", migration)
 				panic(err)
 			}
 			conn.applyMigration(migration, ddl)
 		}
 	}
 
-	if err != nil {
-		panic(err)
-	}
 }
 
 func (conn *Database) createMigrationTable() error {
@@ -71,18 +73,21 @@ func (conn *Database) applyMigration(name, ddl string) {
 
 	tx, err := conn.db.Begin()
 	if err != nil {
+		log.Printf("- Unable to apply: %s.", name)
 		panic(err)
 	}
 
 	_, err = conn.db.Exec(ddl)
 	if err != nil {
 		tx.Rollback()
+		log.Printf("- Unable to apply: %s.", name)
 		panic(err)
 	}
 
 	_, err = conn.db.Exec("insert into migrations (name) values ($1)", name)
 	if err != nil {
 		tx.Rollback()
+		log.Printf("- Unable to apply: %s.", name)
 		panic(err)
 	}
 

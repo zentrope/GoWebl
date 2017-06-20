@@ -22,21 +22,17 @@ type LatestPost struct {
 	DateUpdated time.Time
 	Status      string
 	Slugline    string
-	Author      string
-	Email       string
 	Text        string
 }
 
 func (conn *Database) FocusPost(uuid string) (*LatestPost, error) {
 	var query = `
 	 select
-		 p.uuid, p.date_created, p.date_updated, p.status,
-		 p.slugline, a.handle as author, a.email, p.text
+		 p.uuid, p.date_created, p.date_updated, p.status, p.slugline, p.text
 	 from
-		 post p, author a
+		 post p
 	 where
 		 p.uuid = $1
-		 and p.author=a.handle
 		 and p.status='published'
 	`
 
@@ -56,8 +52,6 @@ func (conn *Database) FocusPost(uuid string) (*LatestPost, error) {
 		&p.DateUpdated,
 		&p.Status,
 		&p.Slugline,
-		&p.Author,
-		&p.Email,
 		&p.Text,
 	)
 
@@ -72,14 +66,13 @@ func (conn *Database) LatestPosts(limit int) ([]*LatestPost, error) {
 	var query = `
 	 select
 		 p.uuid, p.date_created, p.date_updated, p.status,
-		 p.slugline, a.handle as author, a.email, p.text
+		 p.slugline, p.text
 	 from
-		 post p, author a
+		 post p
 	 where
-		 p.author=a.handle
-		 and p.status='published'
+		 p.status='published'
 	 order
-		 by date_created desc
+		 by p.date_created desc
 	 limit $1`
 
 	rows, err := conn.db.Query(query, limit)
@@ -99,8 +92,6 @@ func (conn *Database) LatestPosts(limit int) ([]*LatestPost, error) {
 			&p.DateUpdated,
 			&p.Status,
 			&p.Slugline,
-			&p.Author,
-			&p.Email,
 			&p.Text,
 		)
 
@@ -119,14 +110,13 @@ type ArchiveEntry struct {
 	DateCreated time.Time
 	DateUpdated time.Time
 	Slugline    string
-	Author      string
 }
 
 func (conn *Database) ArchiveEntries() ([]*ArchiveEntry, error) {
 
 	var query = `
 		select
-			uuid, date_created, date_updated, slugline, author
+			uuid, date_created, date_updated, slugline
 		from
 			post
 		where
@@ -151,7 +141,6 @@ func (conn *Database) ArchiveEntries() ([]*ArchiveEntry, error) {
 			&e.DateCreated,
 			&e.DateUpdated,
 			&e.Slugline,
-			&e.Author,
 		)
 
 		if err != nil {
@@ -165,11 +154,11 @@ func (conn *Database) ArchiveEntries() ([]*ArchiveEntry, error) {
 
 }
 
-func (conn *Database) CreatePost(author, slugline, status, text string) (string, error) {
+func (conn *Database) CreatePost(authorUuid, slugline, status, text string) (string, error) {
 	uuid := mkUuid()
 	_, err := conn.db.Exec(
-		"insert into post (uuid, author, slugline, status, text) values ($1, $2, $3, $4, $5)",
-		uuid, author, slugline, status, text)
+		"insert into post (uuid, author_uuid, slugline, status, text) values ($1, $2, $3, $4, $5)",
+		uuid, authorUuid, slugline, status, text)
 	return uuid, err
 }
 
@@ -179,7 +168,7 @@ func (conn *Database) CreatePost(author, slugline, status, text string) (string,
 
 type Post struct {
 	UUID        string
-	Author      string
+	AuthorUuid  string
 	DateCreated time.Time
 	DateUpdated time.Time
 	Status      string
@@ -192,11 +181,8 @@ func (conn *Database) Posts() ([]*Post, error) {
 	return conn.postQuery(q)
 }
 
-func (conn *Database) PostsByAuthor(handle string) ([]*Post, error) {
-	return conn.postQuery(
-		mkPostSql("where lower(author)=lower($1)"),
-		handle,
-	)
+func (conn *Database) PostsByAuthor(authorUuid string) ([]*Post, error) {
+	return conn.postQuery(mkPostSql("where author_uuid=$1"), authorUuid)
 }
 
 func (conn *Database) Post(uuid string) (*Post, error) {
@@ -213,9 +199,9 @@ func (conn *Database) Post(uuid string) (*Post, error) {
 }
 
 // Delete a post if it also belongs to the indicated author.
-func (conn *Database) DeletePost(uuid, author string) error {
+func (conn *Database) DeletePost(uuid, authorId string) error {
 	q := "delete from post where uuid=$1 and lower(author)=lower($2)"
-	_, err := conn.db.Exec(q, uuid, author)
+	_, err := conn.db.Exec(q, uuid, authorId)
 	return err
 }
 
@@ -227,11 +213,11 @@ const (
 )
 
 // Update a post, assuming the uuid and author match the same post.
-func (conn *Database) UpdatePost(uuid, slugline, text, author string) (*Post, error) {
+func (conn *Database) UpdatePost(uuid, slugline, text, authorUuid string) (*Post, error) {
 	q := `update post set slugline=$1, text=$2, date_updated=now() where uuid=$3
-					 and lower(author) = lower($4)`
+					 and author_uuid = $4`
 
-	_, err := conn.db.Exec(q, slugline, text, uuid, author)
+	_, err := conn.db.Exec(q, slugline, text, uuid, authorUuid)
 	if err != nil {
 		return nil, err
 	}
@@ -239,15 +225,15 @@ func (conn *Database) UpdatePost(uuid, slugline, text, author string) (*Post, er
 	return conn.Post(uuid)
 }
 
-func (conn *Database) SetPostStatus(uuid, author string, status PostStatus) (*Post, error) {
+func (conn *Database) SetPostStatus(uuid, authorUuid string, status PostStatus) (*Post, error) {
 	s := "draft"
 	if status == PS_Published {
 		s = "published"
 	}
 
-	q := "update post set status=$1, date_updated=now() where uuid=$2 and author=$3"
+	q := "update post set status=$1, date_updated=now() where uuid=$2 and author_uuid=$3"
 
-	_, err := conn.db.Exec(q, s, uuid, author)
+	_, err := conn.db.Exec(q, s, uuid, authorUuid)
 	if err != nil {
 		return nil, err
 	}
@@ -267,11 +253,11 @@ func (conn *Database) postQuery(query string, args ...interface{}) ([]*Post, err
 
 	rows, err := conn.db.Query(query, args...)
 
-	defer rows.Close()
-
 	if err != nil {
 		return nil, err
 	}
+
+	defer rows.Close()
 
 	results, err := rowsToPosts(rows)
 	if err != nil {
@@ -281,7 +267,7 @@ func (conn *Database) postQuery(query string, args ...interface{}) ([]*Post, err
 }
 
 func mkPostSql(where string) string {
-	q := "select uuid, author, date_created, date_updated, status, slugline, text from post %s"
+	q := "select uuid, author_uuid, date_created, date_updated, status, slugline, text from post %s"
 	return fmt.Sprintf(q, where)
 }
 
@@ -304,7 +290,7 @@ func rowToPost(rows *sql.Rows) (*Post, error) {
 	var p Post
 	err := rows.Scan(
 		&p.UUID,
-		&p.Author,
+		&p.AuthorUuid,
 		&p.DateCreated,
 		&p.DateUpdated,
 		&p.Status,

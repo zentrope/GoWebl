@@ -25,7 +25,7 @@ const Schema = `
 
  type Query {
 	 validate(token: String!): Boolean!
-	 authenticate(user: String! pass: String!): Viewer!
+	 authenticate(email: String! pass: String!): Viewer!
 	 viewer(token: String): Viewer!
 	 site(): Site!
  }
@@ -41,7 +41,7 @@ const Schema = `
 
  type Viewer {
 	 id: ID!
-	 user: String!
+	 name: String!
 	 email: String!
 	 type: String!
 	 token: String!
@@ -51,8 +51,8 @@ const Schema = `
 
  type Author {
 	 id: ID!
-	 handle: String!
 	 email: String!
+	 name: String!
 	 type: String!
 	 status: String!
  }
@@ -100,7 +100,7 @@ func NewApi(database *Database) (*GraphAPI, error) {
 //=============================================================================
 
 type ViewerClaims struct {
-	User string `json:"user"`
+	Uuid string `json:"uuid"`
 	Type string `json:"type"`
 	jwt.StandardClaims
 }
@@ -114,7 +114,8 @@ func mkAuthToken(ctx context.Context, author *Author) (string, error) {
 	secret := getSecret(ctx)
 
 	claims := ViewerClaims{
-		author.Handle, author.Type,
+		author.Uuid,
+		author.Type,
 		jwt.StandardClaims{
 			Issuer: "vaclav",
 		},
@@ -198,11 +199,11 @@ func (r *Resolver) Validate(ctx context.Context, args *struct{ Token string }) (
 	return isValidAuthToken(ctx, tokenString)
 }
 
-func (r *Resolver) Authenticate(ctx context.Context, args *struct{ User, Pass string }) (*viewerResolver, error) {
-	user := args.User
+func (r *Resolver) Authenticate(ctx context.Context, args *struct{ Email, Pass string }) (*viewerResolver, error) {
+	email := args.Email
 	pass := args.Pass
 
-	author, err := r.Database.Authentic(user, pass)
+	author, err := r.Database.Authentic(email, pass)
 	if err != nil {
 		return nil, err
 	}
@@ -226,13 +227,6 @@ func (r *Resolver) Authenticate(ctx context.Context, args *struct{ User, Pass st
 // Viewer
 //=============================================================================
 
-type Viewer struct {
-	ID    graphql.ID
-	User  string
-	Type  string
-	Posts []*Post
-}
-
 type viewerResolver struct {
 	database *Database
 	author   *Author
@@ -247,7 +241,7 @@ func (r *Resolver) Viewer(ctx context.Context, args *struct{ Token *string }) (*
 		return nil, err
 	}
 
-	author, err := r.Database.Author(claims.User)
+	author, err := r.Database.Author(claims.Uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -263,11 +257,11 @@ func (r *Resolver) Viewer(ctx context.Context, args *struct{ Token *string }) (*
 }
 
 func (v *viewerResolver) ID() graphql.ID {
-	return graphql.ID(v.author.Handle)
+	return graphql.ID(v.author.Uuid)
 }
 
-func (v *viewerResolver) User() string {
-	return v.author.Handle
+func (v *viewerResolver) Name() string {
+	return v.author.Name
 }
 
 func (v *viewerResolver) Email() string {
@@ -283,7 +277,7 @@ func (r *viewerResolver) Token() string {
 }
 
 func (v *viewerResolver) Posts() ([]*postResolver, error) {
-	posts, err := v.database.PostsByAuthor(v.author.Handle)
+	posts, err := v.database.PostsByAuthor(v.author.Uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -365,11 +359,11 @@ func (r *Resolver) Authors(ctx context.Context) ([]*authorResolver, error) {
 }
 
 func (r *authorResolver) ID() graphql.ID {
-	return graphql.ID(r.author.Handle)
+	return graphql.ID(r.author.Uuid)
 }
 
-func (r *authorResolver) Handle() string {
-	return r.author.Handle
+func (r *authorResolver) Name() string {
+	return r.author.Name
 }
 
 func (r *authorResolver) Email() string {
@@ -406,7 +400,7 @@ func (r *Resolver) CreatePost(ctx context.Context, args *struct {
 	}
 
 	uuid, err := r.Database.CreatePost(
-		claims.User,
+		claims.Uuid,
 		args.Slugline,
 		args.Status,
 		args.Text,
@@ -435,7 +429,7 @@ func (r *Resolver) UpdatePost(ctx context.Context, args *struct {
 		return nil, err
 	}
 
-	post, err := r.Database.UpdatePost(args.Uuid, args.Slugline, args.Text, claims.User)
+	post, err := r.Database.UpdatePost(args.Uuid, args.Slugline, args.Text, claims.Uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -450,7 +444,7 @@ func (r *Resolver) DeletePost(ctx context.Context, args *struct{ Uuid string }) 
 		return "", err
 	}
 
-	if err := r.Database.DeletePost(args.Uuid, claims.User); err != nil {
+	if err := r.Database.DeletePost(args.Uuid, claims.Uuid); err != nil {
 		return "", err
 	}
 	return args.Uuid, nil
@@ -471,7 +465,7 @@ func (r *Resolver) SetPostStatus(ctx context.Context, args *struct {
 		status = PS_Published
 	}
 
-	post, err := r.Database.SetPostStatus(args.Uuid, claims.User, status)
+	post, err := r.Database.SetPostStatus(args.Uuid, claims.Uuid, status)
 	if err != nil {
 		return nil, err
 	}
@@ -497,7 +491,7 @@ func (r *postResolver) UUID() graphql.ID {
 }
 
 func (r *postResolver) Author() (*authorResolver, error) {
-	author, err := r.database.Author(r.post.Author)
+	author, err := r.database.Author(r.post.AuthorUuid)
 	if err != nil {
 		return nil, err
 	}
