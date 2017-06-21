@@ -33,7 +33,7 @@ insert into post (author, uuid, status, slugline, text) values ('root',
 'b8ec300c-b0f1-4338-b2a7-ca5f06c1fe33',
 'published',
 'First Post',
-'**First Post**: Welcome to my blog.');
+'Welcome to my blog.');
 
 -- To view all the enums
 create or replace view vw_enums as

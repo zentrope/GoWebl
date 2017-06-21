@@ -9,7 +9,7 @@ import './Icon.css'
 
 const icon = name => (color) => {
   return (
-    <i className={"fa " + name + " Icon-" + color} aria-hidden="true"></i>
+    <i className={"fa " + name + " Icon-" + color + " fa-fw"} aria-hidden="true"></i>
   )
 }
 
@@ -18,6 +18,7 @@ const icons = Map({
   "edit-site":    icon("fa-cog"),
   "list-posts":   icon("fa-file-text-o"),
   "edit-account": icon("fa-user-circle"),
+  "change-password": icon("fa-lock"),
   delete:       icon("fa-trash-o"),
   draft:        icon("fa-toggle-off"),
   edit:         icon("fa-pencil-square-o"),

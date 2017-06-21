@@ -114,6 +114,17 @@ const updateViewerQL = (name, email) => {
   }
 }
 
+const updateViewerPasswordQL = (password) => {
+  const q = fl(`mutation
+    UpdateViewerPassword($p: String!) {
+      updateViewerPassword(password: $p) { id }}`)
+  return {
+    query: q,
+    operationName: "UpdateViewerPassword",
+    variables: { p: password }
+  }
+}
+
 const checkStatus = (response) => {
   if (response.status >= 200 && response.status < 300) {
     return response
@@ -179,6 +190,10 @@ class Client {
 
   updateViewer(name, email, callback) {
     this.__doQuery(updateViewerQL(name, email), callback)
+  }
+
+  updateViewerPassword(password, callback) {
+    this.__doQuery(updateViewerPasswordQL(password), callback)
   }
 
   siteData(callback) {

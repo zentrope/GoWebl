@@ -37,6 +37,7 @@ const menus = [
   {name: "New post", event: "new-post"},
   {name: "Site", event: "edit-site"},
   {name: "Account", event: "edit-account"},
+  {name: "Password", event: "change-password"},
 ]
 
 class MenuBar extends React.PureComponent {

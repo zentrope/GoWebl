@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"errors"
+	"fmt"
 
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
@@ -61,6 +62,22 @@ func (conn *Database) UpdateAuthor(authorUuid, name, email string) (*Author, err
 	if err != nil {
 		return nil, err
 	}
+	return conn.Author(authorUuid)
+}
+
+func (conn *Database) UpdateAuthorPassword(authorUuid, password string) (*Author, error) {
+	raw, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
+	encoded := fmt.Sprintf("%x", raw)
+
+	_, err = conn.db.Exec("update author set password=$1 where uuid=$2", encoded, authorUuid)
+	if err != nil {
+		return nil, err
+	}
+
 	return conn.Author(authorUuid)
 }
 
