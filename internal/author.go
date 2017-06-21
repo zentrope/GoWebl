@@ -55,6 +55,15 @@ func (conn *Database) Authentic(email, password string) (*Author, error) {
 	return conn.Author(authorUuid)
 }
 
+func (conn *Database) UpdateAuthor(authorUuid, name, email string) (*Author, error) {
+	q := "update author set name=$1, email=$2 where uuid=$3"
+	_, err := conn.db.Exec(q, name, email, authorUuid)
+	if err != nil {
+		return nil, err
+	}
+	return conn.Author(authorUuid)
+}
+
 func (conn *Database) Author(authorUuid string) (*Author, error) {
 	const query = "select uuid, name, email, type, status from author where uuid=$1"
 	rows, err := conn.db.Query(query, authorUuid)

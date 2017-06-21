@@ -5,7 +5,6 @@
 const fl = (s) =>
   s.replace(/\s+/g, " ")
 
-
 const setPostStatusQL = (uuid, isPublished) => {
   const q = fl(`mutation
     SetPostStatus($uuid: String!, $isPublished: Boolean!) {
@@ -103,6 +102,18 @@ const updateSiteQL = (title, description, baseUrl) => {
   }
 }
 
+const updateViewerQL = (name, email) => {
+  const q = fl(`mutation
+    UpdateViewer($n: String! $e: String!) {
+      updateViewer(name: $n, email: $e) {
+        name email }}`)
+  return {
+    query: q,
+    operationName: "UpdateViewer",
+    variables: { n: name, e: email }
+  }
+}
+
 const checkStatus = (response) => {
   if (response.status >= 200 && response.status < 300) {
     return response
@@ -164,6 +175,10 @@ class Client {
 
   viewerData(callback) {
     this.__doQuery(viewerQL(), callback)
+  }
+
+  updateViewer(name, email, callback) {
+    this.__doQuery(updateViewerQL(name, email), callback)
   }
 
   siteData(callback) {

@@ -12,6 +12,7 @@ import { StatusBar } from '../component/StatusBar'
 import { TitleBar } from '../component/TitleBar'
 
 // Routes
+import { EditAccount } from '../route/EditAccount'
 import { EditPost } from '../route/EditPost'
 import { EditSite } from '../route/EditSite'
 import { Home } from '../route/Home'
@@ -31,10 +32,30 @@ class MainPhase extends React.PureComponent {
 
     this.savePost = this.savePost.bind(this)
     this.updatePost = this.updatePost.bind(this)
+    this.updateAccount = this.updateAccount.bind(this)
   }
 
   componentDidMount() {
     this.refresh()
+  }
+
+  updateAccount(name, email) {
+    const { client } = this.props
+
+    client.updateViewer(name, email, (response) => {
+      if (response.errors) {
+        console.error(response.errors)
+        return
+      }
+      let newName = response.data.updateViewer.name
+      let newEmail = response.data.updateViewer.email
+
+      let v2 = this.state.viewer
+                   .set("name", newName)
+                   .set("email", newEmail)
+      this.setState({viewer: v2, menu: "list-posts"})
+      this.history.push("/admin/home")
+    })
   }
 
   updatePost(data) {
@@ -176,16 +197,21 @@ class MainPhase extends React.PureComponent {
           this.setState({menu: event})
           this.history.push("/admin/site/edit")
           break;
+        case "edit-account":
+          this.setState({menu: event})
+          this.history.push("/admin/account/edit")
+          break;
         default:
           console.log("Unknown menu event:", event);
       }
     }
 
+    const userName = viewer.get("name") + " <" + viewer.get("email") + ">"
+
     return (
       <Router history={this.history}>
         <section className="App">
-          <TitleBar title={ site.title } user={viewer.get("email")}
-                    visit={visit} logout={logout}/>
+          <TitleBar title={ site.title } user={userName} visit={visit} logout={logout}/>
           <MenuBar onClick={onMenuClick} selected={menu}/>
           <StatusBar year="2017" copyright={ site.title }/>
           <Switch>
@@ -193,6 +219,7 @@ class MainPhase extends React.PureComponent {
             <PropRoute path="/admin/post/new" component={NewPost} dispatch={this.dispatch} onCancel={onCancel}/>
             <PropRoute path="/admin/post/:id" component={EditPost} dispatch={this.dispatch}/>
             <PropRoute path="/admin/site/edit" component={EditSite} site={site} onSave={saveSite} onCancel={onCancel}/>
+            <PropRoute path="/admin/account/edit" component={EditAccount} onCancel={onCancel} email={viewer.get("email")} name={viewer.get("name")} onSave={this.updateAccount}/>
             <Redirect to="/admin/home"/>
           </Switch>
         </section>

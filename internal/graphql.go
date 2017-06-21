@@ -37,6 +37,7 @@ const Schema = `
 	 deletePost(uuid: String!): String!
 	 setPostStatus(uuid: String! isPublished: Boolean!): Post!
 	 updateSite(baseUrl: String! description: String! title: String!): Site!
+	 updateViewer(name: String! email: String!): Viewer!
  }
 
  type Viewer {
@@ -232,6 +233,29 @@ type viewerResolver struct {
 	author   *Author
 	token    string
 	site     *SiteConfig
+}
+
+func (r *Resolver) UpdateViewer(ctx context.Context, args *struct {
+	Name  string
+	Email string
+}) (*viewerResolver, error) {
+
+	claims, err := findAuthClaims(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	author, err := r.Database.UpdateAuthor(claims.Uuid, args.Name, args.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	return &viewerResolver{
+		database: r.Database,
+		author:   author,
+		site:     ctx.Value(SITE_KEY).(*SiteConfig),
+		token:    optionalAuthToken(ctx, nil),
+	}, nil
 }
 
 func (r *Resolver) Viewer(ctx context.Context, args *struct{ Token *string }) (*viewerResolver, error) {

@@ -14,9 +14,10 @@ const icon = name => (color) => {
 }
 
 const icons = Map({
-  "new-post":   icon("fa-plus"),
-  "edit-site":  icon("fa-cog"),
-  "list-posts": icon("fa-list"),
+  "new-post":     icon("fa-plus"),
+  "edit-site":    icon("fa-cog"),
+  "list-posts":   icon("fa-file-text-o"),
+  "edit-account": icon("fa-user-circle"),
   delete:       icon("fa-trash-o"),
   draft:        icon("fa-toggle-off"),
   edit:         icon("fa-pencil-square-o"),
