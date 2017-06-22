@@ -74,16 +74,25 @@ class MarkdownEditor extends React.PureComponent {
 
     return (
       <section className="MarkdownEditor">
-        <div className="Slugline">
-          <input name="slugline"
-                 autoFocus={true}
-                 type="text"
-                 value={slugline}
-                 placeholder="Summary or slugline...."
-                 onChange={this.handleChange}/>
+        <div className="TopBar">
+
+          <div className="Slugline">
+            <input name="slugline"
+                   autoFocus={true}
+                   type="text"
+                   value={slugline}
+                   placeholder="Summary or slugline...."
+                   onChange={this.handleChange}/>
+          </div>
+
+          <div className="Status">
+            { dirty ? "UNSAVED" : "saved" }
+          </div>
+
         </div>
-        <div className="Editor">
-          <div className={"Text" + (showPreview ? "" : " Full")}>
+
+        <div className="Viewers">
+          <div className="Editor">
             <textarea name="text"
                       autoFocus={false}
                       placeholder="Thoughts?"
@@ -92,17 +101,23 @@ class MarkdownEditor extends React.PureComponent {
           </div>
           { preview }
         </div>
+
         <div className="Controls">
-          <button disabled={!this.isSubmittable()}
-                  onClick={this.savePost}>
-            Save
-          </button>
-          <button onClick={this.togglePreview}>
-            { showPreview ? "Hide Preview" : "Show Preview" }
-          </button>
-          <button onClick={onCancel}>
-            { dirty ? "Cancel" : "Done" }
-          </button>
+          <div className="Left">
+            <button disabled={!this.isSubmittable()}
+                    onClick={this.savePost}>
+              Save
+            </button>
+            <button onClick={onCancel}>
+              { dirty ? "Cancel" : "Done" }
+            </button>
+          </div>
+          <div className="Right">
+            <button onClick={this.togglePreview}>
+              { showPreview ? "Hide Preview" : "Show Preview" }
+            </button>
+          </div>
+
         </div>
       </section>
     )
