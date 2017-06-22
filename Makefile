@@ -4,6 +4,15 @@
 
 PACKAGE = github.com/zentrope/webl
 
+DB_PASS = wanheda
+DB_USER = blogsvc
+DB_NAME = blogdb
+
+DB_CREATE = create database $(DB_NAME) with encoding 'UTF8'
+DB_SETUP = create user $(DB_USER) with login password '$(DB_PASS)' ;\
+	alter database $(DB_NAME) owner to $(DB_USER) ;\
+	create extension if not exists pgcrypto
+
 .PHONY: build-admin build init govendor vendor vendor-check vendor-unused help
 .PHONY: db-clean db-init
 
@@ -57,13 +66,12 @@ dist-clean: clean ## Clean everything (vendor, node_modules).
 	rm -rf admin/node_modules
 
 db-clean: ## Delete the local dev database
-	dropdb --if-exists blogdb
-	dropuser --if-exists blogsvc
+	psql template1 -c "drop database $(DB_NAME)"
+	psql template1 -c "drop user $(DB_USER)"
 
-db-init: ## Create the local dev database
-	@echo "Type 'wanheda' for password when prompted."
-	createuser blogsvc -P
-	createdb blogdb -O blogsvc
+db-init: ## Create a local dev database with default creds
+	psql template1 -c "$(DB_CREATE)"
+	psql $(DB_NAME) -c "$(DB_SETUP)"
 
 help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}' | sort

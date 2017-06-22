@@ -86,7 +86,7 @@ Create a user, then a database (owned by the user):
 
     $ make db-init
 
-Use `wanheda` as the password (if you want to go with the application defaults). The app itself will take care of populating all the tables.
+This will also set the user's password. The app itself will take care of populating all the tables.
 
 **Delete database**
 
