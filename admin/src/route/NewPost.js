@@ -19,7 +19,6 @@ class NewPost extends React.PureComponent {
 
     return (
       <WorkArea>
-        <h1>New post</h1>
         <MarkdownEditor onCancel={onCancel} onSave={onSave}/>
       </WorkArea>
     )
