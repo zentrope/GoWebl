@@ -10,39 +10,16 @@ import { WorkArea } from '../component/WorkArea'
 // /admin/post/<uuid>
 class EditPost extends React.PureComponent {
 
-  constructor(props) {
-    super(props)
-    this.state = {post: Map()}
-  }
-
-  componentDidMount() {
-    const { dispatch, match, history } = this.props
-    dispatch('post/get', {uuid: match.params.id}, (data) => {
-      if (! data) {
-        history.push('/admin/home')
-        return
-      }
-      this.setState({post: data})
-    })
-  }
-
   render() {
-    const { dispatch, history } = this.props
-    const { post } = this.state
+    const { posts, onCancel, onSave, match } = this.props
+
+    let postUuid = match.params.id
+    let post = (posts) ? (posts.filter(p => p.get("uuid") === postUuid).first()) : Map()
+
     const { uuid, slugline, text } = post.toJS()
-
-    const onCancel = () => {
-      history.push('/admin/home')
-    }
-
-    const onSave = (uuid, slugline, text) => {
-      dispatch('post/update', {uuid: uuid, slugline: slugline, text: text},
-      )
-    }
 
     return (
       <WorkArea>
-        <h1>Edit post</h1>
         <MarkdownEditor uuid={uuid} slugline={slugline} text={text} onCancel={onCancel} onSave={onSave}/>
       </WorkArea>
     )

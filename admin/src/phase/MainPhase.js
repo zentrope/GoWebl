@@ -26,7 +26,11 @@ class MainPhase extends React.PureComponent {
   constructor(props) {
     super(props)
 
-    this.state = {viewer: Map({}), site: props.site, menu: "list-posts"}
+    this.state = {
+      viewer: Map({}),
+      site: props.site,
+      menu: "list-posts"
+    }
     this.history = createBrowserHistory()
     this.dispatch = this.dispatch.bind(this)
     this.refresh = this.refresh.bind(this)
@@ -64,16 +68,13 @@ class MainPhase extends React.PureComponent {
       let newName = response.data.updateViewer.name
       let newEmail = response.data.updateViewer.email
 
-      let v2 = this.state.viewer
-                   .set("name", newName)
-                   .set("email", newEmail)
+      let v2 = this.state.viewer.set("name", newName).set("email", newEmail)
       this.setState({viewer: v2, menu: "list-posts"})
       this.history.push("/admin/home")
     })
   }
 
-  updatePost(data) {
-    const { uuid, slugline, text } = data
+  updatePost(uuid, slugline, text) {
     const { client } = this.props
 
     client.updatePost(uuid, slugline, text, (response) => {
@@ -107,11 +108,16 @@ class MainPhase extends React.PureComponent {
   refresh() {
     const { client } = this.props
     client.viewerData(response => {
+      console.log("refresh", response)
+      // TODO: What happens if there are errors here?
       const data = fromJS(response.data.viewer)
       this.setState({viewer: data, site: response.data.viewer.site})
+      this.forceUpdate()
     })
   }
 
+  // This stuff is a mess.
+  // TODO: Refactor state management
   dispatch(event, data, callback) {
     const { client } = this.props
     console.log("event>", event)
@@ -130,20 +136,8 @@ class MainPhase extends React.PureComponent {
         })
         break
 
-      case 'post/get':
-        if (callback) {
-          callback(this.state.viewer.get("posts")
-                       .filter(p => p.get("uuid") === data.uuid)
-                       .first())
-        }
-        break
-
       case 'post/save':
         this.savePost(data)
-        break
-
-      case 'post/update':
-        this.updatePost(data)
         break
 
       case 'post/delete':
@@ -233,9 +227,9 @@ class MainPhase extends React.PureComponent {
           <MenuBar onClick={onMenuClick} selected={menu}/>
           <StatusBar year="2017" copyright={ site.title }/>
           <Switch>
-            <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} dispatch={this.dispatch}/>
+            <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} onGotoPost={this.gotoPost} dispatch={this.dispatch}/>
             <PropRoute path="/admin/post/new" component={NewPost} dispatch={this.dispatch} onCancel={onCancel}/>
-            <PropRoute path="/admin/post/:id" component={EditPost} dispatch={this.dispatch}/>
+            <PropRoute path="/admin/post/:id" component={EditPost} posts={viewer.get("posts")} onSave={this.updatePost} onCancel={onCancel}/>
             <PropRoute path="/admin/site/edit" component={EditSite} site={site} onSave={saveSite} onCancel={onCancel}/>
             <PropRoute path="/admin/account/edit" component={EditAccount} onCancel={onCancel} email={viewer.get("email")} name={viewer.get("name")} onSave={this.updateAccount}/>
             <PropRoute path="/admin/account/password/edit" component={ChangePassword} onCancel={onCancel} onSave={this.setPassword}/>

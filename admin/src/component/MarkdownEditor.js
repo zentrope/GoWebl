@@ -14,7 +14,18 @@ class MarkdownEditor extends React.PureComponent {
   constructor(props) {
     super(props)
 
-    this.state = {uuid: "", slugline: "", text: "", showPreview : false, dirty: false}
+    const { uuid, slugline, text } = props
+    let u = uuid ? uuid : ""
+    let s = slugline ? slugline : ""
+    let t = text ? text : ""
+
+    this.state = {
+      uuid: u,
+      slugline: s,
+      text: t,
+      showPreview : true,
+      dirty: false
+    }
 
     this.handleChange = this.handleChange.bind(this)
     this.togglePreview = this.togglePreview.bind(this)
@@ -22,29 +33,20 @@ class MarkdownEditor extends React.PureComponent {
     this.savePost = this.savePost.bind(this)
   }
 
-  componentWillReceiveProps(props) {
-    const { uuid, slugline, text } = props
-    let u = uuid ? uuid : ""
-    let s = slugline ? slugline : ""
-    let t = text ? text : ""
-
-    this.state = {uuid: u, slugline: s, text: t}
-  }
-
   handleChange(event) {
-    const name = event.target.name
-    const value = event.target.value
+    let name = event.target.name
+    let value = event.target.value
     this.setState({[name]: value, dirty: true})
   }
 
   togglePreview() {
-    const show = ! this.state.showPreview
+    let show = ! this.state.showPreview
     this.setState({showPreview: show})
   }
 
   isSubmittable() {
-    const t = this.state.text.trim()
-    const s = this.state.slugline.trim()
+    let t = this.state.text.trim()
+    let s = this.state.slugline.trim()
     return (s.length >= 3) && (t.length >= 3)
   }
 
