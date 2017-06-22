@@ -5,8 +5,8 @@
 PACKAGE = github.com/zentrope/webl
 
 DB_PASS = wanheda
-DB_USER = blogsvc
-DB_NAME = blogdb
+DB_USER = webl_user
+DB_NAME = webl_db
 
 DB_CREATE = create database $(DB_NAME) with encoding 'UTF8'
 DB_SETUP = create user $(DB_USER) with login password '$(DB_PASS)' ;\
