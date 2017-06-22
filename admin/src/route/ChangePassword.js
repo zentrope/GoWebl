@@ -38,6 +38,7 @@ class ChangePassword extends React.PureComponent {
 
   render() {
     const { onCancel } = this.props
+    const { password, confirm } = this.state
 
     return (
       <WorkArea>
@@ -46,11 +47,11 @@ class ChangePassword extends React.PureComponent {
           <FormWidgets>
             <FormWidget>
               <FormLabel>Password</FormLabel>
-              <input autoFocus={true} name="password" type="password" onChange={this.handleChange}/>
+              <input value={password} autoFocus={true} name="password" type="password" onChange={this.handleChange}/>
             </FormWidget>
             <FormWidget>
               <FormLabel>Confirm</FormLabel>
-              <input name="confirm" type="password" onChange={this.handleChange}/>
+              <input value={confirm} name="confirm" type="password" onChange={this.handleChange}/>
             </FormWidget>
           </FormWidgets>
           <FormControls>
