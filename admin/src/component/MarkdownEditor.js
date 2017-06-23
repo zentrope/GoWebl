@@ -6,7 +6,7 @@ import React from 'react';
 
 import './MarkdownEditor.css'
 
-const markdown = require('markdown-it')()
+const markdown = require('markdown-it')({html: true})
   .use(require('markdown-it-footnote'))
 
 class MarkdownEditor extends React.PureComponent {
