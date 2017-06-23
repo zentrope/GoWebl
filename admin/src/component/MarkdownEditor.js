@@ -72,6 +72,8 @@ class MarkdownEditor extends React.PureComponent {
       null
     )
 
+    let wordCount = (text === "") ? 0 : text.trim().split(/\s+/).length
+
     return (
       <section className="MarkdownEditor">
         <div className="TopBar">
@@ -112,13 +114,18 @@ class MarkdownEditor extends React.PureComponent {
               { dirty ? "Cancel" : "Done" }
             </button>
           </div>
+          <div className="Badges">
+            <div className="Badge">
+              { wordCount } words
+            </div>
+          </div>
           <div className="Right">
             <button onClick={this.togglePreview}>
               { showPreview ? "Hide Preview" : "Show Preview" }
             </button>
           </div>
 
-        </div>
+          </div>
       </section>
     )
   }

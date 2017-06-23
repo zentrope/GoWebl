@@ -122,6 +122,22 @@
   text-align: right;
 }
 
+.MarkdownEditor .Controls .Badges {
+  flex: 1;
+  text-align: center;
+}
+
+.MarkdownEditor .Controls .Badge {
+  display: inline-block;
+  font-size: 10pt;
+  color: #369;
+}
+
+.MarkdownEditor .Controls .Left {
+  flex: 1;
+  text-align: left;
+}
+
 .MarkdownEditor .Controls .Left button {
   margin-right: 10px;
 }
