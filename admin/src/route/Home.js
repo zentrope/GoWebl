@@ -33,23 +33,24 @@ class Posts extends React.PureComponent {
     }
 
     const renderPost = p => {
-      const { status, uuid, slugline, dateCreated, dateUpdated } = p.toJS()
+      const { status, uuid, slugline, dateCreated, dateUpdated, wordCount } = p.toJS()
       return (
         <tr key={uuid}>
           <td width="1%">
             <Action type={status} color={status} onClick={toggleStatus(p)}/>
           </td>
-          <td width="40%"><Link to={"/admin/post/" + uuid}>{slugline}</Link></td>
-          <td width="29%"><DateShow date={dateCreated}/></td>
-          <td width="29%"><DateShow date={dateUpdated}/></td>
+          <td width="25%"><Link to={"/admin/post/" + uuid}>{slugline}</Link></td>
+          <td width="23%" className="Right">{wordCount}</td>
+          <td width="25%"><DateShow date={dateCreated}/></td>
+          <td width="25%"><DateShow date={dateUpdated}/></td>
           <td width="1%">
-              <Action type="delete" color="blue" onClick={deletePost(p)}/>
+            <Action type="delete" color="blue" onClick={deletePost(p)}/>
           </td>
         </tr>
       )
     }
 
-    const cols = [null, "post", "created", "updated", null]
+    const cols = [null, "post", "words+", "created", "updated", null]
 
     return (
       <Tabular columns={cols} data={posts} render={renderPost}/>

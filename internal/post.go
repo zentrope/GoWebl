@@ -7,6 +7,7 @@ package internal
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
@@ -174,6 +175,7 @@ type Post struct {
 	Status      string
 	Slugline    string
 	Text        string
+	WordCount   int
 }
 
 func (conn *Database) Posts() ([]*Post, error) {
@@ -297,6 +299,7 @@ func rowToPost(rows *sql.Rows) (*Post, error) {
 		&p.Slugline,
 		&p.Text,
 	)
+	p.WordCount = len(strings.Fields(p.Text))
 	if err != nil {
 		return nil, err
 	}

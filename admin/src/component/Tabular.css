@@ -40,6 +40,11 @@
   overflow: hidden;
 }
 
+.Tabular .Right {
+  text-align: right;
+  padding-right: 8px;
+}
+
 .Tabular tbody td.icon {
   text-align: center;
 }

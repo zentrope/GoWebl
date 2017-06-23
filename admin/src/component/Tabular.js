@@ -11,10 +11,26 @@ class Tabular extends React.PureComponent {
   render() {
     const { columns, render, data } = this.props
 
+
+    let headFn = (name) => {
+      let className = ""
+      if (name && name.endsWith("+")) {
+        className = "Right"
+      }
+
+      let colName = name ? name.replace("+", "") : ""
+
+      return (
+        <th key={Math.random()} className={className}>
+          {colName}
+        </th>
+      )
+    }
+
     const headers = (
       <thead>
         <tr>
-          { columns.map(c => <th key={Math.random()}>{ c }</th>) }
+          { columns.map(c => headFn(c)) }
         </tr>
       </thead>
     );

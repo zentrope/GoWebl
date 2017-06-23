@@ -22,7 +22,7 @@ const createPostQL = (slugline, status, text) => {
   const q = fl(`mutation
     CreatePost($slugline: String! $status: String! $text: String! $token: String) {
       createPost(slugline: $slugline, status: $status, text: $text, token: $token) {
-        uuid slugline status dateCreated dateUpdated text }}`)
+        uuid slugline status dateCreated dateUpdated text wordCount }}`)
 
   return {
     query: q,
@@ -39,7 +39,7 @@ const updatePostQL = (uuid, slugline, text) => {
   const q = fl(`mutation
     UpdatePost($u: String! $s: String! $t: String!) {
       updatePost(uuid: $u slugline: $s text: $t) {
-        uuid slugline status dateCreated dateUpdated text}}`)
+        uuid slugline status dateCreated dateUpdated text wordCount}}`)
   return {
     query: q,
     operationName: "UpdatePost",
@@ -81,7 +81,7 @@ const viewerQL = () => {
   const q = fl(`query {
     viewer { id name type email
       site { baseUrl title description }
-      posts { uuid status slugline dateCreated dateUpdated text } } }
+      posts { uuid status slugline dateCreated dateUpdated text wordCount } } }
   `)
   return { query: q }
 }
