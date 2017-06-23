@@ -202,7 +202,7 @@ func (conn *Database) Post(uuid string) (*Post, error) {
 
 // Delete a post if it also belongs to the indicated author.
 func (conn *Database) DeletePost(uuid, authorId string) error {
-	q := "delete from post where uuid=$1 and lower(author)=lower($2)"
+	q := "delete from post where uuid=$1 and author_uuid=$2"
 	_, err := conn.db.Exec(q, uuid, authorId)
 	return err
 }
