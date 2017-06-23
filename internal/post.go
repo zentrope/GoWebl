@@ -18,18 +18,19 @@ import (
 //-----------------------------------------------------------------------------
 
 type LatestPost struct {
-	UUID        string
-	DateCreated time.Time
-	DateUpdated time.Time
-	Status      string
-	Slugline    string
-	Text        string
+	UUID          string
+	DateCreated   time.Time
+	DateUpdated   time.Time
+	DatePublished time.Time
+	Status        string
+	Slugline      string
+	Text          string
 }
 
 func (conn *Database) FocusPost(uuid string) (*LatestPost, error) {
 	var query = `
 	 select
-		 p.uuid, p.date_created, p.date_updated, p.status, p.slugline, p.text
+		 p.uuid, p.date_created, p.date_updated, p.date_published, p.status, p.slugline, p.text
 	 from
 		 post p
 	 where
@@ -51,6 +52,7 @@ func (conn *Database) FocusPost(uuid string) (*LatestPost, error) {
 		&p.UUID,
 		&p.DateCreated,
 		&p.DateUpdated,
+		&p.DatePublished,
 		&p.Status,
 		&p.Slugline,
 		&p.Text,
@@ -66,14 +68,14 @@ func (conn *Database) FocusPost(uuid string) (*LatestPost, error) {
 func (conn *Database) LatestPosts(limit int) ([]*LatestPost, error) {
 	var query = `
 	 select
-		 p.uuid, p.date_created, p.date_updated, p.status,
+		 p.uuid, p.date_created, p.date_updated, p.date_published, p.status,
 		 p.slugline, p.text
 	 from
 		 post p
 	 where
 		 p.status='published'
 	 order
-		 by p.date_created desc
+		 by p.date_published desc
 	 limit $1`
 
 	rows, err := conn.db.Query(query, limit)
@@ -91,6 +93,7 @@ func (conn *Database) LatestPosts(limit int) ([]*LatestPost, error) {
 			&p.UUID,
 			&p.DateCreated,
 			&p.DateUpdated,
+			&p.DatePublished,
 			&p.Status,
 			&p.Slugline,
 			&p.Text,
@@ -107,23 +110,24 @@ func (conn *Database) LatestPosts(limit int) ([]*LatestPost, error) {
 }
 
 type ArchiveEntry struct {
-	UUID        string
-	DateCreated time.Time
-	DateUpdated time.Time
-	Slugline    string
+	UUID          string
+	DateCreated   time.Time
+	DateUpdated   time.Time
+	DatePublished time.Time
+	Slugline      string
 }
 
 func (conn *Database) ArchiveEntries() ([]*ArchiveEntry, error) {
 
 	var query = `
 		select
-			uuid, date_created, date_updated, slugline
+			uuid, date_created, date_updated, date_published, slugline
 		from
 			post
 		where
 			status='published'
 		order by
-			date_created desc;
+			date_published desc;
 	`
 
 	rows, err := conn.db.Query(query)
@@ -141,6 +145,7 @@ func (conn *Database) ArchiveEntries() ([]*ArchiveEntry, error) {
 			&e.UUID,
 			&e.DateCreated,
 			&e.DateUpdated,
+			&e.DatePublished,
 			&e.Slugline,
 		)
 
@@ -168,14 +173,15 @@ func (conn *Database) CreatePost(authorUuid, slugline, status, text string) (str
 //-----------------------------------------------------------------------------
 
 type Post struct {
-	UUID        string
-	AuthorUuid  string
-	DateCreated time.Time
-	DateUpdated time.Time
-	Status      string
-	Slugline    string
-	Text        string
-	WordCount   int
+	UUID          string
+	AuthorUuid    string
+	DateCreated   time.Time
+	DateUpdated   time.Time
+	DatePublished time.Time
+	Status        string
+	Slugline      string
+	Text          string
+	WordCount     int
 }
 
 func (conn *Database) Posts() ([]*Post, error) {
@@ -269,7 +275,7 @@ func (conn *Database) postQuery(query string, args ...interface{}) ([]*Post, err
 }
 
 func mkPostSql(where string) string {
-	q := "select uuid, author_uuid, date_created, date_updated, status, slugline, text from post %s"
+	q := "select uuid, author_uuid, date_created, date_updated, date_published, status, slugline, text from post %s"
 	return fmt.Sprintf(q, where)
 }
 
@@ -295,6 +301,7 @@ func rowToPost(rows *sql.Rows) (*Post, error) {
 		&p.AuthorUuid,
 		&p.DateCreated,
 		&p.DateUpdated,
+		&p.DatePublished,
 		&p.Status,
 		&p.Slugline,
 		&p.Text,

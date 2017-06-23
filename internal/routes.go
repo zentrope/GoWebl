@@ -110,19 +110,21 @@ type postData struct {
 }
 
 type TemplatePost struct {
-	UUID        string
-	DateCreated string
-	DateUpdated string
-	Status      string
-	Slugline    string
-	Text        template.HTML
+	UUID          string
+	DateCreated   string
+	DateUpdated   string
+	DatePublished string
+	Status        string
+	Slugline      string
+	Text          template.HTML
 }
 
 type TemplateArchiveEntry struct {
-	UUID        string
-	DateCreated string
-	DateUpdated string
-	Slugline    string
+	UUID          string
+	DateCreated   string
+	DateUpdated   string
+	DatePublished string
+	Slugline      string
 }
 
 func westCoastTZ(date time.Time) time.Time {
@@ -140,6 +142,7 @@ func xformArchiveEntry(e *ArchiveEntry) *TemplateArchiveEntry {
 		e.UUID,
 		westCoastTZ(e.DateCreated).Format(fmt),
 		westCoastTZ(e.DateUpdated).Format(fmt),
+		westCoastTZ(e.DatePublished).Format(fmt),
 		e.Slugline,
 	}
 }
@@ -174,6 +177,7 @@ func xformTemplatePost(p *LatestPost) *TemplatePost {
 		p.UUID,
 		westCoastTZ(p.DateCreated).Format("January 2, 2006"),
 		westCoastTZ(p.DateUpdated).Format("January 2, 2006"),
+		westCoastTZ(p.DatePublished).Format("January 2, 2006"),
 		p.Status,
 		p.Slugline,
 		template.HTML(MarkdownToHtml(p.Text)),

@@ -69,6 +69,7 @@ const Schema = `
 	 text: String!
 	 dateCreated: String!
 	 dateUpdated: String!
+	 datePublished: String!
 	 wordCount: Int!
  }
 
@@ -566,6 +567,10 @@ func (r *postResolver) DateCreated() string {
 
 func (r *postResolver) DateUpdated() string {
 	return r.post.DateUpdated.Format(time.RFC3339)
+}
+
+func (r *postResolver) DatePublished() string {
+	return r.post.DatePublished.Format(time.RFC3339)
 }
 
 func (r *postResolver) WordCount() int32 {

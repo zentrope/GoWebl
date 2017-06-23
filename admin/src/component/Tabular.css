@@ -40,6 +40,10 @@
   overflow: hidden;
 }
 
+.Tabular tbody td.Date {
+  font-size: 10pt;
+}
+
 .Tabular .Right {
   text-align: right;
   padding-right: 8px;

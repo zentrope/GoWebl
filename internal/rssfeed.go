@@ -47,8 +47,8 @@ func NewRSSFeed(site *SiteConfig, posts []*LatestPost) (string, error) {
 			Title:       post.Slugline,
 			Link:        link,
 			Guid:        RSSGuid{Guid: post.UUID, IsPermalink: false},
-			Author:      "-",
-			PubDate:     post.DateCreated.Format(time.RFC1123Z),
+			Author:      "The Author",
+			PubDate:     post.DatePublished.Format(time.RFC1123Z),
 			Description: MarkdownToHtml(post.Text),
 		})
 	}

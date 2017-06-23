@@ -45,9 +45,9 @@ func NewJSONFeed(site *SiteConfig, posts []*LatestPost) (string, error) {
 			Id:            site.BaseURL + "/post/" + p.UUID,
 			Url:           site.BaseURL + "/post/" + p.UUID,
 			Title:         p.Slugline,
-			DatePublished: p.DateCreated.Format(time.RFC3339),
+			DatePublished: p.DatePublished.Format(time.RFC3339),
 			DateModified:  p.DateUpdated.Format(time.RFC3339),
-			Author:        ItemAuthor{"-"},
+			Author:        ItemAuthor{"The Author"},
 			ContentHtml:   MarkdownToHtml(p.Text),
 		})
 	}
@@ -58,7 +58,7 @@ func NewJSONFeed(site *SiteConfig, posts []*LatestPost) (string, error) {
 		Description: site.Description,
 		HomePageURL: site.BaseURL,
 		FeedURL:     site.BaseURL + "/feeds/json",
-		Author:      ItemAuthor{"Root"},
+		Author:      ItemAuthor{"The Author"},
 		Icon:        site.BaseURL + "/images/apple-touch-icon-180.png",
 		Favicon:     site.BaseURL + "/images/apple-touch-icon-60.png",
 		Items:       items,
