@@ -130,8 +130,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .TableOfContents ul li {
-  line-height: 21pt;
-  font-size: 14pt;
+  line-height: 1.5em;
+  font-size: 15pt;
   color: DarkRed;
 }
 
@@ -176,12 +176,12 @@ h1, h2, h3, h4, h5, h6 {
 .PostBody .Meta .Permalink {
   flex: 1;
   padding: 0 10px 0 10px;
-  font-size: 14pt;
+  font-size: 15pt;
 }
 
 .PostBody p, .PostBody li {
-  line-height: 21pt;
-  font-size: 14pt;
+  line-height: 1.5em;
+  font-size: 15pt;
   color: #000;
   margin-top: 0;
 }
@@ -200,7 +200,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 1em;
 }
 
-.PostBody ol { /* footnotes */
+.PostBody .footnotes ol { /* footnotes */
   border-top: 1px dotted silver;
   margin: 0;
   padding-left: 20px;
@@ -208,9 +208,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Footnotes */
-.PostBody ol li {
-  font-size: 11pt;
-  line-height: 13pt;
+.PostBody .footnotes ol li {
+  font-size: 12pt;
+  line-height: 1.5em;
   margin-bottom: .8em;
   color: #666;
 }
@@ -288,6 +288,23 @@ h1, h2, h3, h4, h5, h6 {
     margin-right: 15px;
     width: unset;
   }
+
+  .Content .PostBody p, .Content .PostBody li {
+    font-size: 13pt;
+  }
+
+  .Content .PostBody .Meta .Permalink {
+    font-size: 13pt;
+  }
+
+  .Content .PostBody .footnotes ol li {
+    font-size: 10pt;
+  }
+
+  .Content .TableOfContents ul li {
+    font-size: 13pt;
+  }
+
   .NavItems {
     margin-left: 15px;
     margin-right: 15px;
