@@ -21,6 +21,8 @@ import { NewPost } from '../route/NewPost'
 
 import createBrowserHistory from 'history/createBrowserHistory'
 
+const moment = require('moment')
+
 class MainPhase extends React.PureComponent {
 
   constructor(props) {
@@ -74,10 +76,17 @@ class MainPhase extends React.PureComponent {
     })
   }
 
-  updatePost(uuid, slugline, text) {
+  updatePost(uuid, slugline, text, datePublished) {
     const { client } = this.props
 
-    client.updatePost(uuid, slugline, text, (response) => {
+    let pub = moment(datePublished).toISOString()
+
+    client.updatePost(uuid, slugline, text, pub, (response) => {
+      if (response.errors) {
+        console.error("error", response.errors[0])
+        return
+      }
+
       const post = response.data.updatePost
       if (post) {
         const posts = this.state.viewer
@@ -85,30 +94,31 @@ class MainPhase extends React.PureComponent {
                           .filter(p => p.get("uuid") !== uuid)
                           .push(fromJS(post))
         this.setState({viewer: this.state.viewer.set("posts", posts)})
-        return
       }
-      console.error(response.errors)
     })
   }
 
-  savePost(data) {
+  savePost(slugline, text, datePublished) {
     const { client } = this.props
-    client.savePost(data.slugline, data.text, "draft", (response) => {
+    let date = moment(datePublished).toISOString()
+    console.log("save post with date:", date)
+    client.savePost(slugline, text, date, "draft", (response) => {
+      if (response.errors) {
+        response.errors.map(e => console.log("err:", e))
+        return
+      }
       const newPost = response.data.createPost
       if (newPost) {
         const v = this.state.viewer.update("posts", ps => ps.push(fromJS(newPost)))
         this.setState({viewer: v})
         this.history.push('/admin/home')
-        return
       }
-      console.error(response.errors)
     })
   }
 
   refresh() {
     const { client } = this.props
     client.viewerData(response => {
-      console.log("refresh", response)
       // TODO: What happens if there are errors here?
       const data = fromJS(response.data.viewer)
       this.setState({viewer: data, site: response.data.viewer.site})
@@ -134,10 +144,6 @@ class MainPhase extends React.PureComponent {
           this.setState({menu: "list-posts"})
           this.history.push("/admin/home")
         })
-        break
-
-      case 'post/save':
-        this.savePost(data)
         break
 
       case 'post/delete':
@@ -228,7 +234,7 @@ class MainPhase extends React.PureComponent {
           <StatusBar year="2017" copyright={ site.title }/>
           <Switch>
             <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} onGotoPost={this.gotoPost} dispatch={this.dispatch}/>
-            <PropRoute path="/admin/post/new" component={NewPost} dispatch={this.dispatch} onCancel={onCancel}/>
+            <PropRoute path="/admin/post/new" component={NewPost} onSave={this.savePost} onCancel={onCancel}/>
             <PropRoute path="/admin/post/:id" component={EditPost} posts={viewer.get("posts")} onSave={this.updatePost} onCancel={onCancel}/>
             <PropRoute path="/admin/site/edit" component={EditSite} site={site} onSave={saveSite} onCancel={onCancel}/>
             <PropRoute path="/admin/account/edit" component={EditAccount} onCancel={onCancel} email={viewer.get("email")} name={viewer.get("name")} onSave={this.updateAccount}/>

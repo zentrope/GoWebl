@@ -160,11 +160,11 @@ func (conn *Database) ArchiveEntries() ([]*ArchiveEntry, error) {
 
 }
 
-func (conn *Database) CreatePost(authorUuid, slugline, status, text string) (string, error) {
+func (conn *Database) CreatePost(authorUuid, slugline, status, text, datePublished string) (string, error) {
 	uuid := mkUuid()
 	_, err := conn.db.Exec(
-		"insert into post (uuid, author_uuid, slugline, status, text) values ($1, $2, $3, $4, $5)",
-		uuid, authorUuid, slugline, status, text)
+		"insert into post (uuid, author_uuid, slugline, status, text, date_published) values ($1, $2, $3, $4, $5, $6)",
+		uuid, authorUuid, slugline, status, text, datePublished)
 	return uuid, err
 }
 
@@ -221,11 +221,12 @@ const (
 )
 
 // Update a post, assuming the uuid and author match the same post.
-func (conn *Database) UpdatePost(uuid, slugline, text, authorUuid string) (*Post, error) {
-	q := `update post set slugline=$1, text=$2, date_updated=now() where uuid=$3
-					 and author_uuid = $4`
+func (conn *Database) UpdatePost(uuid, slugline, text, datePublished, authorUuid string) (*Post, error) {
 
-	_, err := conn.db.Exec(q, slugline, text, uuid, authorUuid)
+	q := `update post set slugline=$1, text=$2, date_updated=now(), date_published=$3 where uuid=$4
+					 and author_uuid = $5`
+
+	_, err := conn.db.Exec(q, slugline, text, datePublished, uuid, authorUuid)
 	if err != nil {
 		return nil, err
 	}

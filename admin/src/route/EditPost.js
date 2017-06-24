@@ -16,11 +16,13 @@ class EditPost extends React.PureComponent {
     let postUuid = match.params.id
     let post = (posts) ? (posts.filter(p => p.get("uuid") === postUuid).first()) : Map()
 
-    const { uuid, slugline, text } = post.toJS()
+    const { uuid, slugline, text, datePublished } = post.toJS()
 
     return (
       <WorkArea>
-        <MarkdownEditor uuid={uuid} slugline={slugline} text={text} onCancel={onCancel} onSave={onSave}/>
+        <MarkdownEditor uuid={uuid} slugline={slugline}
+                        datePublished={datePublished}
+                        text={text} onCancel={onCancel} onSave={onSave}/>
       </WorkArea>
     )
   }

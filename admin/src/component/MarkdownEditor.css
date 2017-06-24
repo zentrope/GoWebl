@@ -111,10 +111,11 @@
 
 .MarkdownEditor .Controls {
   border-top: 1px dotted silver;
-  flex: 1;
+  /* flex: 1; */
   margin-top: 10px;
   align-items: center;
   display: flex;
+  height: 30px;
 }
 
 .MarkdownEditor .Controls .Right {

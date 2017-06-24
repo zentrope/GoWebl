@@ -32,8 +32,8 @@ const Schema = `
 
  type Mutation {
 	 // TODO: Should take objects to allow for easier (and sparse) extension.
-	 createPost(slugline: String! status: String! text: String! token: String): Post!
-	 updatePost(uuid: String! slugline: String! text: String!): Post!
+	 createPost(slugline: String! status: String! text: String! datePublished: String! token: String): Post!
+	 updatePost(uuid: String! slugline: String! text: String! datePublished: String!): Post!
 	 deletePost(uuid: String!): String!
 	 setPostStatus(uuid: String! isPublished: Boolean!): Post!
 	 updateSite(baseUrl: String! description: String! title: String!): Site!
@@ -439,10 +439,11 @@ type postResolver struct {
 }
 
 func (r *Resolver) CreatePost(ctx context.Context, args *struct {
-	Slugline string
-	Status   string
-	Text     string
-	Token    *string
+	Slugline      string
+	Status        string
+	Text          string
+	DatePublished string
+	Token         *string
 }) (*postResolver, error) {
 
 	claims, err := findAuthClaims(ctx, args.Token)
@@ -455,6 +456,7 @@ func (r *Resolver) CreatePost(ctx context.Context, args *struct {
 		args.Slugline,
 		args.Status,
 		args.Text,
+		args.DatePublished,
 	)
 
 	if err != nil {
@@ -470,9 +472,10 @@ func (r *Resolver) CreatePost(ctx context.Context, args *struct {
 }
 
 func (r *Resolver) UpdatePost(ctx context.Context, args *struct {
-	Uuid     string
-	Slugline string
-	Text     string
+	Uuid          string
+	Slugline      string
+	Text          string
+	DatePublished string
 }) (*postResolver, error) {
 
 	claims, err := findAuthClaims(ctx, nil)
@@ -480,7 +483,7 @@ func (r *Resolver) UpdatePost(ctx context.Context, args *struct {
 		return nil, err
 	}
 
-	post, err := r.Database.UpdatePost(args.Uuid, args.Slugline, args.Text, claims.Uuid)
+	post, err := r.Database.UpdatePost(args.Uuid, args.Slugline, args.Text, args.DatePublished, claims.Uuid)
 	if err != nil {
 		return nil, err
 	}

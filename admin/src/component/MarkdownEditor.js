@@ -4,6 +4,8 @@
 
 import React from 'react';
 
+import { DateEditor } from './DateEditor'
+
 import './MarkdownEditor.css'
 
 const markdown = require('markdown-it')({html: true})
@@ -14,15 +16,17 @@ class MarkdownEditor extends React.PureComponent {
   constructor(props) {
     super(props)
 
-    const { uuid, slugline, text } = props
+    const { uuid, slugline, text, datePublished } = props
     let u = uuid ? uuid : ""
     let s = slugline ? slugline : ""
     let t = text ? text : ""
+    let d = datePublished ? datePublished : new Date()
 
     this.state = {
       uuid: u,
       slugline: s,
       text: t,
+      datePublished: d,
       showPreview : true,
       dirty: false
     }
@@ -31,6 +35,11 @@ class MarkdownEditor extends React.PureComponent {
     this.togglePreview = this.togglePreview.bind(this)
     this.isSubmittable = this.isSubmittable.bind(this)
     this.savePost = this.savePost.bind(this)
+    this.setDate = this.setDate.bind(this)
+  }
+
+  setDate(date) {
+    this.setState({datePublished: date})
   }
 
   handleChange(event) {
@@ -52,17 +61,17 @@ class MarkdownEditor extends React.PureComponent {
 
   savePost() {
     const { onSave } = this.props
-    const { uuid, slugline, text} = this.state
+    const { uuid, slugline, text, datePublished } = this.state
     if (uuid) {
-      onSave(uuid, slugline, text)
+      onSave(uuid, slugline, text, datePublished)
     } else {
-      onSave(slugline, text)
+      onSave(slugline, text, datePublished)
     }
   }
 
   render() {
     const { onCancel } = this.props
-    const { slugline, text, showPreview, dirty } = this.state
+    const { slugline, text, datePublished, showPreview, dirty } = this.state
 
     const html = showPreview ? markdown.render(text) : ""
 
@@ -76,8 +85,8 @@ class MarkdownEditor extends React.PureComponent {
 
     return (
       <section className="MarkdownEditor">
-        <div className="TopBar">
 
+        <div className="TopBar">
           <div className="Slugline">
             <input name="slugline"
                    autoFocus={true}
@@ -86,11 +95,15 @@ class MarkdownEditor extends React.PureComponent {
                    placeholder="Summary or slugline...."
                    onChange={this.handleChange}/>
           </div>
-
           <div className="Status">
             { dirty ? "UNSAVED" : "saved" }
           </div>
+        </div>
 
+        <div className="Metadata">
+          <DateEditor time={datePublished}
+                      template="YYYY-MM-DD hh:mm A"
+                      onChange={this.setDate}/>
         </div>
 
         <div className="Viewers">
@@ -125,7 +138,7 @@ class MarkdownEditor extends React.PureComponent {
             </button>
           </div>
 
-          </div>
+        </div>
       </section>
     )
   }

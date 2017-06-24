@@ -18,10 +18,10 @@ const setPostStatusQL = (uuid, isPublished) => {
   }
 }
 
-const createPostQL = (slugline, status, text) => {
+const createPostQL = (slugline, status, text, datePublished) => {
   const q = fl(`mutation
-    CreatePost($slugline: String! $status: String! $text: String! $token: String) {
-      createPost(slugline: $slugline, status: $status, text: $text, token: $token) {
+    CreatePost($slugline: String! $status: String! $text: String! $d: String! $token: String) {
+      createPost(slugline: $slugline, status: $status, text: $text, datePublished: $d, token: $token) {
         uuid slugline status dateCreated dateUpdated datePublished text wordCount }}`)
 
   return {
@@ -31,19 +31,20 @@ const createPostQL = (slugline, status, text) => {
       slugline: slugline,
       status: status,
       text: text,
+      d: datePublished
     }
   }
 }
 
-const updatePostQL = (uuid, slugline, text) => {
+const updatePostQL = (uuid, slugline, text, datePublished) => {
   const q = fl(`mutation
-    UpdatePost($u: String! $s: String! $t: String!) {
-      updatePost(uuid: $u slugline: $s text: $t) {
+    UpdatePost($u: String! $s: String! $t: String! $d: String!) {
+      updatePost(uuid: $u slugline: $s text: $t datePublished: $d) {
         uuid slugline status dateCreated dateUpdated datePublished text wordCount}}`)
   return {
     query: q,
     operationName: "UpdatePost",
-    variables: { u: uuid, s: slugline, t: text }
+    variables: { u: uuid, s: slugline, t: text, d: datePublished }
   }
 }
 
@@ -204,12 +205,12 @@ class Client {
     this.__doQuery(updateSiteQL(title, description, baseUrl), callback)
   }
 
-  savePost(slugline, text, status, callback) {
-    this.__doQuery(createPostQL(slugline, status, text), callback)
+  savePost(slugline, text, datePublished, status, callback) {
+    this.__doQuery(createPostQL(slugline, status, text, datePublished), callback)
   }
 
-  updatePost(uuid, slugline, text, callback) {
-    this.__doQuery(updatePostQL(uuid, slugline, text), callback)
+  updatePost(uuid, slugline, text, datePublished, callback) {
+    this.__doQuery(updatePostQL(uuid, slugline, text, datePublished), callback)
   }
 
   deletePost(uuid, callback) {
