@@ -11,6 +11,7 @@ var migrations = []string{
 	"sql/02-schema.sql",
 	"sql/03-schema.sql",
 	"sql/04-schema.sql",
+	"sql/05-schema.sql",
 }
 
 func (conn *Database) MustRunMigrations(resources *Resources) {

@@ -37,7 +37,7 @@ const (
 
 func (app *WebApplication) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	// log.Printf("> %v %v", r.Method, r.URL.String())
+	app.database.RecordRequest(r)
 
 	w.Header().Set("Access-Control-Allow-Origin", getOriginDomain(r))
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
