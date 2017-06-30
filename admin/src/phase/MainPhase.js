@@ -18,6 +18,7 @@ import { EditPost } from '../route/EditPost'
 import { EditSite } from '../route/EditSite'
 import { Home } from '../route/Home'
 import { NewPost } from '../route/NewPost'
+import { Activity } from '../route/Activity'
 
 import createBrowserHistory from 'history/createBrowserHistory'
 
@@ -31,11 +32,13 @@ class MainPhase extends React.PureComponent {
     this.state = {
       viewer: Map({}),
       site: props.site,
-      menu: "list-posts"
+      menu: "list-posts",
+      activity: []
     }
     this.history = createBrowserHistory()
     this.dispatch = this.dispatch.bind(this)
     this.refresh = this.refresh.bind(this)
+    this.refreshActivity = this.refreshActivity.bind(this)
 
     this.savePost = this.savePost.bind(this)
     this.updatePost = this.updatePost.bind(this)
@@ -116,6 +119,18 @@ class MainPhase extends React.PureComponent {
     })
   }
 
+  refreshActivity() {
+    const { client } = this.props
+    client.requestData(100, (response) => {
+      if (response.errors) {
+        console.log(response.errors[0])
+        return
+      }
+
+      this.setState({activity: response.data.viewer.requests})
+    })
+  }
+
   refresh() {
     const { client } = this.props
     client.viewerData(response => {
@@ -178,7 +193,7 @@ class MainPhase extends React.PureComponent {
 
   render() {
     const { logout, client } = this.props
-    const { viewer, site, menu } = this.state
+    const { viewer, site, menu, activity } = this.state
 
     const PropRoute = ({component: Component, path: Path, ...rest}) => (
       <Route exact path={Path} render={(props) => (<Component {...rest} {...props}/> )}/>
@@ -219,6 +234,11 @@ class MainPhase extends React.PureComponent {
           this.setState({menu: event})
           this.history.push("/admin/account/password/edit")
           break;
+        case "list-activity":
+          this.setState({menu: event})
+          this.refreshActivity()
+          this.history.push("/admin/activity")
+          break;
         default:
           console.log("Unknown menu event:", event);
       }
@@ -234,6 +254,7 @@ class MainPhase extends React.PureComponent {
           <StatusBar year="2017" copyright={ site.title }/>
           <Switch>
             <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} onGotoPost={this.gotoPost} dispatch={this.dispatch}/>
+            <PropRoute path="/admin/activity" component={Activity} activity={activity} onRefresh={this.refreshActivity}/>
             <PropRoute path="/admin/post/new" component={NewPost} onSave={this.savePost} onCancel={onCancel}/>
             <PropRoute path="/admin/post/:id" component={EditPost} posts={viewer.get("posts")} onSave={this.updatePost} onCancel={onCancel}/>
             <PropRoute path="/admin/site/edit" component={EditSite} site={site} onSave={saveSite} onCancel={onCancel}/>

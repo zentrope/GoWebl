@@ -51,6 +51,7 @@ const Schema = `
 	 token: String!
 	 posts: [Post]!
 	 site: Site!
+	 requests(limit: Int): [Request]!
  }
 
  type Author {
@@ -77,6 +78,16 @@ const Schema = `
 	 baseUrl: String!
 	 title: String!
 	 description: String!
+ }
+
+ type Request {
+	 address: String!
+	 host: String!
+	 dateRecorded: String!
+	 method: String!
+	 path: String!
+	 userAgent: String!
+	 referer:	String!
  }
 `
 
@@ -339,6 +350,24 @@ func (v *viewerResolver) Posts() ([]*postResolver, error) {
 	return rs, nil
 }
 
+func (r *viewerResolver) Requests(ctx context.Context, args *struct{ Limit *int32 }) ([]*requestResolver, error) {
+
+	limit := 10
+	if args.Limit != nil {
+		limit = int(*args.Limit)
+	}
+
+	requests, err := r.database.RecentRequests(limit)
+	if err != nil {
+		return nil, err
+	}
+	var rs []*requestResolver
+	for _, r := range requests {
+		rs = append(rs, &requestResolver{r})
+	}
+	return rs, nil
+}
+
 //=============================================================================
 // Site
 //=============================================================================
@@ -386,6 +415,42 @@ func (r siteResolver) Title() string {
 
 func (r siteResolver) Description() string {
 	return r.site.Description
+}
+
+//=============================================================================
+// Request Resolver
+//=============================================================================
+
+type requestResolver struct {
+	request *RequestStat
+}
+
+func (r requestResolver) Address() string {
+	return r.request.Address
+}
+
+func (r requestResolver) Host() string {
+	return r.request.Host
+}
+
+func (r requestResolver) DateRecorded() string {
+	return r.request.DateRecorded.Format(time.RFC3339)
+}
+
+func (r requestResolver) Method() string {
+	return r.request.Method
+}
+
+func (r requestResolver) Path() string {
+	return r.request.Path
+}
+
+func (r requestResolver) UserAgent() string {
+	return r.request.UserAgent
+}
+
+func (r requestResolver) Referer() string {
+	return r.request.Referer
 }
 
 //=============================================================================

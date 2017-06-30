@@ -14,18 +14,19 @@ const icon = name => (color) => {
 }
 
 const icons = Map({
-  "new-post":     icon("fa-plus"),
-  "edit-site":    icon("fa-cog"),
-  "list-posts":   icon("fa-file-text-o"),
+  "new-post": icon("fa-plus"),
+  "edit-site": icon("fa-cog"),
+  "list-posts": icon("fa-file-text-o"),
   "edit-account": icon("fa-user-circle"),
   "change-password": icon("fa-lock"),
-  delete:       icon("fa-trash-o"),
-  draft:        icon("fa-toggle-off"),
-  edit:         icon("fa-pencil-square-o"),
-  published:    icon("fa-toggle-on"),
-  question:     icon("fa-question"),
-  visit:        icon("fa-external-link"),
-  signout:      icon("fa-sign-out")
+  "list-activity": icon("fa-area-chart"),
+  delete: icon("fa-trash-o"),
+  draft: icon("fa-toggle-off"),
+  edit: icon("fa-pencil-square-o"),
+  published: icon("fa-toggle-on"),
+  question: icon("fa-question"),
+  visit: icon("fa-external-link"),
+  signout: icon("fa-sign-out")
 })
 
 class Icon extends React.PureComponent {

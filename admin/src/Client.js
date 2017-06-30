@@ -91,6 +91,16 @@ const siteQL = () => { return {
   query: `query { site { baseUrl title description }}`
 }}
 
+const requestQL = (limit) => {
+  return {
+    query: `query GetRequests($limit: Int) {
+        viewer { requests(limit: $limit) {
+          address host dateRecorded method path userAgent referer }}}`,
+    operationName: "GetRequests",
+    variables: {limit: limit}
+  }
+}
+
 const updateSiteQL = (title, description, baseUrl) => {
   const q = fl(`mutation
     UpdateSite($t: String! $d: String! $b: String!) {
@@ -195,6 +205,10 @@ class Client {
 
   updateViewerPassword(password, callback) {
     this.__doQuery(updateViewerPasswordQL(password), callback)
+  }
+
+  requestData(limit, callback) {
+    this.__doQuery(requestQL(limit), callback)
   }
 
   siteData(callback) {
