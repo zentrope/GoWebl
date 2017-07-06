@@ -39,12 +39,17 @@ func (app *WebApplication) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	app.database.RecordRequest(r)
 
+	w.Header().Set("Cache-Control", "public, max-age=86400")
 	w.Header().Set("Access-Control-Allow-Origin", getOriginDomain(r))
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers",
 		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 
 	if r.Method == "OPTIONS" {
+		return
+	}
+
+	if r.Method == "HEAD" {
 		return
 	}
 
