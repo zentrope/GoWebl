@@ -21,7 +21,7 @@ const topRoutes = `
 
 const topRefers = `
 	select substring(referer, 0, 100) as key, count(*) as value
-		from request group by key order by value desc`
+		from request where referer <> '' group by key order by value desc`
 
 const hitsPerDay = `
 	select date_trunc('day', date_recorded) as key, count (*) as value
