@@ -6,7 +6,6 @@ package internal
 
 import (
 	"log"
-	"net"
 	"net/http"
 	"time"
 )
@@ -46,33 +45,6 @@ func (conn *Database) RecordRequest(r *http.Request) {
 	}()
 }
 
-func findHost(address string, cache map[string]string) string {
-
-	if name, found := cache[address]; found {
-		return name
-	}
-
-	if address == "0.0.0.0" {
-		return address
-	}
-
-	names, err := net.LookupAddr(address)
-	if err != nil {
-		return address
-	}
-
-	if len(names) == 0 {
-		cache[address] = address
-		return address
-	}
-
-	name := names[0]
-
-	cache[address] = name
-
-	return name
-}
-
 func (conn *Database) RecentRequests(limit int) ([]*RequestStat, error) {
 	q := `select address, date_recorded, method, path, user_agent, referer from
 					request where abbrev(address) <> '0.0.0.0'
@@ -86,8 +58,6 @@ func (conn *Database) RecentRequests(limit int) ([]*RequestStat, error) {
 	defer rows.Close()
 
 	requests := make([]*RequestStat, 0)
-
-	tempCache := make(map[string]string, 0)
 
 	for rows.Next() {
 		var r RequestStat
@@ -104,14 +74,7 @@ func (conn *Database) RecentRequests(limit int) ([]*RequestStat, error) {
 			return nil, err
 		}
 
-		r.Host = findHost(r.Address, tempCache)
-		// names, err := net.LookupAddr(r.Address)
-		// if err != nil {
-		//	r.Host = r.Address
-		// } else {
-		//	r.Host = fmt.Sprintf("%v", names)
-		// }
-
+		r.Host = DNSLookup(r.Address)
 		requests = append(requests, &r)
 	}
 

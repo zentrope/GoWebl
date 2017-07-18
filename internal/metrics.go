@@ -4,7 +4,9 @@
 
 package internal
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 type Metric struct {
 	Key   string
@@ -13,7 +15,8 @@ type Metric struct {
 
 const topHits = `
 	select address as key, count(*) as value
-		from request group by address order by value desc`
+		from request where address <> '0.0.0.0'
+			group by address order by value desc`
 
 const topRoutes = `
 	select method || ' ' || substring(path, 0, 100) as key, count(*) as value
@@ -24,7 +27,7 @@ const topRefers = `
 		from request where referer <> '' group by key order by value desc`
 
 const hitsPerDay = `
-	select date_trunc('day', date_recorded) as key, count (*) as value
+	select left(date_trunc('day', date_recorded)::text, 10) as key, count (*) as value
 		from request group by key order by key desc`
 
 func (conn *Database) HitsPerDay() ([]*Metric, error) {
@@ -32,7 +35,16 @@ func (conn *Database) HitsPerDay() ([]*Metric, error) {
 }
 
 func (conn *Database) TopHits() ([]*Metric, error) {
-	return conn.runMetric(topHits)
+	metrics, err := conn.runMetric(topHits)
+	if err != nil {
+		return nil, err
+	}
+	m2 := make([]*Metric, 0)
+	for _, m := range metrics {
+		name := DNSLookup(m.Key)
+		m2 = append(m2, &Metric{name, m.Value})
+	}
+	return m2, nil
 }
 
 func (conn *Database) TopRoutes() ([]*Metric, error) {

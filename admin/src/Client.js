@@ -101,6 +101,11 @@ const requestQL = (limit) => {
   }
 }
 
+const metricsQL = (report) => {
+  let q = `query { viewer { metrics {` + report + `{ key value }}}}`
+  return { query: q }
+}
+
 const updateSiteQL = (title, description, baseUrl) => {
   const q = fl(`mutation
     UpdateSite($t: String! $d: String! $b: String!) {
@@ -209,6 +214,10 @@ class Client {
 
   requestData(limit, callback) {
     this.__doQuery(requestQL(limit), callback)
+  }
+
+  metricsReport(name, callback) {
+    this.__doQuery(metricsQL(name), callback)
   }
 
   siteData(callback) {

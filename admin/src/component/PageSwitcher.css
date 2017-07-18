@@ -1,0 +1,25 @@
+/*
+** Copyright 2017 Keith Irwin. All rights reserved.
+** Use of this source code is governed by a BSD-style
+** license that can be found in the LICENSE file.
+*/
+
+.PageSwitcher {
+  display: flex;
+  margin-top: 38px;
+  align-items: center;
+  border-bottom: 2px solid #f2f2f2;
+  padding-bottom: 2px;
+}
+
+.PageSwitcher .Title {
+  flex: 1;
+  font-size: 13pt;
+  font-weight: bold;
+
+}
+
+.PageSwitcher .Selector {
+  flex: 1;
+  text-align: right;
+}

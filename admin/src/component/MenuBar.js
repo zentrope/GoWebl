@@ -34,11 +34,12 @@ class MenuItem extends React.PureComponent {
 
 const menus = [
   {name: "Posts", event: "list-posts"},
-  {name: "Activity", event: "list-activity"},
   {name: "New post", event: "new-post"},
   {name: "Site", event: "edit-site"},
   {name: "Account", event: "edit-account"},
   {name: "Password", event: "change-password"},
+  {name: "Activity", event: "list-activity"},
+  {name: "Metrics", event: "metrics"}
 ]
 
 class MenuBar extends React.PureComponent {

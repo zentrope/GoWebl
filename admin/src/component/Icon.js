@@ -20,6 +20,7 @@ const icons = Map({
   "edit-account": icon("fa-user-circle"),
   "change-password": icon("fa-lock"),
   "list-activity": icon("fa-area-chart"),
+  "metrics": icon("fa-line-chart"),
   delete: icon("fa-trash-o"),
   draft: icon("fa-toggle-off"),
   edit: icon("fa-pencil-square-o"),

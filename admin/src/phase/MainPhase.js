@@ -12,13 +12,14 @@ import { StatusBar } from '../component/StatusBar'
 import { TitleBar } from '../component/TitleBar'
 
 // Routes
-import { EditAccount } from '../route/EditAccount'
+import { Activity } from '../route/Activity'
 import { ChangePassword } from '../route/ChangePassword'
+import { EditAccount } from '../route/EditAccount'
 import { EditPost } from '../route/EditPost'
 import { EditSite } from '../route/EditSite'
 import { Home } from '../route/Home'
+import { Metrics } from '../route/Metrics'
 import { NewPost } from '../route/NewPost'
-import { Activity } from '../route/Activity'
 
 import createBrowserHistory from 'history/createBrowserHistory'
 
@@ -33,12 +34,15 @@ class MainPhase extends React.PureComponent {
       viewer: Map({}),
       site: props.site,
       menu: "list-posts",
-      activity: []
+      activity: [],
+      metricsReport: "Top Routes",
+      metrics: []
     }
     this.history = createBrowserHistory()
     this.dispatch = this.dispatch.bind(this)
     this.refresh = this.refresh.bind(this)
     this.refreshActivity = this.refreshActivity.bind(this)
+    this.refreshMetrics = this.refreshMetrics.bind(this)
 
     this.savePost = this.savePost.bind(this)
     this.updatePost = this.updatePost.bind(this)
@@ -116,6 +120,30 @@ class MainPhase extends React.PureComponent {
         this.setState({viewer: v})
         this.history.push('/admin/home')
       }
+    })
+  }
+
+  refreshMetrics(reportName) {
+
+    let key = reportName.toLowerCase()
+
+    let resolver = {
+      "top hits": "topHits",
+      "top routes": "topRoutes",
+      "top refers": "topRefers",
+      "hits per day": "hitsPerDay"
+    }
+
+    let report = resolver[key] ? resolver[key] : "topRoutes";
+
+    this.props.client.metricsReport(report, (response) => {
+      if (response.errors) {
+        console.log(response.errors)
+        return
+      }
+
+      let values = response.data.viewer.metrics[report]
+      this.setState({metrics: values, metricsReport: reportName})
     })
   }
 
@@ -239,12 +267,19 @@ class MainPhase extends React.PureComponent {
           this.refreshActivity()
           this.history.push("/admin/activity")
           break;
+        case "metrics":
+          this.setState({menu: event})
+          this.refreshMetrics("Top Routes")
+          this.history.push("/admin/metrics")
+          break;
         default:
           console.log("Unknown menu event:", event);
       }
     }
 
     const userName = viewer.get("name") + " <" + viewer.get("email") + ">"
+
+    const reports = ["Top Hits", "Top Routes", "Top Refers", "Hits per Day"]
 
     return (
       <Router history={this.history}>
@@ -255,6 +290,7 @@ class MainPhase extends React.PureComponent {
           <Switch>
             <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} onGotoPost={this.gotoPost} dispatch={this.dispatch}/>
             <PropRoute path="/admin/activity" component={Activity} activity={activity} onRefresh={this.refreshActivity}/>
+            <PropRoute path="/admin/metrics" component={Metrics} client={client} metrics={this.state.metrics} report={this.state.metricsReport} reports={reports} onChange={this.refreshMetrics}/>
             <PropRoute path="/admin/post/new" component={NewPost} onSave={this.savePost} onCancel={onCancel}/>
             <PropRoute path="/admin/post/:id" component={EditPost} posts={viewer.get("posts")} onSave={this.updatePost} onCancel={onCancel}/>
             <PropRoute path="/admin/site/edit" component={EditSite} site={site} onSave={saveSite} onCancel={onCancel}/>
