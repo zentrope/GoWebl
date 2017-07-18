@@ -52,6 +52,19 @@ const Schema = `
 	 posts: [Post]!
 	 site: Site!
 	 requests(limit: Int): [Request]!
+	 metrics: Metrics!
+ }
+
+ type Metrics {
+	 topHits: [Metric]!
+	 topRoutes: [Metric]!
+	 topRefers: [Metric]!
+	 hitsPerDay: [Metric]!
+ }
+
+ type Metric {
+	key: String!
+	value: Int!
  }
 
  type Author {
@@ -366,6 +379,76 @@ func (r *viewerResolver) Requests(ctx context.Context, args *struct{ Limit *int3
 		rs = append(rs, &requestResolver{r})
 	}
 	return rs, nil
+}
+
+//=============================================================================
+// Metrics
+//=============================================================================
+
+type metricResolver struct {
+	database *Database
+	metric   *Metric
+}
+
+type metricRunner func() ([]*Metric, error)
+
+func (r *viewerResolver) Metrics() metricResolver {
+	return metricResolver{r.database, nil}
+}
+
+func (r metricResolver) TopRoutes() ([]*metricResolver, error) {
+	return r.metricResults(
+		func() ([]*Metric, error) {
+			return r.database.TopRoutes()
+		},
+	)
+}
+
+func (r metricResolver) TopRefers() ([]*metricResolver, error) {
+	return r.metricResults(
+		func() ([]*Metric, error) {
+			return r.database.TopRefers()
+		},
+	)
+}
+
+func (r metricResolver) HitsPerDay() ([]*metricResolver, error) {
+	return r.metricResults(
+		func() ([]*Metric, error) {
+			return r.database.HitsPerDay()
+		},
+	)
+}
+
+func (r metricResolver) TopHits() ([]*metricResolver, error) {
+
+	f := func() ([]*Metric, error) {
+		return r.database.TopHits()
+	}
+
+	return r.metricResults(f)
+}
+
+func (r *metricResolver) metricResults(executor metricRunner) ([]*metricResolver, error) {
+
+	metrics, err := executor()
+	if err != nil {
+		return nil, err
+	}
+
+	results := make([]*metricResolver, 0)
+	for _, metric := range metrics {
+		results = append(results, &metricResolver{r.database, metric})
+	}
+	return results, nil
+}
+
+func (r *metricResolver) Key() string {
+	return r.metric.Key
+}
+
+func (r *metricResolver) Value() int32 {
+	return int32(r.metric.Value)
 }
 
 //=============================================================================

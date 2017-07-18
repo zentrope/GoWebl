@@ -26,11 +26,11 @@ func (conn *Database) Authentic(email, password string) (*Author, error) {
 	const query = "select uuid, password from author where lower(email)=lower($1)"
 	rows, err := conn.db.Query(query, email)
 
-	defer rows.Close()
-
 	if err != nil {
 		return nil, err
 	}
+
+	defer rows.Close()
 
 	if !rows.Next() {
 		return nil, errors.New("User not found.")
