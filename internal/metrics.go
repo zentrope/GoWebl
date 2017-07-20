@@ -39,12 +39,13 @@ func (conn *Database) TopHits() ([]*Metric, error) {
 	if err != nil {
 		return nil, err
 	}
-	m2 := make([]*Metric, 0)
-	for _, m := range metrics {
+
+	for i, m := range metrics {
 		name := DNSLookup(m.Key)
-		m2 = append(m2, &Metric{name, m.Value})
+		metrics[i].Key = name
 	}
-	return m2, nil
+
+	return metrics, nil
 }
 
 func (conn *Database) TopRoutes() ([]*Metric, error) {
