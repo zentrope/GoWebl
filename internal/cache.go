@@ -22,6 +22,7 @@ func DNSLookup(address string) string {
 
 	names, err := net.LookupAddr(address)
 	if err != nil {
+		DNS_CACHE[address] = address
 		return address
 	}
 
