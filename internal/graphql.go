@@ -7,6 +7,7 @@ package internal
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -129,6 +130,8 @@ func NewApi(database *Database) (*GraphAPI, error) {
 // Auth Tokens (JWT)
 //=============================================================================
 
+const BAD_AUTH_MSG = "Invalid authorization request."
+
 type ViewerClaims struct {
 	Uuid string `json:"uuid"`
 	Type string `json:"type"`
@@ -175,7 +178,8 @@ func isValidAuthToken(ctx context.Context, tokenString string) (bool, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &ViewerClaims{}, checkAlgKey(ctx))
 
 	if err != nil {
-		return false, err
+		log.Printf("auth.error: %v", err)
+		return false, fmt.Errorf(BAD_AUTH_MSG)
 	}
 
 	return token.Valid, nil
@@ -213,7 +217,8 @@ func findAuthClaims(ctx context.Context, token *string) (*ViewerClaims, error) {
 
 	claims, err := decodeAuthToken(ctx, auth)
 	if err != nil {
-		return nil, err
+		log.Printf("auth.error: %v", err)
+		return nil, fmt.Errorf(BAD_AUTH_MSG)
 	}
 
 	return claims, nil
@@ -235,7 +240,8 @@ func (r *Resolver) Authenticate(ctx context.Context, args *struct{ Email, Pass s
 
 	author, err := r.Database.Authentic(email, pass)
 	if err != nil {
-		return nil, err
+		log.Printf("auth.error: %v -> %v", email, err)
+		return nil, fmt.Errorf(BAD_AUTH_MSG)
 	}
 
 	token, err := mkAuthToken(ctx, author)
