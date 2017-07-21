@@ -7,15 +7,35 @@ import React from 'react';
 import { MarkdownEditor } from '../component/MarkdownEditor'
 import { WorkArea } from '../component/WorkArea'
 
-// /admin/post/new
+const moment = require('moment')
+
 class NewPost extends React.PureComponent {
 
+  constructor(props) {
+    super(props)
+
+    this.save = this.save.bind(this)
+  }
+
+  save(slugline, text, datePublished) {
+    const { client, onCancel } = this.props
+    let date = moment(datePublished).toISOString()
+    console.log("save post with date:", date)
+    client.savePost(slugline, text, date, "draft", (response) => {
+      if (response.errors) {
+        response.errors.map(e => console.log("err:", e))
+        return
+      }
+      onCancel()
+    })
+  }
+
   render() {
-    const { onSave, onCancel } = this.props
+    const { onCancel } = this.props
 
     return (
       <WorkArea>
-        <MarkdownEditor onCancel={onCancel} onSave={onSave}/>
+        <MarkdownEditor onCancel={onCancel} onSave={this.save}/>
       </WorkArea>
     )
   }

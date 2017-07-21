@@ -38,7 +38,6 @@ class MainPhase extends React.PureComponent {
     this.history = createBrowserHistory()
     this.refresh = this.refresh.bind(this)
 
-    this.savePost = this.savePost.bind(this)
     this.updatePost = this.updatePost.bind(this)
   }
 
@@ -64,24 +63,6 @@ class MainPhase extends React.PureComponent {
                           .filter(p => p.get("uuid") !== uuid)
                           .push(fromJS(post))
         this.setState({viewer: this.state.viewer.set("posts", posts)})
-      }
-    })
-  }
-
-  savePost(slugline, text, datePublished) {
-    const { client } = this.props
-    let date = moment(datePublished).toISOString()
-    console.log("save post with date:", date)
-    client.savePost(slugline, text, date, "draft", (response) => {
-      if (response.errors) {
-        response.errors.map(e => console.log("err:", e))
-        return
-      }
-      const newPost = response.data.createPost
-      if (newPost) {
-        const v = this.state.viewer.update("posts", ps => ps.push(fromJS(newPost)))
-        this.setState({viewer: v})
-        this.history.push('/admin/home')
       }
     })
   }
@@ -161,7 +142,7 @@ class MainPhase extends React.PureComponent {
             <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} onGotoPost={this.gotoPost} dispatch={this.dispatch}/>
             <PropRoute path="/admin/activity" component={Activity}  client={client}/>
             <PropRoute path="/admin/metrics" component={Metrics} client={client}/>
-            <PropRoute path="/admin/post/new" component={NewPost} onSave={this.savePost} onCancel={onCancel}/>
+            <PropRoute path="/admin/post/new" component={NewPost} client={client} onCancel={onCancel}/>
             <PropRoute path="/admin/post/:id" component={EditPost} posts={viewer.get("posts")} onSave={this.updatePost} onCancel={onCancel}/>
             <PropRoute path="/admin/site/edit" component={EditSite} client={client} onCancel={onCancel}/>
             <PropRoute path="/admin/account/edit" component={EditAccount} client={client} onCancel={onCancel}/>
