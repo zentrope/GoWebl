@@ -11,7 +11,7 @@ import './TitleBar.css'
 class TitleBar extends React.PureComponent {
 
   render() {
-    const { user, logout, title, visit } = this.props
+    const { title, user, logout, visit } = this.props
 
     return (
       <section className="TitleBar">

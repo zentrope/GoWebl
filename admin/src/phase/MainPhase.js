@@ -5,8 +5,6 @@
 import React from 'react';
 import { Router, Route, Redirect, Switch } from 'react-router-dom'
 
-import { Map, fromJS } from 'immutable'
-
 import { MenuBar } from '../component/MenuBar'
 import { StatusBar } from '../component/StatusBar'
 import { TitleBar } from '../component/TitleBar'
@@ -29,8 +27,9 @@ class MainPhase extends React.PureComponent {
     super(props)
 
     this.state = {
-      viewer: Map({}),
-      site: props.site,
+      user: "",
+      title: "",
+      baseUrl: "",
       menu: "list-posts"
     }
     this.history = createBrowserHistory()
@@ -44,23 +43,30 @@ class MainPhase extends React.PureComponent {
   refresh() {
     const { client } = this.props
     client.viewerData(response => {
-      // TODO: What happens if there are errors here?
-      const data = fromJS(response.data.viewer)
-      this.setState({viewer: data, site: response.data.viewer.site})
-      this.forceUpdate()
+      if (response.errors) {
+        console.error(response.errors)
+        return
+      }
+      let { name, email } = response.data.viewer
+      let site = response.data.viewer.site
+      this.setState({
+        title: site.title,
+        user: name + " <" + email + ">",
+        baseUrl: site.baseUrl
+      })
     })
   }
 
   render() {
     const { logout, client } = this.props
-    const { viewer, site, menu } = this.state
+    const { title, user, baseUrl, menu } = this.state
 
     const PropRoute = ({component: Component, path: Path, ...rest}) => (
       <Route exact path={Path} render={(props) => (<Component {...rest} {...props}/> )}/>
     )
 
     const visit = () => {
-      window.location.href = site.baseUrl
+      window.location.href = baseUrl
     }
 
     const onCancel = () => {
@@ -104,14 +110,12 @@ class MainPhase extends React.PureComponent {
       }
     }
 
-    const userName = viewer.get("name") + " <" + viewer.get("email") + ">"
-
     return (
       <Router history={this.history}>
         <section className="App">
-          <TitleBar title={ site.title } user={userName} visit={visit} logout={logout}/>
+          <TitleBar title={title} user={user} visit={visit} logout={logout}/>
           <MenuBar onClick={onMenuClick} selected={menu}/>
-          <StatusBar year="2017" copyright={ site.title }/>
+          <StatusBar year="2017" copyright={ title }/>
           <Switch>
             <PropRoute path="/admin/home" component={Home} client={client}/>
             <PropRoute path="/admin/activity" component={Activity}  client={client}/>
