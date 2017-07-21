@@ -10,11 +10,33 @@ import { Tabular } from '../component/Tabular'
 
 class Activity extends React.PureComponent {
 
+  constructor(props) {
+    super(props)
+    this.mounted = false
+    this.state = { activity: [] }
+  }
+
   componentDidMount() {
-    const { onRefresh, activity } = this.props
-    if (onRefresh && activity.length < 1) {
-      onRefresh()
-    }
+    this.mounted = true
+    this.refreshActivity()
+  }
+
+  componentWillUnmount() {
+    this.mounted = false
+  }
+
+  refreshActivity() {
+    const { client } = this.props
+    client.requestData(100, (response) => {
+      if (response.errors) {
+        console.log(response.errors[0])
+        return
+      }
+
+      if (this.mounted) {
+        this.setState({activity: response.data.viewer.requests})
+      }
+    })
   }
 
   renderRow(request) {
@@ -29,7 +51,7 @@ class Activity extends React.PureComponent {
   }
 
   render() {
-    const { activity } = this.props
+    const { activity } = this.state
     return (
       <WorkArea>
         <Tabular columns={["date", "host", "path"]}
