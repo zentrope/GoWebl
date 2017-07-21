@@ -11,13 +11,52 @@ import { WorkArea } from '../component/WorkArea'
 
 class Metrics extends React.PureComponent {
 
-  componentDidMount() {
-    // Handles the case where we arrive here via a direct refresh
-    // on the route.
-    let { metrics, onChange, report} = this.props
-    if (onChange && metrics.length < 1) {
-      onChange(report)
+  constructor(props) {
+    super(props)
+
+    this.mounted = false
+
+    this.state = {
+      report: "Top Routes",
+      metrics: []
     }
+
+    this.handleChange = this.handleChange.bind(this)
+  }
+
+  componentDidMount() {
+    this.mounted = true
+    let { report } = this.state
+    this.handleChange(report)
+  }
+
+  componentWillUnmount() {
+    this.mounted = false
+  }
+
+  handleChange(reportName) {
+    let { client } = this.props
+    let key = reportName.toLowerCase()
+    let resolver = {
+      "top hits": "topHits",
+      "top routes": "topRoutes",
+      "top refers": "topRefers",
+      "hits per day": "hitsPerDay"
+    }
+
+    let report = resolver[key] ? resolver[key] : "topRoutes";
+
+    client.metricsReport(report, (response) => {
+      if (response.errors) {
+        console.log(response.errors)
+        return
+      }
+
+      let values = response.data.viewer.metrics[report]
+      if (this.mounted) {
+        this.setState({metrics: values, report: reportName})
+      }
+    })
   }
 
   renderRow(row) {
@@ -31,12 +70,13 @@ class Metrics extends React.PureComponent {
   }
 
   render() {
-    let { report, reports, metrics, onChange } = this.props
+    let { report, metrics } = this.state
+    const reports = ["Top Hits", "Top Routes", "Top Refers", "Hits per Day"]
 
     return (
       <WorkArea>
         <PageSwitcher title={report}>
-          <WordSelector words={reports} selected={report} onChange={onChange}/>
+          <WordSelector words={reports} selected={report} onChange={this.handleChange}/>
         </PageSwitcher>
         <Tabular columns={["key", "value"]} data={metrics} render={this.renderRow}/>
       </WorkArea>
