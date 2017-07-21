@@ -43,7 +43,9 @@ class Home extends React.PureComponent {
         return
       }
       if (this.mounted) {
-        this.setState({posts: response.data.viewer.posts})
+        let posts = response.data.viewer.posts
+        posts.sort((a, b) => a.datePublished < b.datePublished)
+        this.setState({posts: posts})
       }
     })
   }
