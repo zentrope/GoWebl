@@ -7,7 +7,7 @@ import { Form, FormControls, FormWidgets, FormWidget,
          FormLabel, FormTitle } from '../component/Form'
 import { WorkArea } from '../component/WorkArea'
 
-// /admin/account/edit
+/* /admin/account/edit */
 
 const isBlank = (s) => ((! s) || (s.trim().length === 0))
 
@@ -16,13 +16,20 @@ class EditAccount extends React.PureComponent {
   constructor(props) {
     super(props)
 
-    this.oldEmail = this.props.email
-    this.oldName = this.props.name
-
-    this.state = {name: this.props.name, email: this.props.email}
+    this.state = {name: "", email: ""}
     this.handleChange = this.handleChange.bind(this)
     this.save = this.save.bind(this)
+    this.load = this.load.bind(this)
     this.disabled = this.disabled.bind(this)
+  }
+
+  componentDidMount() {
+    this.mounted = true
+    this.load()
+  }
+
+  componentWillUnmount() {
+    this.mounted = false
   }
 
   handleChange(event) {
@@ -31,8 +38,29 @@ class EditAccount extends React.PureComponent {
     this.setState({[name]: value})
   }
 
+  load() {
+    let { client } = this.props
+    client.viewerData(response => {
+      let { email, name } = response.data.viewer
+      this.oldEmail = email
+      this.oldName = name
+      if (this.mounted) {
+        this.setState({email: email, name: name})
+      }
+    })
+  }
+
   save() {
-    this.props.onSave(this.state.name, this.state.email)
+    let { name, email } = this.state
+    let { client, onCancel } = this.props
+
+    client.updateViewer(name, email, (response) => {
+      if (response.errors) {
+        console.error(response.errors)
+        return
+      }
+      onCancel()
+    })
   }
 
   disabled() {
