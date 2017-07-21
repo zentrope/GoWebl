@@ -13,18 +13,25 @@ class EditSite extends React.PureComponent {
   constructor(props) {
     super(props)
 
-    this.state = props.site
+    this.mounted = false
+    this.state = {title: "", description: "", baseUrl: ""}
     this.handleChange = this.handleChange.bind(this)
     this.saveSite = this.saveSite.bind(this)
   }
 
-  componentWillReceiveProps(props) {
-    const { title, description, baseUrl } = props.site
-    let t = title ? title : ""
-    let d = description ? description : ""
-    let b = baseUrl ? baseUrl : ""
+  componentDidMount() {
+    this.mounted = true
+    let { client } = this.props
+    client.viewerData(response => {
+      let { title, description, baseURL } = response.data.viewer.site
+      if (this.mounted) {
+        this.setState({title: title, description: description, baseURL: baseURL})
+      }
+    })
+  }
 
-    this.setState({title: t, description: d, baseUrl: b})
+  componentWillUnmount() {
+    this.mounted = false
   }
 
   handleChange(event) {
@@ -34,7 +41,16 @@ class EditSite extends React.PureComponent {
   }
 
   saveSite() {
-    this.props.onSave(this.state)
+    let { title, description, baseUrl } = this.state
+    let { client, onCancel } = this.props
+
+    client.updateSite(title, description, baseUrl, (response) => {
+      if (response.errors) {
+        console.error(response.errors)
+      }
+
+      onCancel()
+    })
   }
 
   render() {

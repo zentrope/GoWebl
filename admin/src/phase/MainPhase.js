@@ -136,18 +136,6 @@ class MainPhase extends React.PureComponent {
 
     switch (event) {
 
-      case 'site/update':
-        client.updateSite(data.title, data.description, data.baseUrl, (response) => {
-          if (response.errors) {
-            console.error(response.errors)
-          } else {
-            this.setState({ site : response.data.updateSite })
-          }
-          this.setState({menu: "list-posts"})
-          this.history.push("/admin/home")
-        })
-        break
-
       case 'post/delete':
         client.deletePost(data.uuid, (response) => {
           const uuid = response.data.deletePost
@@ -190,12 +178,9 @@ class MainPhase extends React.PureComponent {
       window.location.href = site.baseUrl
     }
 
-    const saveSite = (siteData) => {
-      this.dispatch('site/update', siteData)
-    }
-
     const onCancel = () => {
       this.setState({menu: "list-posts"})
+      this.refresh()
       this.history.push("/admin/home")
     }
 
@@ -248,7 +233,7 @@ class MainPhase extends React.PureComponent {
             <PropRoute path="/admin/metrics" component={Metrics} client={client}/>
             <PropRoute path="/admin/post/new" component={NewPost} onSave={this.savePost} onCancel={onCancel}/>
             <PropRoute path="/admin/post/:id" component={EditPost} posts={viewer.get("posts")} onSave={this.updatePost} onCancel={onCancel}/>
-            <PropRoute path="/admin/site/edit" component={EditSite} site={site} onSave={saveSite} onCancel={onCancel}/>
+            <PropRoute path="/admin/site/edit" component={EditSite} client={client} onCancel={onCancel}/>
             <PropRoute path="/admin/account/edit" component={EditAccount} onCancel={onCancel} email={viewer.get("email")} name={viewer.get("name")} onSave={this.updateAccount}/>
             <PropRoute path="/admin/account/password/edit" component={ChangePassword} onCancel={onCancel} onSave={this.setPassword}/>
             <Redirect to="/admin/home"/>
