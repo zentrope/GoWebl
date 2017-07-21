@@ -36,7 +36,6 @@ class MainPhase extends React.PureComponent {
       menu: "list-posts"
     }
     this.history = createBrowserHistory()
-    this.dispatch = this.dispatch.bind(this)
     this.refresh = this.refresh.bind(this)
 
     this.savePost = this.savePost.bind(this)
@@ -95,44 +94,6 @@ class MainPhase extends React.PureComponent {
       this.setState({viewer: data, site: response.data.viewer.site})
       this.forceUpdate()
     })
-  }
-
-  // This stuff is a mess.
-  // TODO: Refactor state management
-  dispatch(event, data, callback) {
-    const { client } = this.props
-    console.log("event>", event)
-
-    switch (event) {
-
-      case 'post/delete':
-        client.deletePost(data.uuid, (response) => {
-          const uuid = response.data.deletePost
-          if (uuid) {
-            const posts = this.state.viewer
-                              .get("posts")
-                              .filter(p => p.get("uuid") !== uuid)
-            this.setState({viewer: this.state.viewer.set("posts", posts)})
-            return
-          }
-          console.error(response.errors)
-        })
-        break
-
-      case 'post/status':
-        client.setPostStatus(data.uuid, data.isPublished, (response) => {
-          const updated = response.data.setPostStatus
-          const errors = response.errors
-          if (updated) {
-            this.refresh() // should fold into existing data
-          } else {
-            console.log(errors)
-          }
-        })
-        break
-      default:
-        console.log("Unable to handle event.", data)
-    }
   }
 
   render() {
