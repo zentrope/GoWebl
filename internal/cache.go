@@ -53,12 +53,17 @@ func (c *GenericCache) Transact(key string, tx CacheTransactor) (interface{}, er
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
+	values := c.data.Load().(GenericMap)
+
+	if value, found := values[key]; found {
+		return value, nil
+	}
+
 	val, err := tx()
 	if err != nil {
 		return nil, err
 	}
 
-	values := c.data.Load().(GenericMap)
 	values[key] = val
 	c.data.Store(values)
 	return val, nil
