@@ -42,6 +42,20 @@ class MarkdownEditor extends React.PureComponent {
     this.setState({datePublished: date})
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { uuid, slugline, text, datePublished } = nextProps
+    let u = uuid ? uuid : ""
+    let s = slugline ? slugline : ""
+    let t = text ? text : ""
+    let d = datePublished ? datePublished : new Date()
+    this.setState({
+      uuid: u,
+      slugline: s,
+      text: t,
+      datePublished: d
+    })
+  }
+
   handleChange(event) {
     let name = event.target.name
     let value = event.target.value
@@ -67,6 +81,7 @@ class MarkdownEditor extends React.PureComponent {
     } else {
       onSave(slugline, text, datePublished)
     }
+    this.setState({dirty: false})
   }
 
   render() {

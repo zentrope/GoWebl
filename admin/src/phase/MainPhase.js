@@ -23,8 +23,6 @@ import { NewPost } from '../route/NewPost'
 
 import createBrowserHistory from 'history/createBrowserHistory'
 
-const moment = require('moment')
-
 class MainPhase extends React.PureComponent {
 
   constructor(props) {
@@ -37,34 +35,10 @@ class MainPhase extends React.PureComponent {
     }
     this.history = createBrowserHistory()
     this.refresh = this.refresh.bind(this)
-
-    this.updatePost = this.updatePost.bind(this)
   }
 
   componentDidMount() {
     this.refresh()
-  }
-
-  updatePost(uuid, slugline, text, datePublished) {
-    const { client } = this.props
-
-    let pub = moment(datePublished).toISOString()
-
-    client.updatePost(uuid, slugline, text, pub, (response) => {
-      if (response.errors) {
-        console.error("error", response.errors[0])
-        return
-      }
-
-      const post = response.data.updatePost
-      if (post) {
-        const posts = this.state.viewer
-                          .get("posts")
-                          .filter(p => p.get("uuid") !== uuid)
-                          .push(fromJS(post))
-        this.setState({viewer: this.state.viewer.set("posts", posts)})
-      }
-    })
   }
 
   refresh() {
@@ -139,11 +113,11 @@ class MainPhase extends React.PureComponent {
           <MenuBar onClick={onMenuClick} selected={menu}/>
           <StatusBar year="2017" copyright={ site.title }/>
           <Switch>
-            <PropRoute path="/admin/home" component={Home} viewer={viewer} client={client} onGotoPost={this.gotoPost} dispatch={this.dispatch}/>
+            <PropRoute path="/admin/home" component={Home} client={client}/>
             <PropRoute path="/admin/activity" component={Activity}  client={client}/>
             <PropRoute path="/admin/metrics" component={Metrics} client={client}/>
             <PropRoute path="/admin/post/new" component={NewPost} client={client} onCancel={onCancel}/>
-            <PropRoute path="/admin/post/:id" component={EditPost} posts={viewer.get("posts")} onSave={this.updatePost} onCancel={onCancel}/>
+            <PropRoute path="/admin/post/:id" component={EditPost} client={client} onCancel={onCancel}/>
             <PropRoute path="/admin/site/edit" component={EditSite} client={client} onCancel={onCancel}/>
             <PropRoute path="/admin/account/edit" component={EditAccount} client={client} onCancel={onCancel}/>
             <PropRoute path="/admin/account/password/edit" component={ChangePassword} client={client} onCancel={onCancel}/>

@@ -3,26 +3,84 @@
 // license that can be found in the LICENSE file.
 
 import React from 'react';
-import { Map } from 'immutable'
+
 import { MarkdownEditor } from '../component/MarkdownEditor'
 import { WorkArea } from '../component/WorkArea'
 
-// /admin/post/<uuid>
+const moment = require('moment')
+
 class EditPost extends React.PureComponent {
 
+  constructor(props) {
+    super(props)
+    this.mounted = false
+    this.state = { uuid: "", slugline: "", datePublished: "", text: "" }
+    this.update = this.update.bind(this)
+    this.load = this.load.bind(this)
+  }
+
+  componentDidMount() {
+    this.mounted = true
+    this.load()
+  }
+
+  componentWillUnmount() {
+    this.mounted = false
+  }
+
+  update(uuid, slugline, text, datePublished) {
+    const { client } = this.props
+
+    let pub = moment(datePublished).toISOString()
+
+    client.updatePost(uuid, slugline, text, pub, (response) => {
+      if (response.errors) {
+        console.error("error", response.errors[0])
+        return
+      }
+    })
+  }
+
+  load() {
+    let { client, match } = this.props
+    let id = match.params.id
+
+    client.viewerData(response => {
+      if (response.errors) {
+        console.log(response.errors)
+        return
+      }
+      let posts = response.data.viewer.posts
+      let post = { uuid: "", slugline: "", datePublished: "", text: "" }
+      for (let i = 0; i < posts.length; i++) {
+        if (posts[i].uuid === id) {
+          post = posts[i]
+          break
+        }
+      }
+
+      let {uuid, slugline, datePublished, text} = post
+
+      if (this.mounted) {
+        this.setState({uuid: uuid,
+                       slugline: slugline,
+                       datePublished: datePublished, text:text})
+      }
+    })
+}
+
   render() {
-    const { posts, onCancel, onSave, match } = this.props
-
-    let postUuid = match.params.id
-    let post = (posts) ? (posts.filter(p => p.get("uuid") === postUuid).first()) : Map()
-
-    const { uuid, slugline, text, datePublished } = post.toJS()
+    const { onCancel } = this.props
+    const { uuid, slugline, text, datePublished } = this.state
 
     return (
       <WorkArea>
-        <MarkdownEditor uuid={uuid} slugline={slugline}
+        <MarkdownEditor uuid={uuid}
+                        slugline={slugline}
                         datePublished={datePublished}
-                        text={text} onCancel={onCancel} onSave={onSave}/>
+                        text={text}
+                        onCancel={onCancel}
+                        onSave={this.update}/>
       </WorkArea>
     )
   }
