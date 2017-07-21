@@ -42,23 +42,10 @@ class MainPhase extends React.PureComponent {
     this.savePost = this.savePost.bind(this)
     this.updatePost = this.updatePost.bind(this)
     this.updateAccount = this.updateAccount.bind(this)
-    this.setPassword = this.setPassword.bind(this)
   }
 
   componentDidMount() {
     this.refresh()
-  }
-
-  setPassword(password) {
-    const { client } = this.props
-    client.updateViewerPassword(password, (response) => {
-      if (response.errors) {
-        console.error(response.errors)
-        return
-      }
-      this.setState({menu: "list-posts"})
-      this.history.push("/admin/home")
-    })
   }
 
   updateAccount(name, email) {
@@ -235,7 +222,7 @@ class MainPhase extends React.PureComponent {
             <PropRoute path="/admin/post/:id" component={EditPost} posts={viewer.get("posts")} onSave={this.updatePost} onCancel={onCancel}/>
             <PropRoute path="/admin/site/edit" component={EditSite} client={client} onCancel={onCancel}/>
             <PropRoute path="/admin/account/edit" component={EditAccount} onCancel={onCancel} email={viewer.get("email")} name={viewer.get("name")} onSave={this.updateAccount}/>
-            <PropRoute path="/admin/account/password/edit" component={ChangePassword} onCancel={onCancel} onSave={this.setPassword}/>
+            <PropRoute path="/admin/account/password/edit" component={ChangePassword} client={client} onCancel={onCancel}/>
             <Redirect to="/admin/home"/>
           </Switch>
         </section>

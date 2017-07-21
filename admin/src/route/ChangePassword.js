@@ -20,20 +20,29 @@ class ChangePassword extends React.PureComponent {
   }
 
   handleChange(event) {
-    let name = event.target.name
-    let value = event.target.value
+    let { name, value } = event.target
     this.setState({[name]: value})
   }
 
   update() {
-    this.props.onSave(this.state.password)
+    const { client, onCancel } = this.props
+    let { password } = this.state
+
+    client.updateViewerPassword(password, (response) => {
+      if (response.errors) {
+        console.error(response.errors)
+        return
+      }
+      onCancel()
+    })
   }
 
   disabled() {
-    return isBlank(this.state.password) ||
-           isBlank(this.state.confirm) ||
-           this.state.password.length < 8 ||
-           this.state.confirm !== this.state.password
+    let { password, confirm } = this.state
+    return isBlank(password) ||
+           isBlank(confirm) ||
+           password.length < 8 ||
+           confirm !== password
   }
 
   render() {
