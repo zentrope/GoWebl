@@ -108,7 +108,7 @@ This is especially useful if you don't want to or can't use Docker on your Mac. 
 
 ## License
 
-Copyright (C) 2017 Keith Irwin
+Copyright (c) 2017 Keith Irwin
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published
