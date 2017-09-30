@@ -27,7 +27,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/russross/blackfriday"
+	mdown "gopkg.in/russross/blackfriday.v2"
 )
 
 type WebApplication struct {
@@ -165,27 +165,20 @@ func xformArchiveEntry(e *ArchiveEntry) *TemplateArchiveEntry {
 }
 
 func MarkdownToHtml(data string) string {
-	htmlFlags := blackfriday.HTML_USE_XHTML |
-		blackfriday.HTML_USE_SMARTYPANTS |
-		blackfriday.HTML_SMARTYPANTS_FRACTIONS |
-		blackfriday.HTML_SMARTYPANTS_DASHES |
-		blackfriday.HTML_SMARTYPANTS_LATEX_DASHES
 
-	extensions := blackfriday.EXTENSION_NO_INTRA_EMPHASIS |
-		blackfriday.EXTENSION_TABLES |
-		blackfriday.EXTENSION_FENCED_CODE |
-		blackfriday.EXTENSION_AUTOLINK |
-		blackfriday.EXTENSION_STRIKETHROUGH |
-		blackfriday.EXTENSION_SPACE_HEADERS |
-		blackfriday.EXTENSION_HEADER_IDS |
-		blackfriday.EXTENSION_BACKSLASH_LINE_BREAK |
-		blackfriday.EXTENSION_DEFINITION_LISTS |
-		blackfriday.EXTENSION_FOOTNOTES
-	renderer := blackfriday.HtmlRenderer(htmlFlags, "", "")
+	extensions := mdown.NoIntraEmphasis |
+		mdown.Tables |
+		mdown.FencedCode |
+		mdown.Autolink |
+		mdown.Strikethrough |
+		mdown.SpaceHeadings |
+		mdown.HeadingIDs |
+		mdown.BackslashLineBreak |
+		mdown.DefinitionLists |
+		mdown.Footnotes
+
 	input := []byte(data)
-	options := blackfriday.Options{Extensions: extensions}
-
-	output := blackfriday.MarkdownOptions(input, renderer, options)
+	output := mdown.Run(input, mdown.WithExtensions(extensions))
 	return strings.TrimSpace(string(output))
 }
 

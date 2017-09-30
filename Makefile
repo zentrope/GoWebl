@@ -25,16 +25,19 @@ DB_SETUP = create user $(DB_USER) with login password '$(DB_PASS)' ;\
 	alter database $(DB_NAME) owner to $(DB_USER) ;\
 	create extension if not exists pgcrypto
 
-.PHONY: build-admin build init govendor vendor vendor-check vendor-unused help
+.PHONY: build-admin build init godep vendor vendor-check vendor-unused help
 .PHONY: db-clean db-init
 
 .DEFAULT_GOAL := help
 
-# To update dependency versions, govendor fetch +vendor
 
-govendor:
-	@hash govendor > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		go get -v -u github.com/kardianos/govendor; \
+##-----------------------------------------------------------------------------
+## Make depenencies
+##-----------------------------------------------------------------------------
+
+godep:
+	@hash dep > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		go get -v -u github.com/golang/dep/cmd/dep; \
 	fi
 
 ricebox:
@@ -42,20 +45,20 @@ ricebox:
 		go get -v -u github.com/GeertJohan/go.rice/rice; \
 	fi
 
-vendor: govendor ## Install govendor and sync deps
-	govendor sync
+##-----------------------------------------------------------------------------
+## Project dependencies
+##-----------------------------------------------------------------------------
 
-vendor-check: ## Verify that vendored packages match git HEAD
-	@git diff-index --quiet HEAD vendor/ || (echo "check-vendor target failed: vendored packages out of sync" && echo && git diff vendor/ && exit 1)
-
-run: vendor ## Run the app from source
-	go run main.go
-
-vendor-unused: govendor ## Find unused vendored dependencies
-	@govendor list +unused
+vendor: godep ## Install and sync deps
+	dep ensure
 
 init: vendor ricebox ## Make sure everything is set up properly for dev.
 	cd admin ; yarn
+
+##-----------------------------------------------------------------------------
+
+run: vendor ## Run the app from source
+	go run main.go
 
 build-admin: ## Build the admin client
 	cd admin; yarn ; yarn build
@@ -86,4 +89,6 @@ db-init: ## Create a local dev database with default creds
 	psql $(DB_NAME) -c "$(DB_SETUP)"
 
 help:
-	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}' | sort
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}' \
+		| sort
