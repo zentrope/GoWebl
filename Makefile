@@ -61,15 +61,15 @@ build-admin: ## Build the admin client
 	cd admin; yarn ; yarn build
 
 build-freebsd: init build-admin ## Build a version for FreeBSD
-	cd internal ; rm -f rice-box.go ;  rice -v embed-go
+	cd server ; rm -f rice-box.go ;  rice -v embed-go
 	GOOS=freebsd GOARCH=amd64 go build -o webl
 
 build: init build-admin ## Build webl into a local binary ./webl.
-	cd internal ; rm -f rice-box.go ;  rice -v embed-go
+	cd server ; rm -f rice-box.go ;  rice -v embed-go
 	go build -o webl
 
 clean: ## Clean build artifacts.
-	rm -f internal/rice-box.go
+	rm -f server/rice-box.go
 	rm -rf webl
 	rm -rf admin/build
 

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package internal
+package server
 
 import (
 	"database/sql"
@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 
+	// The Postgres driver requires an unnamed import
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 )

@@ -25,26 +25,26 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/zentrope/webl/internal"
+	"github.com/zentrope/webl/server"
 )
 
 //-----------------------------------------------------------------------------
 // Construction
 //-----------------------------------------------------------------------------
 
-func mkResources() *internal.Resources {
+func mkResources() *server.Resources {
 	log.Println("Constructing resources.")
-	r, err := internal.NewResources()
+	r, err := server.NewResources()
 	if err != nil {
 		log.Fatal(err)
 	}
 	return r
 }
 
-func mkConfig(resources *internal.Resources) *internal.AppConfig {
+func mkConfig(resources *server.Resources) *server.AppConfig {
 	log.Println("Constructing application configuration.")
 	var overrideConfigFile string
-	flag.StringVar(&overrideConfigFile, "c", internal.DefaultConfigFile,
+	flag.StringVar(&overrideConfigFile, "c", server.DefaultConfigFile,
 		"Path to configuration override file.")
 
 	flag.Parse()
@@ -54,7 +54,7 @@ func mkConfig(resources *internal.Resources) *internal.AppConfig {
 		flag.PrintDefaults()
 	}
 
-	c, err := internal.LoadConfigFile(overrideConfigFile, resources)
+	c, err := server.LoadConfigFile(overrideConfigFile, resources)
 	if err != nil {
 		panic(err)
 	}
@@ -62,17 +62,17 @@ func mkConfig(resources *internal.Resources) *internal.AppConfig {
 	return c
 }
 
-func mkDatabase(config *internal.AppConfig) *internal.Database {
+func mkDatabase(config *server.AppConfig) *server.Database {
 	log.Println("Constructing database connection.")
-	d := internal.NewDatabase(config.Storage)
+	d := server.NewDatabase(config.Storage)
 	d.MustConnect()
 	return d
 }
 
-func mkGraphAPI(database *internal.Database) *internal.GraphAPI {
+func mkGraphAPI(database *server.Database) *server.GraphAPI {
 	log.Println("Constructing GraphQL API.")
 
-	api, err := internal.NewApi(database)
+	api, err := server.NewApi(database)
 	if err != nil {
 		panic(err)
 	}
@@ -80,13 +80,13 @@ func mkGraphAPI(database *internal.Database) *internal.GraphAPI {
 }
 
 func mkWebApp(
-	config *internal.AppConfig,
-	resources *internal.Resources,
-	database *internal.Database,
-	graphapi *internal.GraphAPI,
+	config *server.AppConfig,
+	resources *server.Resources,
+	database *server.Database,
+	graphapi *server.GraphAPI,
 ) *http.Server {
 
-	app := internal.NewWebApplication(config, resources, database, graphapi)
+	app := server.NewWebApplication(config, resources, database, graphapi)
 
 	listen := config.Web.Listen
 	if listen == "" {
@@ -113,7 +113,7 @@ func blockUntilShutdownThenDo(fn func()) {
 	fn()
 }
 
-func notify(config *internal.AppConfig) {
+func notify(config *server.AppConfig) {
 	log.Printf("Ready on port %v.", config.Web.Port)
 }
 
