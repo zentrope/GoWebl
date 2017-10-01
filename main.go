@@ -18,7 +18,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -32,15 +31,28 @@ import (
 // Construction
 //-----------------------------------------------------------------------------
 
+var resourceDir, adminDir, overrideFile, assetDir string
+
+func init() {
+	flag.StringVar(&resourceDir, "resources", "./resources", "Path to scripts, templates.")
+	flag.StringVar(&assetDir, "assets", "./assets", "Path to web assets.")
+	flag.StringVar(&adminDir, "app", "./admin/build", "Path to admin web app.")
+	flag.StringVar(&overrideFile, "c", "", "Path to configuration override file.")
+
+	flag.Parse()
+
+	log.Println("Config:")
+	log.Printf("  %-9v '%v'", "resource:", resourceDir)
+	log.Printf("  %-9v '%v'", "admin:", adminDir)
+	log.Printf("  %-9v '%v'", "asset:", assetDir)
+	log.Printf("  %-9v '%v'", "override:", overrideFile)
+}
+
 func mkResources() server.Resources {
 	log.Println("Constructing resources.")
 	log.Println(" - WARNING: resources are using hard coded paths.")
 
-	publicDir := "./resources/public"
-	privateDir := "./resources"
-	adminDir := "./admin/build"
-
-	r, err := server.NewResources(privateDir, publicDir, adminDir)
+	r, err := server.NewResources(resourceDir, assetDir, adminDir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,18 +61,8 @@ func mkResources() server.Resources {
 
 func mkConfig(resources server.Resources) *server.AppConfig {
 	log.Println("Constructing application configuration.")
-	var overrideConfigFile string
-	flag.StringVar(&overrideConfigFile, "c", "_",
-		"Path to configuration override file.")
 
-	flag.Parse()
-
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage:\n")
-		flag.PrintDefaults()
-	}
-
-	c, err := server.LoadConfigFile(overrideConfigFile, resources)
+	c, err := server.LoadConfigFile(overrideFile)
 	if err != nil {
 		panic(err)
 	}

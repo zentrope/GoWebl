@@ -73,11 +73,11 @@ var defaultConfig = &AppConfig{
 	},
 }
 
-func LoadConfigFile(pathToOverride string, resources Resources) (*AppConfig, error) {
+func LoadConfigFile(pathToOverride string) (*AppConfig, error) {
 
 	config := defaultConfig
 
-	if pathToOverride == "_" {
+	if pathToOverride == "" {
 		return config, nil
 	}
 
