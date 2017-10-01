@@ -42,15 +42,15 @@ func init() {
 	flag.Parse()
 
 	log.Println("Config:")
-	log.Printf("  %-9v '%v'", "resource:", resourceDir)
-	log.Printf("  %-9v '%v'", "admin:", adminDir)
-	log.Printf("  %-9v '%v'", "asset:", assetDir)
-	log.Printf("  %-9v '%v'", "override:", overrideFile)
+	t := "- %-9v '%v'"
+	log.Printf(t, "resource:", resourceDir)
+	log.Printf(t, "admin:", adminDir)
+	log.Printf(t, "asset:", assetDir)
+	log.Printf(t, "override:", overrideFile)
 }
 
 func mkResources() server.Resources {
 	log.Println("Constructing resources.")
-	log.Println(" - WARNING: resources are using hard coded paths.")
 
 	r, err := server.NewResources(resourceDir, assetDir, adminDir)
 	if err != nil {
