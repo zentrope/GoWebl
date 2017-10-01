@@ -34,7 +34,13 @@ import (
 
 func mkResources() server.Resources {
 	log.Println("Constructing resources.")
-	r, err := server.NewResources()
+	log.Println(" - WARNING: resources are using hard coded paths.")
+
+	publicDir := "./resources/public"
+	privateDir := "./resources"
+	adminDir := "./admin/build"
+
+	r, err := server.NewResources(privateDir, publicDir, adminDir)
 	if err != nil {
 		log.Fatal(err)
 	}

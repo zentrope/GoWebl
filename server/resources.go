@@ -19,7 +19,6 @@ package server
 import (
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -34,11 +33,21 @@ type Resources struct {
 
 // NewResources returns a new instance for the resource
 // manager for loading static files.
-func NewResources() (Resources, error) {
-	log.Printf("WARNING: resources are using hard coded paths.")
-	pr, _ := filepath.Abs("./resources")
-	pu, _ := filepath.Abs("./resources/public")
-	ad, _ := filepath.Abs("./admin/build")
+func NewResources(privateDir, publicDir, adminDir string) (Resources, error) {
+	pr, err := filepath.Abs(privateDir)
+	if err != nil {
+		return Resources{}, nil
+	}
+
+	pu, err := filepath.Abs(publicDir)
+	if err != nil {
+		return Resources{}, nil
+	}
+
+	ad, err := filepath.Abs(adminDir)
+	if err != nil {
+		return Resources{}, nil
+	}
 
 	return Resources{
 		privateDir: pr,
