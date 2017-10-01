@@ -32,7 +32,7 @@ import (
 
 type WebApplication struct {
 	router    *http.ServeMux
-	resources *Resources
+	resources Resources
 	graphql   *GraphAPI
 	database  *Database
 }
@@ -80,7 +80,7 @@ func (app *WebApplication) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	app.router.ServeHTTP(w, r.WithContext(ctx4))
 }
 
-func NewWebApplication(config *AppConfig, resources *Resources,
+func NewWebApplication(config *AppConfig, resources Resources,
 	database *Database, graphapi *GraphAPI) *WebApplication {
 
 	service := http.NewServeMux()
@@ -237,20 +237,20 @@ func queryApi(w http.ResponseWriter, r *http.Request) {
 
 func staticPage(w http.ResponseWriter, r *http.Request) {
 	resources := resolveRes(r)
-	fs := resources.AdminFileServer()
+	fs := resources.adminFileServer()
 	fs.ServeHTTP(w, r)
 }
 
 func adminPage(w http.ResponseWriter, r *http.Request) {
 	resources := resolveRes(r)
-	fs := resources.AdminFileServer()
+	fs := resources.adminFileServer()
 
-	if resources.AdminFileExists(r.URL.Path[1:]) {
+	if resources.adminFileExists(r.URL.Path[1:]) {
 		fs.ServeHTTP(w, r)
 		return
 	}
 
-	page, err := resources.Admin.String("index.html")
+	page, err := resources.adminString("index.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 		return
@@ -306,14 +306,14 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	database := resolveDb(r)
 	site := resolveSite(r)
 
-	fs := resources.PublicFileServer()
+	fs := resources.publicFileServer()
 
 	if !isIndexPath("/", r) {
 		fs.ServeHTTP(w, r)
 		return
 	}
 
-	page, err := resources.ResolveTemplate("index.html")
+	page, err := resources.resolveTemplate("index.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
@@ -345,7 +345,7 @@ func postPage(w http.ResponseWriter, r *http.Request) {
 	database := resolveDb(r)
 	site := resolveSite(r)
 
-	page, err := resources.ResolveTemplate("post.html")
+	page, err := resources.resolveTemplate("post.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
@@ -373,7 +373,7 @@ func archivePage(w http.ResponseWriter, r *http.Request) {
 	database := resolveDb(r)
 	site := resolveSite(r)
 
-	page, err := resources.ResolveTemplate("archive.html")
+	page, err := resources.resolveTemplate("archive.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
@@ -400,7 +400,7 @@ func archivePage(w http.ResponseWriter, r *http.Request) {
 
 func graphQlClientPage(w http.ResponseWriter, r *http.Request) {
 	resources := resolveRes(r)
-	page, err := resources.PrivateString("graphql.html")
+	page, err := resources.privateString("graphql.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
@@ -442,6 +442,6 @@ func resolveSite(r *http.Request) *SiteConfig {
 	return r.Context().Value(SITE_KEY).(*SiteConfig)
 }
 
-func resolveRes(r *http.Request) *Resources {
-	return r.Context().Value(RES_KEY).(*Resources)
+func resolveRes(r *http.Request) Resources {
+	return r.Context().Value(RES_KEY).(Resources)
 }

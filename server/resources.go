@@ -18,69 +18,76 @@ package server
 
 import (
 	"html/template"
+	"io/ioutil"
+	"log"
 	"net/http"
-
-	rice "github.com/GeertJohan/go.rice"
+	"os"
+	"path/filepath"
 )
 
+// Resources represent static files, templates, images, etc.
 type Resources struct {
-	Private *rice.Box
-	Public  *rice.Box
-	Admin   *rice.Box
+	privateDir string
+	publicDir  string
+	adminDir   string
 }
 
-func NewResources() (*Resources, error) {
+// NewResources returns a new instance for the resource
+// manager for loading static files.
+func NewResources() (Resources, error) {
+	log.Printf("WARNING: resources are using hard coded paths.")
+	pr, _ := filepath.Abs("./resources")
+	pu, _ := filepath.Abs("./resources/public")
+	ad, _ := filepath.Abs("./admin/build")
 
-	private, err := rice.FindBox("../resources")
+	return Resources{
+		privateDir: pr,
+		publicDir:  pu,
+		adminDir:   ad,
+	}, nil
+}
+
+func (r Resources) resolveTemplate(name string) (*template.Template, error) {
+	templateString, err := r.privateString(name)
 	if err != nil {
-		return nil, err
+		return &template.Template{}, err
 	}
+	return template.New(name).Parse(templateString)
+}
 
-	public, err := rice.FindBox("../resources/public")
+func (r Resources) adminFileExists(name string) bool {
+	return fileExists(r.adminDir, name)
+}
+
+func (r Resources) publicFileServer() http.Handler {
+	return http.FileServer(http.Dir(r.publicDir))
+}
+
+func (r Resources) adminFileServer() http.Handler {
+	return http.FileServer(http.Dir(r.adminDir))
+}
+
+func (r Resources) adminString(name string) (string, error) {
+	return loadFile(r.adminDir, name)
+}
+
+func (r Resources) privateString(name string) (string, error) {
+	return loadFile(r.privateDir, name)
+}
+
+func loadFile(root, name string) (string, error) {
+	path := filepath.Join(root, name)
+	b, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
+	return string(b), nil
+}
 
-	admin, err := rice.FindBox("../admin/build")
-	if err != nil {
-		return nil, err
+func fileExists(root, name string) bool {
+	path := filepath.Join(root, name)
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return false
 	}
-
-	return &Resources{private, public, admin}, nil
-}
-
-var cache = NewCache()
-
-func (r *Resources) ResolveTemplate(name string) (*template.Template, error) {
-
-	t, err := cache.GetOrSet(name, func() (interface{}, error) {
-		templateString, err := r.Private.String(name)
-		if err != nil {
-			return nil, err
-		}
-		return template.New(name).Parse(templateString)
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return t.(*template.Template), nil
-}
-
-func (r *Resources) AdminFileExists(name string) bool {
-	_, err := r.Admin.Open(name)
-	return err == nil
-}
-
-func (r *Resources) PublicFileServer() http.Handler {
-	return http.FileServer(r.Public.HTTPBox())
-}
-
-func (r *Resources) AdminFileServer() http.Handler {
-	return http.FileServer(r.Admin.HTTPBox())
-}
-
-func (r *Resources) PrivateString(name string) (string, error) {
-	return r.Private.String(name)
+	return true
 }

@@ -32,7 +32,7 @@ import (
 // Construction
 //-----------------------------------------------------------------------------
 
-func mkResources() *server.Resources {
+func mkResources() server.Resources {
 	log.Println("Constructing resources.")
 	r, err := server.NewResources()
 	if err != nil {
@@ -41,10 +41,10 @@ func mkResources() *server.Resources {
 	return r
 }
 
-func mkConfig(resources *server.Resources) *server.AppConfig {
+func mkConfig(resources server.Resources) *server.AppConfig {
 	log.Println("Constructing application configuration.")
 	var overrideConfigFile string
-	flag.StringVar(&overrideConfigFile, "c", server.DefaultConfigFile,
+	flag.StringVar(&overrideConfigFile, "c", "_",
 		"Path to configuration override file.")
 
 	flag.Parse()
@@ -81,7 +81,7 @@ func mkGraphAPI(database *server.Database) *server.GraphAPI {
 
 func mkWebApp(
 	config *server.AppConfig,
-	resources *server.Resources,
+	resources server.Resources,
 	database *server.Database,
 	graphapi *server.GraphAPI,
 ) *http.Server {

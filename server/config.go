@@ -59,17 +59,26 @@ type AppConfig struct {
 	Web     WebConfig     `json:"web,omitempty"`
 }
 
-const DefaultConfigFile = "resources/config.json"
+var defaultConfig = &AppConfig{
+	StorageConfig{
+		User:     "webl_user",
+		Password: "wanheda",
+		Database: "webl_db",
+		Host:     "localhost",
+		Port:     "5432",
+	},
+	WebConfig{
+		Port:   "8080",
+		Listen: "0.0.0.0",
+	},
+}
 
-func LoadConfigFile(pathToOverride string, resources *Resources) (*AppConfig, error) {
+func LoadConfigFile(pathToOverride string, resources Resources) (*AppConfig, error) {
 
-	config, err := loadDefaultConfigFile(resources)
-	if err != nil {
-		return nil, err
-	}
+	config := defaultConfig
 
-	if pathToOverride == DefaultConfigFile {
-		return &config, nil
+	if pathToOverride == "_" {
+		return config, nil
 	}
 
 	override, err := loadConfigFile(pathToOverride)
@@ -147,19 +156,20 @@ func (conn *Database) UpdateSite(title, description, url string) (*SiteConfig, e
 // Implementation
 //-----------------------------------------------------------------------------
 
-func loadDefaultConfigFile(resources *Resources) (AppConfig, error) {
-	contents, err := resources.Private.String("config.json")
-
-	if err != nil {
-		return AppConfig{}, err
+func loadDefaultConfigFile() AppConfig {
+	return AppConfig{
+		StorageConfig{
+			User:     "webl_user",
+			Password: "wanheda",
+			Database: "webl_db",
+			Host:     "localhost",
+			Port:     "5432",
+		},
+		WebConfig{
+			Port:   "8080",
+			Listen: "0.0.0.0",
+		},
 	}
-
-	var config AppConfig
-	if err := json.Unmarshal([]byte(contents), &config); err != nil {
-		return AppConfig{}, err
-	}
-
-	return config, nil
 }
 
 func loadConfigFile(path string) (AppConfig, error) {
