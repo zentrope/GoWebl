@@ -2,18 +2,6 @@
 
 
 [[projects]]
-  branch = "master"
-  name = "github.com/GeertJohan/go.rice"
-  packages = [".","embedded"]
-  revision = "c02ca9a983da5807ddf7d796784928f5be4afd09"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/daaku/go.zipexe"
-  packages = ["."]
-  revision = "a5fe2436ffcb3236e175e5149162b41cd28bd27d"
-
-[[projects]]
   name = "github.com/dgrijalva/jwt-go"
   packages = ["."]
   revision = "d2709f9f1f31ebcda9651b03077758c1f3a0018c"
@@ -24,12 +12,6 @@
   packages = ["."]
   revision = "3e95a51e0639b4cf372f2ccf74c86749d747fbdc"
   version = "0.2.2"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/kardianos/osext"
-  packages = ["."]
-  revision = "ae77be60afb1dcacde03767a8c37337fad28ac14"
 
 [[projects]]
   branch = "master"
@@ -82,6 +64,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d1a784a309977eafd34f6034cb70292fe01620031ce82ffa41b602a8283d2c8b"
+  inputs-digest = "25f78b49072876e94aa180dfe08a296f7e5d59ebd07d0c9a883db21f8353a534"
   solver-name = "gps-cdcl"
   solver-version = 1
