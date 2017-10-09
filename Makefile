@@ -40,11 +40,6 @@ godep:
 		go get -v -u github.com/golang/dep/cmd/dep; \
 	fi
 
-ricebox:
-	@hash rice > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		go get -v -u github.com/GeertJohan/go.rice/rice; \
-	fi
-
 ##-----------------------------------------------------------------------------
 ## Project dependencies
 ##-----------------------------------------------------------------------------
@@ -52,7 +47,7 @@ ricebox:
 vendor: godep ## Install and sync deps
 	dep ensure
 
-init: vendor ricebox ## Make sure everything is set up properly for dev.
+init: vendor ## Make sure everything is set up properly for dev.
 	cd admin ; yarn
 
 ##-----------------------------------------------------------------------------
@@ -64,20 +59,17 @@ build-admin: ## Build the admin client
 	cd admin; yarn ; yarn build
 
 build-freebsd: init build-admin ## Build a version for FreeBSD
-	cd server ; rm -f rice-box.go ;  rice -v embed-go
 	GOOS=freebsd GOARCH=amd64 go build -o webl
 
 build: init build-admin ## Build webl into a local binary ./webl.
-	cd server ; rm -f rice-box.go ;  rice -v embed-go
 	go build -o webl
 
 clean: ## Clean build artifacts.
-	rm -f server/rice-box.go
 	rm -rf webl
 	rm -rf admin/build
 
 dist-clean: clean ## Clean everything (vendor, node_modules).
-	rm -rf vendor/*/
+	rm -rf vendor
 	rm -rf admin/node_modules
 
 db-clean: ## Delete the local dev database
