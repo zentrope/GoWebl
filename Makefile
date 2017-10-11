@@ -25,9 +25,6 @@ DB_SETUP = create user $(DB_USER) with login password '$(DB_PASS)' ;\
 	alter database $(DB_NAME) owner to $(DB_USER) ;\
 	create extension if not exists pgcrypto
 
-.PHONY: build-admin build init godep vendor vendor-check vendor-unused help
-.PHONY: db-clean db-init
-
 .DEFAULT_GOAL := help
 
 ##-----------------------------------------------------------------------------
@@ -60,22 +57,25 @@ godep:
 ## Project dependencies
 ##-----------------------------------------------------------------------------
 
+.PHONY: vendor init
+
 vendor: godep ## Install and sync deps
 	dep ensure
 
-init: vendor ## Make sure everything is set up properly for dev.
+init: ## Make sure everything is set up properly for dev.
+	@$(MAKE) vendor
 	cd admin ; yarn
 
 ##-----------------------------------------------------------------------------
-## Distribution
+## Build
 ##-----------------------------------------------------------------------------
 
-.PHONY: dist-prepare dist dist-assemble
+.PHONY: build-admin build-freebsd build clean
 
-DIST = ./dist
-DIST_ADMIN = $(DIST)/admin
-DIST_RESOURCES = $(DIST)/resources
-DIST_ASSETS = $(DIST)/assets
+clean: ## Clean build artifacts.
+	rm -rf webl
+	rm -rf admin/build
+	rm -rf dist
 
 build-admin: ## Build the admin client
 	@echo "Building admin client"
@@ -86,6 +86,21 @@ build-freebsd: init build-admin ## Build a version for FreeBSD
 
 build: init build-admin ## Build webl into a local binary ./webl.
 	CGO_ENABLED=0 go build -o webl
+
+##-----------------------------------------------------------------------------
+## Distribute
+##-----------------------------------------------------------------------------
+
+.PHONY: dist-prepare dist dist-assemble dist-freebsd dist-clean
+
+DIST = ./dist
+DIST_ADMIN = $(DIST)/admin
+DIST_RESOURCES = $(DIST)/resources
+DIST_ASSETS = $(DIST)/assets
+
+dist-clean: clean ## Clean everything (vendor, node_modules, dist).
+	rm -rf vendor
+	rm -rf admin/node_modules
 
 dist-prepare:
 	if [ -e "dist" ]; then rm -rf dist ; fi
@@ -100,32 +115,20 @@ dist-assemble:
 	cp -r webl $(DIST)
 
 dist: ## Build distribution for current platform.
-	@${MAKE} dist-prepare
-	@${MAKE} build
-	@${MAKE} dist-assemble
+	@$(MAKE) dist-prepare
+	@$(MAKE) build
+	@$(MAKE) dist-assemble
 
 dist-freebsd: ## Build distribution for FreeBSD.
-	@${MAKE} dist-prepare
-	@${MAKE} build-freebsd
-	@${MAKE} dist-assemble
-
-##-----------------------------------------------------------------------------
-
-run: vendor ## Run the app from source
-	go run main.go
-
-clean: ## Clean build artifacts.
-	rm -rf webl
-	rm -rf admin/build
-	rm -rf dist
-
-dist-clean: clean ## Clean everything (vendor, node_modules).
-	rm -rf vendor
-	rm -rf admin/node_modules
+	@$(MAKE) dist-prepare
+	@$(MAKE) build-freebsd
+	@$(MAKE) dist-assemble
 
 ##-----------------------------------------------------------------------------
 ## Database
 ##-----------------------------------------------------------------------------
+
+.PHONY: db-clean db-init
 
 db-clean: psqldep ## Delete the local dev database
 	$(PSQL) template1 -c "drop database $(DB_NAME)"
@@ -138,6 +141,11 @@ db-init: psqldep ## Create a local dev database with default creds
 ##-----------------------------------------------------------------------------
 ## Utilties
 ##-----------------------------------------------------------------------------
+
+.PHONY: run tree help
+
+run: vendor ## Run the app from source
+	go run main.go
 
 tree: treedep ## View source hierarchy without vendor pkgs
 	$(TREE) -C -I "node_modules|vendor|build|dist"
