@@ -14,9 +14,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-TREE := $(shell which tree)
-TREE := $(if $(TREE),$(TREE),"tree")
-
 PACKAGE = github.com/zentrope/webl
 
 DB_PASS = wanheda
@@ -36,6 +33,23 @@ DB_SETUP = create user $(DB_USER) with login password '$(DB_PASS)' ;\
 ##-----------------------------------------------------------------------------
 ## Make depenencies
 ##-----------------------------------------------------------------------------
+
+.PHONY: godep psqldep treedep
+
+TREE = tree
+PSQL = psql
+
+treedep:
+	@hash $(TREE) > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		echo "$(TREE) not found. Try 'brew install $(TREE)'."; \
+		exit 1; \
+	fi
+
+psqldep:
+	@hash $(PSQL) > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		echo "$(PSQL) not found. Try 'brew install postgresql'."; \
+		exit 1; \
+	fi
 
 godep:
 	@hash dep > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
@@ -63,6 +77,16 @@ DIST_ADMIN = $(DIST)/admin
 DIST_RESOURCES = $(DIST)/resources
 DIST_ASSETS = $(DIST)/assets
 
+build-admin: ## Build the admin client
+	@echo "Building admin client"
+	@cd admin; yarn ; yarn build
+
+build-freebsd: init build-admin ## Build a version for FreeBSD
+	CGO_ENABLED=0 GOOS=freebsd GOARCH=amd64 go build -o webl
+
+build: init build-admin ## Build webl into a local binary ./webl.
+	CGO_ENABLED=0 go build -o webl
+
 dist-prepare:
 	if [ -e "dist" ]; then rm -rf dist ; fi
 	mkdir -p $(DIST_ADMIN)
@@ -75,23 +99,20 @@ dist-assemble:
 	cp -r assets/* $(DIST_ASSETS)
 	cp -r webl $(DIST)
 
-dist: dist-prepare vendor build dist-assemble ## Build distribution for current platform.
+dist: ## Build distribution for current platform.
+	@${MAKE} dist-prepare
+	@${MAKE} build
+	@${MAKE} dist-assemble
 
-dist-freebsd: dist-prepare build-freebsd dist-assemble ## Build distribution for FreeBSD.
+dist-freebsd: ## Build distribution for FreeBSD.
+	@${MAKE} dist-prepare
+	@${MAKE} build-freebsd
+	@${MAKE} dist-assemble
 
 ##-----------------------------------------------------------------------------
 
 run: vendor ## Run the app from source
 	go run main.go
-
-build-admin: ## Build the admin client
-	cd admin; yarn ; yarn build
-
-build-freebsd: init build-admin ## Build a version for FreeBSD
-	GOOS=freebsd GOARCH=amd64 go build -o webl
-
-build: init build-admin ## Build webl into a local binary ./webl.
-	go build -o webl
 
 clean: ## Clean build artifacts.
 	rm -rf webl
@@ -102,25 +123,24 @@ dist-clean: clean ## Clean everything (vendor, node_modules).
 	rm -rf vendor
 	rm -rf admin/node_modules
 
-db-clean: ## Delete the local dev database
-	psql template1 -c "drop database $(DB_NAME)"
-	psql template1 -c "drop user $(DB_USER)"
+##-----------------------------------------------------------------------------
+## Database
+##-----------------------------------------------------------------------------
 
-db-init: ## Create a local dev database with default creds
-	psql template1 -c "$(DB_CREATE)"
-	psql $(DB_NAME) -c "$(DB_SETUP)"
+db-clean: psqldep ## Delete the local dev database
+	$(PSQL) template1 -c "drop database $(DB_NAME)"
+	$(PSQL) template1 -c "drop user $(DB_USER)"
 
+db-init: psqldep ## Create a local dev database with default creds
+	$(PSQL) template1 -c "$(DB_CREATE)"
+	$(PSQL) $(DB_NAME) -c "$(DB_SETUP)"
 
 ##-----------------------------------------------------------------------------
 ## Utilties
 ##-----------------------------------------------------------------------------
 
-tree: ## View source hierarchy without vendor pkgs
-	@if [ ! -e $(TREE) ]; then \
-		echo "tree command not found. Try 'brew install tree'."; \
-	else \
-		$(TREE) -C -I "node_modules|vendor|build|dist"; \
-	fi
+tree: treedep ## View source hierarchy without vendor pkgs
+	$(TREE) -C -I "node_modules|vendor|build|dist"
 
 help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
