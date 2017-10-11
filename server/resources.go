@@ -57,7 +57,8 @@ func NewResources(privateDir, publicDir, adminDir string) (Resources, error) {
 }
 
 func (r Resources) resolveTemplate(name string) (*template.Template, error) {
-	templateString, err := r.privateString(name)
+	templateFile := filepath.Join("templates", name)
+	templateString, err := r.privateString(templateFile)
 	if err != nil {
 		return &template.Template{}, err
 	}
