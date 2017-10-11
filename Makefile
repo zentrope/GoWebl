@@ -14,6 +14,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+TREE := $(shell which tree)
+TREE := $(if $(TREE),$(TREE),"tree")
+
 PACKAGE = github.com/zentrope/webl
 
 DB_PASS = wanheda
@@ -106,6 +109,18 @@ db-clean: ## Delete the local dev database
 db-init: ## Create a local dev database with default creds
 	psql template1 -c "$(DB_CREATE)"
 	psql $(DB_NAME) -c "$(DB_SETUP)"
+
+
+##-----------------------------------------------------------------------------
+## Utilties
+##-----------------------------------------------------------------------------
+
+tree: ## View source hierarchy without vendor pkgs
+	@if [ ! -e $(TREE) ]; then \
+		echo "tree command not found. Try 'brew install tree'."; \
+	else \
+		$(TREE) -C -I "node_modules|vendor|build|dist"; \
+	fi
 
 help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
