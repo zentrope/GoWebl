@@ -30,7 +30,6 @@ DB_SETUP = create user $(DB_USER) with login password '$(DB_PASS)' ;\
 
 .DEFAULT_GOAL := help
 
-
 ##-----------------------------------------------------------------------------
 ## Make depenencies
 ##-----------------------------------------------------------------------------
@@ -51,6 +50,33 @@ init: vendor ## Make sure everything is set up properly for dev.
 	cd admin ; yarn
 
 ##-----------------------------------------------------------------------------
+## Distribution
+##-----------------------------------------------------------------------------
+
+.PHONY: dist-prepare dist dist-assemble
+
+DIST = ./dist
+DIST_ADMIN = $(DIST)/admin
+DIST_RESOURCES = $(DIST)/resources
+DIST_ASSETS = $(DIST)/assets
+
+dist-prepare:
+	if [ -e "dist" ]; then rm -rf dist ; fi
+	mkdir -p $(DIST_ADMIN)
+	mkdir -p $(DIST_RESOURCES)
+	mkdir -p $(DIST_ASSETS)
+
+dist-assemble:
+	cp -r admin/build/* $(DIST_ADMIN)
+	cp -r resources/* $(DIST_RESOURCES)
+	cp -r assets/* $(DIST_ASSETS)
+	cp -r webl $(DIST)
+
+dist: dist-prepare vendor build dist-assemble ## Build distribution for current platform.
+
+dist-freebsd: dist-prepare build-freebsd dist-assemble ## Build distribution for FreeBSD.
+
+##-----------------------------------------------------------------------------
 
 run: vendor ## Run the app from source
 	go run main.go
@@ -67,6 +93,7 @@ build: init build-admin ## Build webl into a local binary ./webl.
 clean: ## Clean build artifacts.
 	rm -rf webl
 	rm -rf admin/build
+	rm -rf dist
 
 dist-clean: clean ## Clean everything (vendor, node_modules).
 	rm -rf vendor
