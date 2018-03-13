@@ -23,7 +23,7 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	graphql "github.com/neelance/graphql-go"
+	graphql "github.com/graph-gophers/graphql-go"
 )
 
 //=============================================================================

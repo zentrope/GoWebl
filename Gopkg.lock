@@ -10,7 +10,7 @@
 [[projects]]
   branch = "master"
   name = "github.com/graph-gophers/graphql-go"
-  packages = ["errors","internal/common","internal/exec","internal/exec/packer","internal/exec/resolvable","internal/exec/selected","internal/query","internal/schema","internal/validation","introspection","log","trace"]
+  packages = [".","errors","internal/common","internal/exec","internal/exec/packer","internal/exec/resolvable","internal/exec/selected","internal/query","internal/schema","internal/validation","introspection","log","trace"]
   revision = "1e97269a08627cd1b2e2e8f753cb7a647882f622"
 
 [[projects]]
@@ -24,12 +24,6 @@
   name = "github.com/lib/pq"
   packages = [".","oid"]
   revision = "88edab0803230a3898347e77b474f8c1820a1f20"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/neelance/graphql-go"
-  packages = ["."]
-  revision = "1e97269a08627cd1b2e2e8f753cb7a647882f622"
 
 [[projects]]
   name = "github.com/opentracing/opentracing-go"
@@ -70,6 +64,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "25f78b49072876e94aa180dfe08a296f7e5d59ebd07d0c9a883db21f8353a534"
+  inputs-digest = "5bdf2e638d1c36d9c5d9250050147f6cff4167a13dc71359b3d71b1743b605e8"
   solver-name = "gps-cdcl"
   solver-version = 1
