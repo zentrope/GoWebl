@@ -48,17 +48,19 @@ And the app will merge that into the defaults. No need to copy the defaults and 
 
 I work on the project using two terminals:
 
-In one, I start up the `yarn` process for working with the React-based admin app.
-
-    $ cd webl/admin
-    $ yarn start
-
-In another terminal, I start the server process itself:
+In the first terminal, start the server process itself:
 
     $ make init
     $ go run main.go
 
-And that's it. The admin app will reload when you make changes. You'll have to `^C` the server process, then up arrow and return to cycle it.
+In the other terminal, start the `yarn` process for working with the React-based admin app.
+
+    $ cd webl/admin
+    $ yarn start
+
+Then open `localhost:3000`.
+
+When in this mode, you won't be able to get to the admin page via the `/admin` route. And that's it. The admin app will reload when you make changes. You'll have to `^C` the server process, then up arrow and return to cycle it.
 
 ## Docker
 
