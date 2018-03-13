@@ -68,6 +68,30 @@ Running, building, docker-composering: I've just not gotten to it yet. If you wa
 
 However, I do plan to create some scripts that allow for building the app without having to install any of the dependencies (build or otherwise).
 
+## Deployment (new (v2))
+
+I think this is how it works:
+
+Make the app:
+
+    $ make build-freebsd
+
+then copy:
+
+- ./webl (binary)
+- ./resource/
+- ./admin/build/
+- ./assets/
+
+to the server, when start webl as:
+
+    $ ./webl -c config.json -app admin/build
+
+So what I need to do is package this up in a `dist` dir (as a zip,
+maybe) so I can copy it over as a single artifact, or use Transmit to
+deploy via sync. Anyway, not as easy as when all the assets were
+embedded in the Go binary itself.
+
 ## Database Notes
 
 **Default (dev) database params**
