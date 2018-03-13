@@ -4,8 +4,14 @@
 [[projects]]
   name = "github.com/dgrijalva/jwt-go"
   packages = ["."]
-  revision = "dbeaa9332f19a944acb5736b4456cfcc02140e29"
-  version = "v3.1.0"
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/graph-gophers/graphql-go"
+  packages = ["errors","internal/common","internal/exec","internal/exec/packer","internal/exec/resolvable","internal/exec/selected","internal/query","internal/schema","internal/validation","introspection","log","trace"]
+  revision = "1e97269a08627cd1b2e2e8f753cb7a647882f622"
 
 [[projects]]
   name = "github.com/imdario/mergo"
@@ -17,13 +23,13 @@
   branch = "master"
   name = "github.com/lib/pq"
   packages = [".","oid"]
-  revision = "8c6ee72f3e6bcb1542298dd5f76cb74af9742cec"
+  revision = "88edab0803230a3898347e77b474f8c1820a1f20"
 
 [[projects]]
   branch = "master"
   name = "github.com/neelance/graphql-go"
-  packages = [".","errors","internal/common","internal/exec","internal/exec/packer","internal/exec/resolvable","internal/exec/selected","internal/query","internal/schema","internal/validation","introspection","log","trace"]
-  revision = "beff08417b04a91f0a7618b55786d63eec833b9f"
+  packages = ["."]
+  revision = "1e97269a08627cd1b2e2e8f753cb7a647882f622"
 
 [[projects]]
   name = "github.com/opentracing/opentracing-go"
@@ -34,8 +40,8 @@
 [[projects]]
   name = "github.com/satori/go.uuid"
   packages = ["."]
-  revision = "879c5887cd475cd7864858769793b2ceb0d44feb"
-  version = "v1.1.0"
+  revision = "f58768cc1a7a7e77a3bd49e98cdd21419399b6a3"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
@@ -47,13 +53,13 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["bcrypt","blowfish"]
-  revision = "9f005a07e0d31d45e6656d241bb5c0f2efd4bc94"
+  revision = "c4a91bd4f524f10d064139674cf55852e055ad01"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context"]
-  revision = "a337091b0525af65de94df2eb7e98bd9962dcbe2"
+  revision = "803fdb99c0f72e493c28ef2099d250a9c989d8ff"
 
 [[projects]]
   name = "gopkg.in/russross/blackfriday.v2"
