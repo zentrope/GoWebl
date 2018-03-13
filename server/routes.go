@@ -49,8 +49,6 @@ const (
 
 func (app *WebApplication) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	app.database.RecordRequest(r)
-
 	w.Header().Set("Cache-Control", "public, max-age=86400")
 	w.Header().Set("Access-Control-Allow-Origin", getOriginDomain(r))
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
