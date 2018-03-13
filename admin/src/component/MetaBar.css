@@ -15,39 +15,26 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-.TitleBar {
+.MetaBar {
   position: fixed;
-  top: 0;
+  bottom: 30px;
+  height: 30px;
   left: 0;
   width: 150px;
-  height: 60px;
 
   background-color: #f2f2f2;
-  border-bottom: 1px solid #d8d8d8;
 
   display: flex;
   align-items: center;
-  padding-left: 20px;
+  border-top: 1px solid #d8d8d8;
+
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
-.TitleBar .Meta {
-  display: flex;
-  flex-direction: column;
-}
-
-.TitleBar .Meta .Title {
-  flex: 2;
-  color: #444;
-  font-weight: normal;
-  font-size: 12pt;
-  white-space: nowrap;
-  padding-bottom: 2px;
-}
-
-.TitleBar .Meta .Name {
+.MetaBar .Option {
   flex: 1;
-  font-size: 9pt;
-  color: #444;
-  font-style: italic;
-  white-space: nowrap;
+
+  display: flex;
+  justify-content: center;
 }

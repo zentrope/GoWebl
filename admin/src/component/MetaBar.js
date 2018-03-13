@@ -1,5 +1,5 @@
-/*
-// Copyright (c) 2018 Keith Irwin
+//
+// Copyright (c) 2017 Keith Irwin
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published
@@ -13,41 +13,29 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 
-.TitleBar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 150px;
-  height: 60px;
+import React from 'react';
+import { Icon } from './Icon.js'
+import './MetaBar.css'
 
-  background-color: #f2f2f2;
-  border-bottom: 1px solid #d8d8d8;
-
-  display: flex;
-  align-items: center;
-  padding-left: 20px;
+class MetaBar extends React.PureComponent {
+  render() {
+    const { logout, visit } = this.props
+    return (
+      <section className="MetaBar">
+        <div className="Option">
+          <button onClick={visit}>
+            <Icon type="visit" /> Site
+          </button>
+        </div>
+        <div className="Option">
+          <button onClick={logout}>
+            <Icon type="signout"/>&nbsp;Bye
+          </button>
+        </div>
+      </section>
+    )
+  }
 }
 
-.TitleBar .Meta {
-  display: flex;
-  flex-direction: column;
-}
-
-.TitleBar .Meta .Title {
-  flex: 2;
-  color: #444;
-  font-weight: normal;
-  font-size: 12pt;
-  white-space: nowrap;
-  padding-bottom: 2px;
-}
-
-.TitleBar .Meta .Name {
-  flex: 1;
-  font-size: 9pt;
-  color: #444;
-  font-style: italic;
-  white-space: nowrap;
-}
+export { MetaBar }

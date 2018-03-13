@@ -18,6 +18,7 @@ import React from 'react';
 import { Router, Route, Redirect, Switch } from 'react-router-dom'
 
 import { MenuBar } from '../component/MenuBar'
+import { MetaBar } from '../component/MetaBar'
 import { StatusBar } from '../component/StatusBar'
 import { TitleBar } from '../component/TitleBar'
 
@@ -59,11 +60,12 @@ class MainPhase extends React.PureComponent {
         console.error(response.errors)
         return
       }
-      let { name, email } = response.data.viewer
+      let { name// , email
+          } = response.data.viewer
       let site = response.data.viewer.site
       this.setState({
         title: site.title,
-        user: name + " <" + email + ">",
+        user: name, // + " <" + email + ">",
         baseUrl: site.baseUrl
       })
     })
@@ -125,9 +127,10 @@ class MainPhase extends React.PureComponent {
     return (
       <Router history={this.history}>
         <section className="App">
-          <TitleBar title={title} user={user} visit={visit} logout={logout}/>
+          <TitleBar title={title} user={user} />
           <MenuBar onClick={onMenuClick} selected={menu}/>
-          <StatusBar year="2017" copyright={ title }/>
+          <MetaBar visit={visit} logout={logout}/>
+          <StatusBar year="2018" copyright={ title }/>
           <Switch>
             <PropRoute path="/admin/home" component={Home} client={client}/>
             <PropRoute path="/admin/activity" component={Activity}  client={client}/>
