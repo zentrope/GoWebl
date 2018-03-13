@@ -145,10 +145,10 @@ db-init: psqldep ## Create a local dev database with default creds
 .PHONY: run tree help
 
 run: vendor ## Run the app from source
-	go run main.go
+	go run main.go || true
 
 tree: treedep ## View source hierarchy without vendor pkgs
-	$(TREE) -C -I "node_modules|vendor|build|dist"
+	$(TREE) -C -I "node_modules|vendor|build|dist" || true
 
 help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
