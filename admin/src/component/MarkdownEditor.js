@@ -109,6 +109,7 @@ class MarkdownEditor extends React.PureComponent {
     )
 
     let wordCount = (text === "") ? 0 : text.trim().split(/\s+/).length
+    let status = dirty ? "UNSAVED" : "Saved"
 
     return (
       <section className="MarkdownEditor">
@@ -122,16 +123,13 @@ class MarkdownEditor extends React.PureComponent {
                    placeholder="Summary or slugline...."
                    onChange={this.handleChange}/>
           </div>
-          <div className="Status">
-            { dirty ? "UNSAVED" : "saved" }
+          <div className="Metadata">
+            <DateEditor time={datePublished}
+                        template="YYYY-MM-DD hh:mm A"
+                        onChange={this.setDate}/>
           </div>
         </div>
 
-        <div className="Metadata">
-          <DateEditor time={datePublished}
-                      template="YYYY-MM-DD hh:mm A"
-                      onChange={this.setDate}/>
-        </div>
 
         <div className="Viewers">
           <div className="Editor">
@@ -157,6 +155,9 @@ class MarkdownEditor extends React.PureComponent {
           <div className="Badges">
             <div className="Badge">
               { wordCount } words
+            </div>
+            <div className={"Badge " + status}>
+              { status }
             </div>
           </div>
           <div className="Right">
