@@ -29,6 +29,11 @@
   outline: none;
   border: none;
   margin: 0;
+  font-style: italic;
+}
+
+.TSEditor input:focus {
+  font-style: normal;
 }
 
 .TSEditor .Suggest {
