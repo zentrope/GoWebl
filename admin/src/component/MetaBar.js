@@ -23,15 +23,11 @@ class MetaBar extends React.PureComponent {
     const { logout, visit } = this.props
     return (
       <section className="MetaBar">
-        <div className="Option">
-          <button onClick={visit}>
-            <Icon type="visit" /> Site
-          </button>
+        <div className="Option" onClick={visit} title="Visit site">
+          <Icon type="visit" />
         </div>
-        <div className="Option">
-          <button onClick={logout}>
-            <Icon type="signout"/>&nbsp;Bye
-          </button>
+        <div className="Option" onClick={logout} title="Sign out">
+          <Icon type="signout"/>
         </div>
       </section>
     )

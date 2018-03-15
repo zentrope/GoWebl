@@ -17,24 +17,48 @@
 
 .MetaBar {
   position: fixed;
-  bottom: 30px;
+  bottom: 0px;
   height: 30px;
   left: 0;
   width: 150px;
 
+  border-top: 1px solid #eaebeb;
   background-color: #f9fafa;
   border-right: 1px solid #f4f5f5;
 
   display: flex;
   align-items: center;
 
-  padding-left: 15px;
-  padding-right: 15px;
+  padding: 0;
+  margin: 0;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .MetaBar .Option {
   flex: 1;
 
+  padding: 0;
+  margin: 0;
+
+  cursor: pointer;
+
   display: flex;
   justify-content: center;
+  border: 1px solid transparent;
+
+  margin-right: 5px;
+  margin-left: 5px;
+  border-radius: 4px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.MetaBar .Option:hover {
+  border: 1px solid silver;
+}
+
+.MetaBar .Option:active {
+  border: 1px solid silver;
+  background-color: #e4e6e9 !important;
 }

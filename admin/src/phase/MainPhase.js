@@ -19,7 +19,6 @@ import { Router, Route, Redirect, Switch } from 'react-router-dom'
 
 import { MenuBar } from '../component/MenuBar'
 import { MetaBar } from '../component/MetaBar'
-import { StatusBar } from '../component/StatusBar'
 import { TitleBar } from '../component/TitleBar'
 
 // Routes
@@ -120,7 +119,6 @@ class MainPhase extends React.PureComponent {
           <TitleBar title={title} user={user} />
           <MenuBar onClick={onMenuClick} selected={menu}/>
           <MetaBar visit={visit} logout={logout}/>
-          <StatusBar year="2018" copyright={ title }/>
           <Switch>
             <PropRoute path="/admin/home" component={Home} client={client}/>
             <PropRoute path="/admin/post/new" component={NewPost} client={client} onCancel={onCancel}/>
