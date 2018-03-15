@@ -17,7 +17,8 @@
 
 .MenuBar {
   position: fixed;
-  top: 60px;
+  padding-top: 30px;
+  top: 0;
   bottom: 30px;
   width: 150px;
   display: flex;

@@ -19,7 +19,6 @@ import { Router, Route, Redirect, Switch } from 'react-router-dom'
 
 import { MenuBar } from '../component/MenuBar'
 import { MetaBar } from '../component/MetaBar'
-import { TitleBar } from '../component/TitleBar'
 
 // Routes
 import { ChangePassword } from '../route/ChangePassword'
@@ -57,8 +56,7 @@ class MainPhase extends React.PureComponent {
         console.error(response.errors)
         return
       }
-      let { name// , email
-          } = response.data.viewer
+      let { name } = response.data.viewer
       let site = response.data.viewer.site
       this.setState({
         title: site.title,
@@ -70,7 +68,7 @@ class MainPhase extends React.PureComponent {
 
   render() {
     const { logout, client } = this.props
-    const { title, user, baseUrl, menu } = this.state
+    const { baseUrl, menu } = this.state
 
     const PropRoute = ({component: Component, path: Path, ...rest}) => (
       <Route exact path={Path} render={(props) => (<Component {...rest} {...props}/> )}/>
@@ -116,7 +114,9 @@ class MainPhase extends React.PureComponent {
     return (
       <Router history={this.history}>
         <section className="App">
-          <TitleBar title={title} user={user} />
+          {
+              // <TitleBar title={title} user={user} />
+          }
           <MenuBar onClick={onMenuClick} selected={menu}/>
           <MetaBar visit={visit} logout={logout}/>
           <Switch>
