@@ -39,7 +39,7 @@ class MarkdownEditor extends React.PureComponent {
       slugline: s,
       text: t,
       datePublished: d,
-      showPreview : true,
+      showPreview : false,
       dirty: false
     }
 
