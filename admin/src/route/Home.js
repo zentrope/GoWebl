@@ -112,8 +112,8 @@ class Home extends React.PureComponent {
           <Action type={status} color={status} onClick={toggle(p)}/>
         </td>
         <td width="10%" className="Right">{wordCount}</td>
-        <td width="44%"><Link to={"/admin/post/" + uuid}>{slugline}</Link></td>
-        <td width="44%" className="Date"><DateShow date={datePublished}/></td>
+        <td width="64%"><Link to={"/admin/post/" + uuid}>{slugline}</Link></td>
+        <td width="24%" className="Date"><DateShow date={datePublished}/></td>
         <td width="1%">
           <Action type="delete" color="blue" onClick={remove(p)}/>
         </td>
