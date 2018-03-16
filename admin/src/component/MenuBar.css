@@ -17,7 +17,7 @@
 
 .MenuBar {
   position: fixed;
-  padding-top: 30px;
+  padding-top: 50px;
   top: 0;
   bottom: 30px;
   width: 150px;
@@ -28,22 +28,18 @@
 }
 
 .MenuBar .MenuItem {
-  height: 35px;
-  min-height: 35px;
-  border-top: 1px solid #f1f1f1;
-  border-bottom: 1px solid #e8e8e8;
+  min-height: 25px;
+  margin-bottom: 7px;
+  margin-right: 10px;
+  margin-left: 10px;
+  border-radius: 2px;
   cursor: pointer;
-  padding-left: 15px;
   display: flex;
-  font-size: 11pt;
+  align-items: center;
 }
 
 .MenuBar .MenuItem:active {
-}
-
-.MenuBar .MenuItem:active {
-  color: DarkRed;
-  background-color: #d8d8d8;
+  background-color: #e4e5e6;
 }
 
 .MenuBar .MenuItem .Icon {
@@ -51,21 +47,16 @@
   align-self: center;
   color: #369;
   pointer-events: none;
-  opacity: 0.70;
   text-align: center;
-  padding-right: 6px;
 }
 
 .MenuBar .MenuItem .Name {
-  flex: 5;
+  flex: 3;
+  font-size: 10pt;
   align-self: center;
   pointer-events: none;
 }
 
-.MenuBar .MenuItem.Focus .Name {
-  color: DarkRed;
-}
-
-.MenuBar .MenuItem.Focus .Icon {
-  opacity: 1;
+.MenuBar .MenuItem.Focus {
+  background-color: #e4e5e6;
 }
