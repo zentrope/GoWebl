@@ -20,6 +20,7 @@ import { Link } from 'react-router-dom'
 
 import { Action } from '../component/Action'
 import { DateShow } from '../component/DateShow'
+import { PageTitle } from '../component/PageTitle'
 import { Tabular } from '../component/Tabular'
 import { WorkArea } from '../component/WorkArea'
 
@@ -123,10 +124,12 @@ class Home extends React.PureComponent {
 
   render() {
     let { posts } = this.state
+    const { title, user } = this.props
 
     const cols = [null, "words+", "post", "published", null]
     return (
       <WorkArea>
+        <PageTitle title={title} subtitle={user}/>
         <Tabular columns={cols} data={posts} render={this.renderPost}/>
       </WorkArea>
     )

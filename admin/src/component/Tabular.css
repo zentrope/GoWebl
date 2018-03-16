@@ -5,7 +5,7 @@
 */
 
 .Tabular {
-  margin-top: 40px;
+  margin-top: 25px;
 }
 
 .Tabular table {
@@ -14,7 +14,7 @@
 }
 
 .Tabular thead th {
-  border-bottom: 1px solid #d8d8d8;
+  border-bottom: 1px solid #eaebeb;
   text-align: left;
   font-size: 10pt;
   padding: 4px;
@@ -23,16 +23,12 @@
   font-style: italic;
 }
 
-/* .Tabular tbody tr:nth-child(odd) { */
-/*   background-color: #e8e8e8; */
-/* } */
-
 .Tabular tbody tr.inactive {
   color: #888;
 }
 
 .Tabular tbody td {
-  border-bottom: 1px solid #d8d8d8;
+  border-bottom: 1px solid #eaebeb;
   font-size: 11pt;
   padding: 4px;
   text-overflow: ellipsis;

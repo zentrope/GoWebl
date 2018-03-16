@@ -56,11 +56,11 @@ class MainPhase extends React.PureComponent {
         console.error(response.errors)
         return
       }
-      let { name } = response.data.viewer
+      let { name, email } = response.data.viewer
       let site = response.data.viewer.site
       this.setState({
         title: site.title,
-        user: name, // + " <" + email + ">",
+        user: name + " <" + email + ">",
         baseUrl: site.baseUrl
       })
     })
@@ -68,7 +68,7 @@ class MainPhase extends React.PureComponent {
 
   render() {
     const { logout, client } = this.props
-    const { baseUrl, menu } = this.state
+    const { title, user, baseUrl, menu } = this.state
 
     const PropRoute = ({component: Component, path: Path, ...rest}) => (
       <Route exact path={Path} render={(props) => (<Component {...rest} {...props}/> )}/>
@@ -114,13 +114,10 @@ class MainPhase extends React.PureComponent {
     return (
       <Router history={this.history}>
         <section className="App">
-          {
-              // <TitleBar title={title} user={user} />
-          }
           <MenuBar onClick={onMenuClick} selected={menu}/>
           <MetaBar visit={visit} logout={logout}/>
           <Switch>
-            <PropRoute path="/admin/home" component={Home} client={client}/>
+            <PropRoute path="/admin/home" component={Home} client={client} title={title} user={user}/>
             <PropRoute path="/admin/post/new" component={NewPost} client={client} onCancel={onCancel}/>
             <PropRoute path="/admin/post/:id" component={EditPost} client={client} onCancel={onCancel}/>
             <PropRoute path="/admin/site/edit" component={EditSite} client={client} onCancel={onCancel}/>
