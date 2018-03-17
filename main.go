@@ -36,7 +36,7 @@ var resourceDir, adminDir, overrideFile, assetDir string
 func init() {
 	flag.StringVar(&resourceDir, "resources", "./resources", "Path to scripts, templates.")
 	flag.StringVar(&assetDir, "assets", "./assets", "Path to web assets.")
-	flag.StringVar(&adminDir, "app", "./admin/build", "Path to admin web app.")
+	flag.StringVar(&adminDir, "app", "./admin", "Path to admin web app.")
 	flag.StringVar(&overrideFile, "c", "", "Path to configuration override file.")
 
 	flag.Parse()
