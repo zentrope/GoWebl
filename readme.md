@@ -48,23 +48,49 @@ And the app will merge that into the defaults. No need to copy the defaults and 
 
 I work on the project using two terminals:
 
-In one, I start up the `yarn` process for working with the React-based admin app.
-
-    $ cd webl/admin
-    $ yarn start
-
-In another terminal, I start the server process itself:
+In the first terminal, start the server process itself:
 
     $ make init
     $ go run main.go
 
-And that's it. The admin app will reload when you make changes. You'll have to `^C` the server process, then up arrow and return to cycle it.
+In the other terminal, start the `yarn` process for working with the React-based admin app.
+
+    $ cd webl/admin
+    $ yarn start
+
+Then open `localhost:3000`.
+
+When in this mode, you won't be able to get to the admin page via the `/admin` route. And that's it. The admin app will reload when you make changes. You'll have to `^C` the server process, then up arrow and return to cycle it.
 
 ## Docker
 
 Running, building, docker-composering: I've just not gotten to it yet. If you want to try this application out, I'd recommend going with stock Homebrew (or whatever) installs of Golang, Postgres and Yarn and leave it at that.
 
 However, I do plan to create some scripts that allow for building the app without having to install any of the dependencies (build or otherwise).
+
+## Deployment (new (v2))
+
+I think this is how it works:
+
+Make the app:
+
+    $ make build-freebsd
+
+then copy:
+
+- ./webl (binary)
+- ./resource/
+- ./admin/build/
+- ./assets/
+
+to the server, when start webl as:
+
+    $ ./webl -c config.json -app admin/build
+
+So what I need to do is package this up in a `dist` dir (as a zip,
+maybe) so I can copy it over as a single artifact, or use Transmit to
+deploy via sync. Anyway, not as easy as when all the assets were
+embedded in the Go binary itself.
 
 ## Database Notes
 

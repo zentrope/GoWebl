@@ -20,6 +20,7 @@ import { Link } from 'react-router-dom'
 
 import { Action } from '../component/Action'
 import { DateShow } from '../component/DateShow'
+import { PageTitle } from '../component/PageTitle'
 import { Tabular } from '../component/Tabular'
 import { WorkArea } from '../component/WorkArea'
 
@@ -112,8 +113,8 @@ class Home extends React.PureComponent {
           <Action type={status} color={status} onClick={toggle(p)}/>
         </td>
         <td width="10%" className="Right">{wordCount}</td>
-        <td width="44%"><Link to={"/admin/post/" + uuid}>{slugline}</Link></td>
-        <td width="44%" className="Date"><DateShow date={datePublished}/></td>
+        <td width="64%"><Link to={"/admin/post/" + uuid}>{slugline}</Link></td>
+        <td width="24%" className="Date"><DateShow date={datePublished}/></td>
         <td width="1%">
           <Action type="delete" color="blue" onClick={remove(p)}/>
         </td>
@@ -123,10 +124,12 @@ class Home extends React.PureComponent {
 
   render() {
     let { posts } = this.state
+    const { title, user } = this.props
 
     const cols = [null, "words+", "post", "published", null]
     return (
       <WorkArea>
+        <PageTitle title={title} subtitle={user}/>
         <Tabular columns={cols} data={posts} render={this.renderPost}/>
       </WorkArea>
     )

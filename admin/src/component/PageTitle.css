@@ -1,5 +1,5 @@
-//
-// Copyright (c) 2017 Keith Irwin
+/*
+// Copyright (c) 2018 Keith Irwin
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published
@@ -13,20 +13,34 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
-import React from 'react';
-import './StatusBar.css'
+.PageTitle {
+  height: 30px;
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
 
-class StatusBar extends React.PureComponent {
-  render() {
-    const { year, copyright } = this.props
-
-    return (
-      <section className="StatusBar">
-        <div className="Copyright">&copy; {year}, {copyright}</div>
-      </section>
-    )
-  }
+  background-color: #f9fafa;
+  padding: 3px;
+  border-radius: 4px;
 }
 
-export { StatusBar }
+.PageTitle .Title {
+  flex: 1;
+  font-size: 14pt;
+  color: black;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: auto;
+}
+
+.PageTitle .Subtitle {
+  flex: 1;
+  font-size: 10pt;
+  color: #999;
+  text-align: right;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: auto;
+}

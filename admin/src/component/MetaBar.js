@@ -15,33 +15,23 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-
 import { Icon } from './Icon.js'
+import './MetaBar.css'
 
-import './TitleBar.css'
-
-class TitleBar extends React.PureComponent {
-
+class MetaBar extends React.PureComponent {
   render() {
-    const { title, user, logout, visit } = this.props
-
+    const { logout, visit } = this.props
     return (
-      <section className="TitleBar">
-        <div className="Meta">
-          <div className="Title">{title}</div>
-          <div className="Name">{user}</div>
+      <section className="MetaBar">
+        <div className="Option" onClick={visit} title="Visit site">
+          <Icon type="visit" />
         </div>
-        <div className="Options">
-          <button onClick={visit}>
-            <Icon type="visit" /> Site
-          </button>
-          <button onClick={logout}>
-            <Icon type="signout"/>&nbsp;Bye
-          </button>
+        <div className="Option" onClick={logout} title="Sign out">
+          <Icon type="signout"/>
         </div>
       </section>
     )
   }
 }
 
-export { TitleBar }
+export { MetaBar }

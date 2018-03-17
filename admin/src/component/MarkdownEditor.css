@@ -1,7 +1,18 @@
 /*
-**  Copyright 2017 Keith Irwin. All rights reserved.
-**  Use of this source code is governed by a BSD-style
-**  license that can be found in the LICENSE file.
+// Copyright (c) 2018 Keith Irwin
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License,
+// or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 .MarkdownEditor {
@@ -9,41 +20,45 @@
   top: 15px;
   left: 15px;
   right: 15px;
-  bottom: 0;
+  bottom: 40px;
   display: flex;
   flex-direction: column;
 }
 
 .MarkdownEditor .TopBar {
   display: flex;
-  align-items: flex-end;
-  border-bottom: 2px solid #9bd;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
 }
 
 .MarkdownEditor .TopBar .Slugline {
-  flex: 10;
+  flex: 1;
   display: flex;
-  height: 40px;
-  padding-bottom: 5px;
+  height: 30px;
+}
+
+.MarkdownEditor .TopBar .Slugline input:focus {
+  font-style: normal;
 }
 
 .MarkdownEditor .TopBar .Slugline input {
   flex: 1;
   margin: 0;
-  padding: 0;
-  font-size: 12pt;
+  font-size: 11pt;
   border: 0;
   outline: none;
-  align-self: flex-end;
+  color: #369;
+  font-style: italic;
 }
 
-.MarkdownEditor .TopBar .Status {
-  text-align: right;
-  color: darkred;
-  font-size: 12pt;
+.MarkdownEditor .TopBar .Metadata {
   flex: 1;
-  align-self: flex-end;
-  padding-bottom: 5px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+
+  padding-left: 4px;
 }
 
 .MarkdownEditor .Viewers {
@@ -77,7 +92,6 @@
   background-color: #fbfdfe;
 }
 
-
 .MarkdownEditor .Viewers .Html {
   flex: 1;
   margin: 0;
@@ -110,12 +124,19 @@
 }
 
 .MarkdownEditor .Controls {
-  border-top: 1px dotted silver;
-  /* flex: 1; */
-  margin-top: 10px;
-  align-items: center;
-  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 150px;
+  right: 0;
   height: 30px;
+
+  padding-right: 10px;
+  padding-left: 10px;
+
+  border-top: 1px solid #eee;
+  display: flex;
+  align-items: center;
+
 }
 
 .MarkdownEditor .Controls .Right {
@@ -132,6 +153,16 @@
   display: inline-block;
   font-size: 10pt;
   color: #369;
+  margin-right: 5px;
+  margin-left: 5px;
+}
+
+.MarkdownEditor .Controls .Badge.Saved {
+  color: MediumSeaGreen !important;
+}
+
+.MarkdownEditor .Controls .Badge.UNSAVED {
+  color: IndianRed !important;
 }
 
 .MarkdownEditor .Controls .Left {

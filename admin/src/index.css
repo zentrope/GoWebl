@@ -4,6 +4,12 @@
 **  license that can be found in the LICENSE file.
 */
 
+html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+} /* Helps keep Chrome from rubber banding. */
+
 html, body {
   margin: 0;
   padding: 0;

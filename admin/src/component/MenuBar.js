@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Keith Irwin
+// Copyright (c) 2017-2018 Keith Irwin
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published
@@ -49,9 +49,7 @@ const menus = [
   {name: "New post", event: "new-post"},
   {name: "Site", event: "edit-site"},
   {name: "Account", event: "edit-account"},
-  {name: "Password", event: "change-password"},
-  {name: "Activity", event: "list-activity"},
-  {name: "Metrics", event: "metrics"}
+  {name: "Password", event: "change-password"}
 ]
 
 class MenuBar extends React.PureComponent {

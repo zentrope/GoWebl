@@ -1,9 +1,7 @@
 #
-# Ignore third-party libs placed by govendor
-vendor/*/*
-#
-#
+vendor
 .DS_Store
 /webl
-/internal/rice-box.go
 /admin/node_modules
+/admin/build
+dist

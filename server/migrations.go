@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package internal
+package server
 
 import "log"
 
@@ -25,9 +25,10 @@ var migrations = []string{
 	"sql/04-schema.sql",
 	"sql/05-schema.sql",
 	"sql/06-schema.sql",
+	"sql/07-schema.sql",
 }
 
-func (conn *Database) MustRunMigrations(resources *Resources) {
+func (conn *Database) MustRunMigrations(resources Resources) {
 
 	conn.createMigrationTable()
 
@@ -40,7 +41,7 @@ func (conn *Database) MustRunMigrations(resources *Resources) {
 		run := applied[migration]
 		log.Printf("- Migration '%s' has been run? %v\n", migration, run)
 		if !run {
-			ddl, err := resources.PrivateString(migration)
+			ddl, err := resources.privateString(migration)
 			if err != nil {
 				log.Printf("- Unable to apply: %s.", migration)
 				panic(err)

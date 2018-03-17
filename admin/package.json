@@ -3,11 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "fetch": "^1.1.0",
     "immutable": "^3.8.1",
     "markdown-it": "^8.3.1",
     "markdown-it-footnote": "^3.0.1",
-    "moment": "^2.18.1",
+    "moment": "2.18.1",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-router-dom": "^4.1.1"

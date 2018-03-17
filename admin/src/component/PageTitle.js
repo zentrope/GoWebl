@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Keith Irwin
+// Copyright (c) 2018 Keith Irwin
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published
@@ -14,33 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import React from 'react';
+import './PageTitle.css'
 
-class WordSelector extends React.PureComponent {
-  // Move this to components
-
-  constructor(props) {
-    super(props)
-    this.handleChange = this.handleChange.bind(this)
-  }
-
-  handleChange(event) {
-    let delegate = this.props.onChange
-    let value = event.target.value
-    if (delegate) {
-      delegate(value)
-    }
-  }
-
+class PageTitle extends React.PureComponent {
   render() {
-    const { words, selected } = this.props
+    const { title, subtitle } = this.props
 
     return (
-      <select value={selected} onChange={this.handleChange}>
-        { words.map(w => <option key={w} value={w}>{w}</option>) }
-      </select>
+      <div className="PageTitle">
+        <div className="Title">
+          { title }
+        </div>
+        <div className="Subtitle">
+          { subtitle }
+        </div>
+      </div>
     )
   }
 }
 
-export { WordSelector }
+export { PageTitle }

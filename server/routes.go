@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package internal
+package server
 
 import (
 	"context"
@@ -27,12 +27,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/russross/blackfriday"
+	mdown "gopkg.in/russross/blackfriday.v2"
 )
 
 type WebApplication struct {
 	router    *http.ServeMux
-	resources *Resources
+	resources Resources
 	graphql   *GraphAPI
 	database  *Database
 }
@@ -48,8 +48,6 @@ const (
 )
 
 func (app *WebApplication) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
-	app.database.RecordRequest(r)
 
 	w.Header().Set("Cache-Control", "public, max-age=86400")
 	w.Header().Set("Access-Control-Allow-Origin", getOriginDomain(r))
@@ -80,7 +78,7 @@ func (app *WebApplication) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	app.router.ServeHTTP(w, r.WithContext(ctx4))
 }
 
-func NewWebApplication(config *AppConfig, resources *Resources,
+func NewWebApplication(config *AppConfig, resources Resources,
 	database *Database, graphapi *GraphAPI) *WebApplication {
 
 	service := http.NewServeMux()
@@ -165,27 +163,20 @@ func xformArchiveEntry(e *ArchiveEntry) *TemplateArchiveEntry {
 }
 
 func MarkdownToHtml(data string) string {
-	htmlFlags := blackfriday.HTML_USE_XHTML |
-		blackfriday.HTML_USE_SMARTYPANTS |
-		blackfriday.HTML_SMARTYPANTS_FRACTIONS |
-		blackfriday.HTML_SMARTYPANTS_DASHES |
-		blackfriday.HTML_SMARTYPANTS_LATEX_DASHES
 
-	extensions := blackfriday.EXTENSION_NO_INTRA_EMPHASIS |
-		blackfriday.EXTENSION_TABLES |
-		blackfriday.EXTENSION_FENCED_CODE |
-		blackfriday.EXTENSION_AUTOLINK |
-		blackfriday.EXTENSION_STRIKETHROUGH |
-		blackfriday.EXTENSION_SPACE_HEADERS |
-		blackfriday.EXTENSION_HEADER_IDS |
-		blackfriday.EXTENSION_BACKSLASH_LINE_BREAK |
-		blackfriday.EXTENSION_DEFINITION_LISTS |
-		blackfriday.EXTENSION_FOOTNOTES
-	renderer := blackfriday.HtmlRenderer(htmlFlags, "", "")
+	extensions := mdown.NoIntraEmphasis |
+		mdown.Tables |
+		mdown.FencedCode |
+		mdown.Autolink |
+		mdown.Strikethrough |
+		mdown.SpaceHeadings |
+		mdown.HeadingIDs |
+		mdown.BackslashLineBreak |
+		mdown.DefinitionLists |
+		mdown.Footnotes
+
 	input := []byte(data)
-	options := blackfriday.Options{Extensions: extensions}
-
-	output := blackfriday.MarkdownOptions(input, renderer, options)
+	output := mdown.Run(input, mdown.WithExtensions(extensions))
 	return strings.TrimSpace(string(output))
 }
 
@@ -244,20 +235,20 @@ func queryApi(w http.ResponseWriter, r *http.Request) {
 
 func staticPage(w http.ResponseWriter, r *http.Request) {
 	resources := resolveRes(r)
-	fs := resources.AdminFileServer()
+	fs := resources.adminFileServer()
 	fs.ServeHTTP(w, r)
 }
 
 func adminPage(w http.ResponseWriter, r *http.Request) {
 	resources := resolveRes(r)
-	fs := resources.AdminFileServer()
+	fs := resources.adminFileServer()
 
-	if resources.AdminFileExists(r.URL.Path[1:]) {
+	if resources.adminFileExists(r.URL.Path[1:]) {
 		fs.ServeHTTP(w, r)
 		return
 	}
 
-	page, err := resources.Admin.String("index.html")
+	page, err := resources.adminString("index.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 		return
@@ -313,14 +304,14 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	database := resolveDb(r)
 	site := resolveSite(r)
 
-	fs := resources.PublicFileServer()
+	fs := resources.publicFileServer()
 
 	if !isIndexPath("/", r) {
 		fs.ServeHTTP(w, r)
 		return
 	}
 
-	page, err := resources.ResolveTemplate("index.html")
+	page, err := resources.resolveTemplate("index.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
@@ -352,7 +343,7 @@ func postPage(w http.ResponseWriter, r *http.Request) {
 	database := resolveDb(r)
 	site := resolveSite(r)
 
-	page, err := resources.ResolveTemplate("post.html")
+	page, err := resources.resolveTemplate("post.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
@@ -380,7 +371,7 @@ func archivePage(w http.ResponseWriter, r *http.Request) {
 	database := resolveDb(r)
 	site := resolveSite(r)
 
-	page, err := resources.ResolveTemplate("archive.html")
+	page, err := resources.resolveTemplate("archive.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
@@ -407,7 +398,7 @@ func archivePage(w http.ResponseWriter, r *http.Request) {
 
 func graphQlClientPage(w http.ResponseWriter, r *http.Request) {
 	resources := resolveRes(r)
-	page, err := resources.PrivateString("graphql.html")
+	page, err := resources.privateString("graphql.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
@@ -449,6 +440,6 @@ func resolveSite(r *http.Request) *SiteConfig {
 	return r.Context().Value(SITE_KEY).(*SiteConfig)
 }
 
-func resolveRes(r *http.Request) *Resources {
-	return r.Context().Value(RES_KEY).(*Resources)
+func resolveRes(r *http.Request) Resources {
+	return r.Context().Value(RES_KEY).(Resources)
 }

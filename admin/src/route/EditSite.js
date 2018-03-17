@@ -35,9 +35,9 @@ class EditSite extends React.PureComponent {
     this.mounted = true
     let { client } = this.props
     client.viewerData(response => {
-      let { title, description, baseURL } = response.data.viewer.site
+      let { title, description, baseUrl } = response.data.viewer.site
       if (this.mounted) {
-        this.setState({title: title, description: description, baseURL: baseURL})
+        this.setState({title: title, description: description, baseUrl: baseUrl})
       }
     })
   }

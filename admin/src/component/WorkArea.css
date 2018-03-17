@@ -6,8 +6,8 @@
 
 .WorkArea {
   position: fixed;
-  top: 60px;
-  bottom: 30px;
+  top: 0;
+  bottom: 0;
   left: 150px;
   right: 0;
 

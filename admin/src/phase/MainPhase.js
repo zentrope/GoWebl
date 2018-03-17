@@ -18,17 +18,14 @@ import React from 'react';
 import { Router, Route, Redirect, Switch } from 'react-router-dom'
 
 import { MenuBar } from '../component/MenuBar'
-import { StatusBar } from '../component/StatusBar'
-import { TitleBar } from '../component/TitleBar'
+import { MetaBar } from '../component/MetaBar'
 
 // Routes
-import { Activity } from '../route/Activity'
 import { ChangePassword } from '../route/ChangePassword'
 import { EditAccount } from '../route/EditAccount'
 import { EditPost } from '../route/EditPost'
 import { EditSite } from '../route/EditSite'
 import { Home } from '../route/Home'
-import { Metrics } from '../route/Metrics'
 import { NewPost } from '../route/NewPost'
 
 import createBrowserHistory from 'history/createBrowserHistory'
@@ -109,14 +106,6 @@ class MainPhase extends React.PureComponent {
           this.setState({menu: event})
           this.history.push("/admin/account/password/edit")
           break;
-        case "list-activity":
-          this.setState({menu: event})
-          this.history.push("/admin/activity")
-          break;
-        case "metrics":
-          this.setState({menu: event})
-          this.history.push("/admin/metrics")
-          break;
         default:
           console.log("Unknown menu event:", event);
       }
@@ -125,13 +114,10 @@ class MainPhase extends React.PureComponent {
     return (
       <Router history={this.history}>
         <section className="App">
-          <TitleBar title={title} user={user} visit={visit} logout={logout}/>
           <MenuBar onClick={onMenuClick} selected={menu}/>
-          <StatusBar year="2017" copyright={ title }/>
+          <MetaBar visit={visit} logout={logout}/>
           <Switch>
-            <PropRoute path="/admin/home" component={Home} client={client}/>
-            <PropRoute path="/admin/activity" component={Activity}  client={client}/>
-            <PropRoute path="/admin/metrics" component={Metrics} client={client}/>
+            <PropRoute path="/admin/home" component={Home} client={client} title={title} user={user}/>
             <PropRoute path="/admin/post/new" component={NewPost} client={client} onCancel={onCancel}/>
             <PropRoute path="/admin/post/:id" component={EditPost} client={client} onCancel={onCancel}/>
             <PropRoute path="/admin/site/edit" component={EditSite} client={client} onCancel={onCancel}/>

@@ -25,65 +25,132 @@ DB_SETUP = create user $(DB_USER) with login password '$(DB_PASS)' ;\
 	alter database $(DB_NAME) owner to $(DB_USER) ;\
 	create extension if not exists pgcrypto
 
-.PHONY: build-admin build init govendor vendor vendor-check vendor-unused help
-.PHONY: db-clean db-init
-
 .DEFAULT_GOAL := help
 
-# To update dependency versions, govendor fetch +vendor
+##-----------------------------------------------------------------------------
+## Make depenencies
+##-----------------------------------------------------------------------------
 
-govendor:
-	@hash govendor > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		go get -v -u github.com/kardianos/govendor; \
+.PHONY: godep psqldep treedep
+
+TREE = tree
+PSQL = psql
+
+treedep:
+	@hash $(TREE) > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		echo "$(TREE) not found. Try 'brew install $(TREE)'."; \
+		exit 1; \
 	fi
 
-ricebox:
-	@hash rice > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		go get -v -u github.com/GeertJohan/go.rice/rice; \
+psqldep:
+	@hash $(PSQL) > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		echo "$(PSQL) not found. Try 'brew install postgresql'."; \
+		exit 1; \
 	fi
 
-vendor: govendor ## Install govendor and sync deps
-	govendor sync
+godep:
+	@hash dep > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		go get -v -u github.com/golang/dep/cmd/dep; \
+	fi
 
-vendor-check: ## Verify that vendored packages match git HEAD
-	@git diff-index --quiet HEAD vendor/ || (echo "check-vendor target failed: vendored packages out of sync" && echo && git diff vendor/ && exit 1)
+##-----------------------------------------------------------------------------
+## Project dependencies
+##-----------------------------------------------------------------------------
 
-run: vendor ## Run the app from source
-	go run main.go
+.PHONY: vendor init
 
-vendor-unused: govendor ## Find unused vendored dependencies
-	@govendor list +unused
+vendor: godep ## Install and sync deps
+	dep ensure
 
-init: vendor ricebox ## Make sure everything is set up properly for dev.
+init: ## Make sure everything is set up properly for dev.
+	@$(MAKE) vendor
 	cd admin ; yarn
 
-build-admin: ## Build the admin client
-	cd admin; yarn ; yarn build
+##-----------------------------------------------------------------------------
+## Build
+##-----------------------------------------------------------------------------
 
-build-freebsd: init build-admin ## Build a version for FreeBSD
-	cd internal ; rm -f rice-box.go ;  rice -v embed-go
-	GOOS=freebsd GOARCH=amd64 go build -o webl
-
-build: init build-admin ## Build webl into a local binary ./webl.
-	cd internal ; rm -f rice-box.go ;  rice -v embed-go
-	go build -o webl
+.PHONY: build-admin build-freebsd build clean
 
 clean: ## Clean build artifacts.
-	rm -f internal/rice-box.go
 	rm -rf webl
 	rm -rf admin/build
+	rm -rf dist
 
-dist-clean: clean ## Clean everything (vendor, node_modules).
-	rm -rf vendor/*/
+build-admin: ## Build the admin client
+	@echo "Building admin client"
+	@cd admin; yarn ; yarn build
+
+build-freebsd: init build-admin ## Build a version for FreeBSD
+	CGO_ENABLED=0 GOOS=freebsd GOARCH=amd64 go build -o webl
+
+build: init build-admin ## Build webl into a local binary ./webl.
+	CGO_ENABLED=0 go build -o webl
+
+##-----------------------------------------------------------------------------
+## Distribute
+##-----------------------------------------------------------------------------
+
+.PHONY: dist-prepare dist dist-assemble dist-freebsd dist-clean
+
+DIST = ./dist
+DIST_ADMIN = $(DIST)/admin
+DIST_RESOURCES = $(DIST)/resources
+DIST_ASSETS = $(DIST)/assets
+
+dist-clean: clean ## Clean everything (vendor, node_modules, dist).
+	rm -rf vendor
 	rm -rf admin/node_modules
 
-db-clean: ## Delete the local dev database
-	psql template1 -c "drop database $(DB_NAME)"
-	psql template1 -c "drop user $(DB_USER)"
+dist-prepare:
+	if [ -e "dist" ]; then rm -rf dist ; fi
+	mkdir -p $(DIST_ADMIN)
+	mkdir -p $(DIST_RESOURCES)
+	mkdir -p $(DIST_ASSETS)
 
-db-init: ## Create a local dev database with default creds
-	psql template1 -c "$(DB_CREATE)"
-	psql $(DB_NAME) -c "$(DB_SETUP)"
+dist-assemble:
+	cp -r admin/build/* $(DIST_ADMIN)
+	cp -r resources/* $(DIST_RESOURCES)
+	cp -r assets/* $(DIST_ASSETS)
+	cp -r webl $(DIST)
+
+dist: ## Build distribution for current platform.
+	@$(MAKE) dist-prepare
+	@$(MAKE) build
+	@$(MAKE) dist-assemble
+
+dist-freebsd: ## Build distribution for FreeBSD.
+	@$(MAKE) dist-prepare
+	@$(MAKE) build-freebsd
+	@$(MAKE) dist-assemble
+
+##-----------------------------------------------------------------------------
+## Database
+##-----------------------------------------------------------------------------
+
+.PHONY: db-clean db-init
+
+db-clean: psqldep ## Delete the local dev database
+	$(PSQL) template1 -c "drop database $(DB_NAME)"
+	$(PSQL) template1 -c "drop user $(DB_USER)"
+
+db-init: psqldep ## Create a local dev database with default creds
+	$(PSQL) template1 -c "$(DB_CREATE)"
+	$(PSQL) $(DB_NAME) -c "$(DB_SETUP)"
+
+##-----------------------------------------------------------------------------
+## Utilties
+##-----------------------------------------------------------------------------
+
+.PHONY: run tree help
+
+run: vendor ## Run the app from source
+	go run main.go || true
+
+tree: treedep ## View source hierarchy without vendor pkgs
+	$(TREE) -C -I "node_modules|vendor|build|dist" || true
 
 help:
-	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}' | sort
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}' \
+		| sort
