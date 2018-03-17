@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"github.com/zentrope/webl/server"
@@ -34,9 +35,19 @@ import (
 var resourceDir, adminDir, overrideFile, assetDir string
 
 func init() {
-	flag.StringVar(&resourceDir, "resources", "./resources", "Path to scripts, templates.")
-	flag.StringVar(&assetDir, "assets", "./assets", "Path to web assets.")
-	flag.StringVar(&adminDir, "app", "./admin", "Path to admin web app.")
+
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	resourcePath := filepath.Join(dir, "resources")
+	assetPath := filepath.Join(dir, "assets")
+	adminPath := filepath.Join(dir, "admin")
+
+	flag.StringVar(&resourceDir, "resources", resourcePath, "Path to scripts, templates.")
+	flag.StringVar(&assetDir, "assets", assetPath, "Path to web assets.")
+	flag.StringVar(&adminDir, "app", adminPath, "Path to admin web app.")
 	flag.StringVar(&overrideFile, "c", "", "Path to configuration override file.")
 
 	flag.Parse()
