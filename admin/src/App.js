@@ -66,7 +66,7 @@ class App extends React.PureComponent {
     })
 
     this.client.validate(token, result => {
-      if (! result.data.validate) {
+      if (! result.data || ! result.data.validate) {
         console.log(result.errors)
         this.onLogout()
       } else {

@@ -37,7 +37,10 @@ class LoginForm extends React.PureComponent {
     const { client, login } = this.props
 
     client.login(user, pass, (result) => {
-      let okay = result.data.authenticate !== null
+      var okay = false
+      if (result.data !== null && result.data.authenticate !== null) {
+        okay = true
+      }
       if (! okay) {
         this.setState({error: "Unable to sign in."})
         document.getElementById("user").focus()
