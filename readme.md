@@ -98,8 +98,8 @@ embedded in the Go binary itself.
 
 These are the default connection parameters for a Postgres instance:
 
-    database: blogdb
-    user:     blogsvc
+    database: webl_db
+    user:     webl_user
     pass:     wanheda
     host:     localhost
     port:     5432
