@@ -132,9 +132,27 @@ Homebrew's `brew services` stuff is actually kind handy.
 
 This is especially useful if you don't want to or can't use Docker on your Mac. (I have an old Macbook Air, for instance, that won't run it.)
 
+**Database is Ancient**
+
+If your local databases are incompatible because you've updated your server multiple times without ever starting it or reading the fine print about upgrading, you can do the following:
+
+    $ brew services stop postgresql
+    $ mv /usr/local/var/postgres ~/.Trash
+    $ initdb /usr/local/var/postgres
+    $ brew services start postgresql
+    $ brew services ls
+
+Make sure the process is stopped (and it should be already given the problem), remove the database files, run the `initdb` comment, start up postgresql and then verify that it's running.
+
+After that, run:
+
+    $ make db-init
+
+And hopefully, you're back in business.
+
 ## License
 
-Copyright (c) 2017 Keith Irwin
+Copyright (c) 2017-2021 Keith Irwin
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published

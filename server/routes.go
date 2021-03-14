@@ -27,7 +27,7 @@ import (
 	"strings"
 	"time"
 
-	mdown "gopkg.in/russross/blackfriday.v2"
+	mdown "github.com/russross/blackfriday/v2"
 )
 
 type WebApplication struct {

@@ -31,7 +31,7 @@ DB_SETUP = create user $(DB_USER) with login password '$(DB_PASS)' ;\
 ## Make depenencies
 ##-----------------------------------------------------------------------------
 
-.PHONY: godep psqldep treedep
+.PHONY: psqldep treedep
 
 TREE = tree
 PSQL = psql
@@ -48,19 +48,15 @@ psqldep:
 		exit 1; \
 	fi
 
-godep:
-	@hash dep > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		go get -v -u github.com/golang/dep/cmd/dep; \
-	fi
-
 ##-----------------------------------------------------------------------------
 ## Project dependencies
 ##-----------------------------------------------------------------------------
 
 .PHONY: vendor init
 
-vendor: godep ## Install and sync deps
-	dep ensure
+vendor: ## Install and sync deps
+	go mod download
+	go mod tidy
 
 init: ## Make sure everything is set up properly for dev.
 	@$(MAKE) vendor
