@@ -54,7 +54,7 @@ class MarkdownEditor extends React.PureComponent {
     this.setState({datePublished: date})
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { uuid, slugline, text, datePublished } = nextProps
     let u = uuid ? uuid : ""
     let s = slugline ? slugline : ""
