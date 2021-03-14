@@ -28,7 +28,7 @@ import { EditSite } from '../route/EditSite'
 import { Home } from '../route/Home'
 import { NewPost } from '../route/NewPost'
 
-import createBrowserHistory from 'history/createBrowserHistory'
+import { createBrowserHistory } from 'history'
 
 class MainPhase extends React.PureComponent {
 
