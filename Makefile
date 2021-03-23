@@ -28,7 +28,7 @@ DB_SETUP = create user $(DB_USER) with login password '$(DB_PASS)' ;\
 .DEFAULT_GOAL := help
 
 ##-----------------------------------------------------------------------------
-## Make depenencies
+## Make dependencies
 ##-----------------------------------------------------------------------------
 
 .PHONY: psqldep treedep
