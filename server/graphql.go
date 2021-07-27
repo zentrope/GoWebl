@@ -22,7 +22,7 @@ import (
 	"log"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	jwt "github.com/golang-jwt/jwt"
 	graphql "github.com/graph-gophers/graphql-go"
 )
 
