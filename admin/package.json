@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "immutable": "^4.0.0-rc.12",
-    "markdown-it": "^12.0.6",
+    "immutable": "^4.0.0-rc.14",
+    "markdown-it": "^12.1.0",
     "markdown-it-footnote": "^3.0.1",
     "moment": "2.29.1",
     "react": "^17.0.2",
