@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/golang-jwt/jwt v3.2.1+incompatible
-	github.com/graph-gophers/graphql-go v1.1.0
+	github.com/graph-gophers/graphql-go v1.3.0
 	github.com/imdario/mergo v0.3.12
 	github.com/lib/pq v1.10.2
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
