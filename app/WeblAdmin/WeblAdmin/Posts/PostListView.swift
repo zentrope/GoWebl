@@ -16,59 +16,82 @@ struct PostListView: View {
 
     var body: some View {
         HSplitView {
-        //HStack(spacing: 0) {
             List(selection: $selectedPost) {
 
                 ForEach(state.posts, id: \.id) { post in
-                    HStack {
+                    HStack(alignment: .center) {
+                        StatusIcon(post.status)
+                            .font(.callout)
+                            .frame(width: 15)
                         Text("\(post.wordCount)")
                             .frame(width: 40, alignment: .trailing)
-                            .foregroundColor(.secondary)
+                            .help("Word count")
                         Text("\(post.slugline)")
                             .lineLimit(1)
                         Spacer()
-                        Group {
-                        DateView(date: post.dateCreated, format: .dateNameShort)
-                            .frame(width: 80, alignment: .leading)
-                            .font(.callout)
+                        DateView(date: post.datePublished, format: .dateDense)
+                            .frame(width: 130, alignment: .leading)
+                            .font(.caption)
                             .foregroundColor(.secondary)
-                        }
+                            .help("Date published")
                     }
+                    .padding(.vertical, 2)
                 }
             }
             .listStyle(.inset(alternatesRowBackgrounds: true))
             .frame(minWidth: 350, idealWidth: 350)
 
-          //  Divider()
-
-            if selectedPost != nil {
-                ScrollView {
-                    VStack {
-                        TextEditor(text: $bodyText)
-                            .disableAutocorrection(false)                            
-                            .font(.body.monospaced())
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        Spacer()
-                    }
-                    .padding()
-                }
-                .background(Color(nsColor: .textBackgroundColor))
-                .frame(minWidth: 350)
+            if let postId = selectedPost,
+               let post = state.post(id: postId) {
+                PostSourceViewer(post: post)
+                    .frame(minWidth: 350)
             }
         }
+        .navigationSubtitle("\(state.site.title) — \(state.name) <\(state.email)>")
         .onChange(of: selectedPost) { postId in
             let post = state.post(id: postId)
             bodyText = post?.text ?? ""
         }
         .toolbar {
+
+            ToolbarItem {
+                if selectedPost != nil {
+                    Button {
+                        print("Not implemented.")
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                    }
+                }
+            }
+
             ToolbarItem {
                 Button {
                     print("Not implemented.")
                 } label: {
-                    Image(systemName: "gear")
+                    Image(systemName: "gearshape")
                 }
 
             }
+        }
+    }
+}
+
+// MARK: - Supplemental views
+
+extension PostListView {
+
+    @ViewBuilder
+    private func StatusIcon(_ status: WebClient.Post.Status) -> some View {
+        switch status {
+            case .draft:
+                Image(systemName: "icloud.slash")
+                    .foregroundColor(.secondary)
+                    .help(status.rawValue)
+            case .published:
+                Image(systemName: "icloud.fill")
+                    .foregroundColor(.mint)
+                    .help(status.rawValue)
+
         }
     }
 }

@@ -13,7 +13,11 @@ fileprivate let log = Logger(subsystem: "com.zentrope.WeblAdmin", category: "Pos
 @MainActor
 final class PostListViewState: NSObject, ObservableObject {
 
+    @Published var name = ""
+    @Published var email = ""
     @Published var posts = [WebClient.Post]()
+    @Published var site = WebClient.Site(baseUrl: "…", title: "…", description: "…")
+
     @Published var showAlert = false
     @Published var error: Error?
 
@@ -26,16 +30,16 @@ final class PostListViewState: NSObject, ObservableObject {
     func post(id: String?) -> WebClient.Post? {
         return posts.first(where: { $0.id == id })
     }
+
     private func reload() {
         Task {
             do {
                 let client = WebClient()
-                let posts = try await client.viewerData()
-                self.posts = posts.sorted(by: { $0.dateCreated > $1.dateCreated })
-                log.debug("Downloaded \(self.posts.count) posts.")
-                if let fp = self.posts.first {
-                    log.debug("First \(String(describing: fp))")
-                }
+                let viewerData = try await client.viewerData()
+                self.name = viewerData.name
+                self.email = viewerData.email
+                self.site = viewerData.site
+                self.posts = viewerData.posts.sorted(by: { $0.dateCreated > $1.dateCreated })
             } catch (let e) {
                 showAlert(error: e)
             }

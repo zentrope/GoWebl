@@ -35,6 +35,10 @@ struct DateView: View {
         /// "MMMM yyyy"
         case dateMonthYear = "MMMM yyyy"
 
+        /// 15 Dec 21 - 14:37 PM
+        case dateDense = "dd MMM yy - hh:mm a"
+
+
         case overdueSince = "formatOverdue()"
     }
 

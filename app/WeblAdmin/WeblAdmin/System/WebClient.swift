@@ -26,7 +26,7 @@ class WebClient: NSObject {
         return !result.isEmpty
     }
 
-    func viewerData() async throws -> [Post] {
+    func viewerData() async throws -> Viewer {
         let token = try await login()
 
         let ql = """
@@ -37,8 +37,10 @@ class WebClient: NSObject {
         """
         let query = Query(query: ql, operationName: "", variables: [:])
         let result = try await doQuery(query, token: token)
-        return result.data.viewer?.posts ?? []
-        //print(result)
+        if let viewer = result.data.viewer {
+            return viewer
+        }
+        throw GraphQlError.NoViewerData
     }
 
     private func doQuery(_ query: Query, token: String? = nil) async throws -> GQLResponse {
@@ -59,17 +61,17 @@ class WebClient: NSObject {
 
         let (data, _) = try await URLSession.shared.data(for: request)
 
-        guard let doc = String(data: data, encoding: .utf8) else {
-            log.error("cannot decode raw data into UTF8 string")
-            throw URLError(.cannotDecodeRawData)
-        }
-
-        log.debug("decoding: \(doc)")
+//        guard let doc = String(data: data, encoding: .utf8) else {
+//            log.error("cannot decode raw data into UTF8 string")
+//            throw URLError(.cannotDecodeRawData)
+//        }
+//
+//        log.debug("decoding: \(doc)")
 
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
+
         let gdoc = try decoder.decode(GQLResponse.self, from: data)
-        log.debug("decoded: \(String(describing: gdoc))")
 
         if gdoc.hasError() {
             let msg = gdoc.errors?.first?.message ?? "Unable to decode error, check log"
@@ -106,10 +108,12 @@ extension WebClient {
 
     enum GraphQlError: Error, LocalizedError {
         case Error(String)
+        case NoViewerData
 
         var errorDescription: String? {
             switch self {
                 case let .Error(msg): return "gql: \(msg)"
+                case .NoViewerData: return "unable to retrieve data, check account preferences"
             }
         }
     }
@@ -154,9 +158,9 @@ extension WebClient {
         var description: String
     }
 
-    struct Post: Decodable, Identifiable {
+    struct Post: Decodable, Identifiable, Equatable {
         var id: String
-        var status: String
+        var status: Status
         var slugline: String
         var dateCreated: Date
         var dateUpdated: Date
@@ -166,6 +170,11 @@ extension WebClient {
 
         private enum CodingKeys: String, CodingKey {
             case id = "uuid", status, slugline, dateCreated, dateUpdated, datePublished, wordCount, text
+        }
+
+        enum Status: String, Codable {
+            case published
+            case draft
         }
     }
 
@@ -189,25 +198,3 @@ extension WebClient {
     }
 }
 
-
-extension URLRequest {
-
-    init?(method: String = "GET", host: String, path: String, auth: String, params: [String:String] = [:]) {
-
-        let resource = "https://\(host)\(path)"
-
-        guard var url = URLComponents(string: resource) else {
-            return nil
-        }
-
-        if !params.isEmpty {
-            url.queryItems = params.map { URLQueryItem(name: $0, value: $1) }
-        }
-        self.init(url: url.url!)
-        httpMethod = method
-        addValue("application/json", forHTTPHeaderField: "Accept")
-        addValue("application/json", forHTTPHeaderField: "Content-Type")
-        addValue("1", forHTTPHeaderField: "X-PrettyPrint")
-        addValue("Bearer \(auth)", forHTTPHeaderField: "Authorization")
-    }
-}
