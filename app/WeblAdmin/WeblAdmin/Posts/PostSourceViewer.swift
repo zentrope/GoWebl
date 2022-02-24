@@ -13,33 +13,34 @@ struct PostSourceViewer: View {
 
 
     var body: some View {
-        VStack(spacing: 10) {
-            HStack {
-                Text(post.slugline)
-                    .font(.headline)
+        VStack {
+            VStack(spacing: 10) {
+                HStack {
+                    Text(post.slugline)
+                        .font(.headline)
 
-                Spacer()
-                DateView(date: post.datePublished, format: .dateTimeNameLong)
-                    .font(.subheadline)
-            }
-            .lineLimit(1)
-
-            Divider()
-            //.overlay(Divider(), alignment: .bottom)
-
-            ScrollView {
-                VStack {
-
-                    Text(post.text)
-                        .font(.body.monospaced())
-                        .foregroundColor(.indigo)
-                        .lineSpacing(5)
                     Spacer()
+                    DateView(date: post.datePublished, format: .dateTimeNameLong)
+                        .font(.subheadline)
                 }
-            }
+                .lineLimit(1)
 
+                Divider()
+            }
+            .padding([.horizontal, .top])
+
+            VStack {
+                WebPostPreview(document: post.text.markdownToHtml)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.leading, 10)
         }
-        .padding()
         .background(Color(nsColor: .textBackgroundColor))
+    }
+}
+
+fileprivate extension String {
+    var markdownToHtml: String {
+        HTMLEncoder(self).html()
     }
 }

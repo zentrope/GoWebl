@@ -1,0 +1,32 @@
+/*
+ font: -apple-system-body
+ font: -apple-system-headline
+ font: -apple-system-subheadline
+ font: -apple-system-caption1
+ font: -apple-system-caption2
+ font: -apple-system-footnote
+ font: -apple-system-short-body
+ font: -apple-system-short-headline
+ font: -apple-system-short-subheadline
+ font: -apple-system-short-caption1
+ font: -apple-system-short-footnote
+ font: -apple-system-tall-body
+ */
+
+:root {
+    color-scheme: light dark;
+    font: -apple-system-body;
+}
+
+code {
+    color: firebrick;
+}
+
+pre {
+    color: #777;
+    margin-left: 5px;
+}
+
+p {
+    line-height: 1.4;
+}

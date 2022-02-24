@@ -17,6 +17,10 @@
 		5333A27427C30F3B0064FF44 /* PostListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5333A27327C30F3B0064FF44 /* PostListView.swift */; };
 		5333A27627C30F470064FF44 /* PostListViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5333A27527C30F470064FF44 /* PostListViewState.swift */; };
 		5333A27927C313780064FF44 /* DateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5333A27827C313780064FF44 /* DateView.swift */; };
+		535BBE0627C7595D00920283 /* WebPostPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535BBE0527C7595D00920283 /* WebPostPreview.swift */; };
+		535BBE0A27C75E1B00920283 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = 535BBE0927C75E1B00920283 /* style.css */; };
+		535BBE0D27C762E100920283 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 535BBE0C27C762E100920283 /* Markdown */; };
+		535BBE0F27C764F100920283 /* HtmlEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535BBE0E27C764F100920283 /* HtmlEncoder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +36,9 @@
 		5333A27327C30F3B0064FF44 /* PostListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostListView.swift; sourceTree = "<group>"; };
 		5333A27527C30F470064FF44 /* PostListViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostListViewState.swift; sourceTree = "<group>"; };
 		5333A27827C313780064FF44 /* DateView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateView.swift; sourceTree = "<group>"; };
+		535BBE0527C7595D00920283 /* WebPostPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPostPreview.swift; sourceTree = "<group>"; };
+		535BBE0927C75E1B00920283 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = style.css; sourceTree = "<group>"; };
+		535BBE0E27C764F100920283 /* HtmlEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HtmlEncoder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				535BBE0D27C762E100920283 /* Markdown in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +96,7 @@
 		5333A26C27C2F3D10064FF44 /* System */ = {
 			isa = PBXGroup;
 			children = (
+				535BBE0E27C764F100920283 /* HtmlEncoder.swift */,
 				5333A26D27C2F3EE0064FF44 /* WebClient.swift */,
 			);
 			path = System;
@@ -104,9 +113,11 @@
 		5333A27227C30F270064FF44 /* Posts */ = {
 			isa = PBXGroup;
 			children = (
+				535BBE0827C75DFA00920283 /* Resources */,
 				5333A27327C30F3B0064FF44 /* PostListView.swift */,
 				5333A27527C30F470064FF44 /* PostListViewState.swift */,
 				53105D2427C3722D0038204F /* PostSourceViewer.swift */,
+				535BBE0527C7595D00920283 /* WebPostPreview.swift */,
 			);
 			path = Posts;
 			sourceTree = "<group>";
@@ -117,6 +128,14 @@
 				5333A27827C313780064FF44 /* DateView.swift */,
 			);
 			path = Common;
+			sourceTree = "<group>";
+		};
+		535BBE0827C75DFA00920283 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				535BBE0927C75E1B00920283 /* style.css */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -135,6 +154,9 @@
 			dependencies = (
 			);
 			name = WeblAdmin;
+			packageProductDependencies = (
+				535BBE0C27C762E100920283 /* Markdown */,
+			);
 			productName = WeblAdmin;
 			productReference = 5333A25A27C2F3A80064FF44 /* WeblAdmin.app */;
 			productType = "com.apple.product-type.application";
@@ -163,6 +185,9 @@
 				Base,
 			);
 			mainGroup = 5333A25127C2F3A80064FF44;
+			packageReferences = (
+				535BBE0B27C762E100920283 /* XCRemoteSwiftPackageReference "swift-markdown" */,
+			);
 			productRefGroup = 5333A25B27C2F3A80064FF44 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -178,6 +203,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5333A26527C2F3A90064FF44 /* Preview Assets.xcassets in Resources */,
+				535BBE0A27C75E1B00920283 /* style.css in Resources */,
 				5333A26227C2F3A90064FF44 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -190,12 +216,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				53105D2527C3722D0038204F /* PostSourceViewer.swift in Sources */,
+				535BBE0F27C764F100920283 /* HtmlEncoder.swift in Sources */,
 				5333A27627C30F470064FF44 /* PostListViewState.swift in Sources */,
 				5333A26027C2F3A80064FF44 /* ContentView.swift in Sources */,
 				5333A27927C313780064FF44 /* DateView.swift in Sources */,
 				5333A25E27C2F3A80064FF44 /* WeblAdminApp.swift in Sources */,
 				5333A27127C2F44B0064FF44 /* AccountPreferences.swift in Sources */,
 				5333A26E27C2F3EE0064FF44 /* WebClient.swift in Sources */,
+				535BBE0627C7595D00920283 /* WebPostPreview.swift in Sources */,
 				5333A27427C30F3B0064FF44 /* PostListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -392,6 +420,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		535BBE0B27C762E100920283 /* XCRemoteSwiftPackageReference "swift-markdown" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-markdown.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		535BBE0C27C762E100920283 /* Markdown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 535BBE0B27C762E100920283 /* XCRemoteSwiftPackageReference "swift-markdown" */;
+			productName = Markdown;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5333A25227C2F3A80064FF44 /* Project object */;
 }
