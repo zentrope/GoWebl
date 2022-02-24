@@ -1,8 +1,18 @@
 # Web Log
 
-Learning Golang.
+## New Goal -- 2022
 
-## Goal
+- Play around with Github issues and project features.
+- Port the admin interface to a Mac app.
+- Remove the react-based javascript web-app admin interface.
+- Port from GraphQL to a simpler query/command JSON/HTTP web interface.
+- Maybe: port from Postgres to sqlite.
+
+----
+
+## Goal -- Olden Times
+
+Learning Golang.
 
 The goal of this learning project is to produce a single binary (except the Postgres database) that can render blog posts via cacheable server-side templates (to allow for search engines) as well as create and edit them via an interactive single-page client app. Normally, you'd serve both client and API via a web-proxy, etc, etc, but I want to see how close I can get to the JVM world's `uberjar` concept.
 
