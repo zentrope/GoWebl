@@ -19,6 +19,7 @@
 		5333A27927C313780064FF44 /* DateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5333A27827C313780064FF44 /* DateView.swift */; };
 		535BBE0627C7595D00920283 /* WebPostPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535BBE0527C7595D00920283 /* WebPostPreview.swift */; };
 		535BBE0A27C75E1B00920283 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = 535BBE0927C75E1B00920283 /* style.css */; };
+		535BBE0D27C762E100920283 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 535BBE0C27C762E100920283 /* Markdown */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				535BBE0D27C762E100920283 /* Markdown in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,6 +151,9 @@
 			dependencies = (
 			);
 			name = WeblAdmin;
+			packageProductDependencies = (
+				535BBE0C27C762E100920283 /* Markdown */,
+			);
 			productName = WeblAdmin;
 			productReference = 5333A25A27C2F3A80064FF44 /* WeblAdmin.app */;
 			productType = "com.apple.product-type.application";
@@ -177,6 +182,9 @@
 				Base,
 			);
 			mainGroup = 5333A25127C2F3A80064FF44;
+			packageReferences = (
+				535BBE0B27C762E100920283 /* XCRemoteSwiftPackageReference "swift-markdown" */,
+			);
 			productRefGroup = 5333A25B27C2F3A80064FF44 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -408,6 +416,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		535BBE0B27C762E100920283 /* XCRemoteSwiftPackageReference "swift-markdown" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-markdown.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		535BBE0C27C762E100920283 /* Markdown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 535BBE0B27C762E100920283 /* XCRemoteSwiftPackageReference "swift-markdown" */;
+			productName = Markdown;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5333A25227C2F3A80064FF44 /* Project object */;
 }
