@@ -30,11 +30,17 @@ struct PostSourceViewer: View {
             .padding([.horizontal, .top])
 
             VStack {
-                WebPostPreview(document: "<p>\(post.text)</p>")
+                WebPostPreview(document: post.text.markdownToHtml)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.leading, 10)
         }
         .background(Color(nsColor: .textBackgroundColor))
+    }
+}
+
+fileprivate extension String {
+    var markdownToHtml: String {
+        HTMLEncoder(self).html()
     }
 }

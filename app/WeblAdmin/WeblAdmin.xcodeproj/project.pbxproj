@@ -20,6 +20,7 @@
 		535BBE0627C7595D00920283 /* WebPostPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535BBE0527C7595D00920283 /* WebPostPreview.swift */; };
 		535BBE0A27C75E1B00920283 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = 535BBE0927C75E1B00920283 /* style.css */; };
 		535BBE0D27C762E100920283 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 535BBE0C27C762E100920283 /* Markdown */; };
+		535BBE0F27C764F100920283 /* HtmlEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535BBE0E27C764F100920283 /* HtmlEncoder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +38,7 @@
 		5333A27827C313780064FF44 /* DateView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateView.swift; sourceTree = "<group>"; };
 		535BBE0527C7595D00920283 /* WebPostPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPostPreview.swift; sourceTree = "<group>"; };
 		535BBE0927C75E1B00920283 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = style.css; sourceTree = "<group>"; };
+		535BBE0E27C764F100920283 /* HtmlEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HtmlEncoder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +96,7 @@
 		5333A26C27C2F3D10064FF44 /* System */ = {
 			isa = PBXGroup;
 			children = (
+				535BBE0E27C764F100920283 /* HtmlEncoder.swift */,
 				5333A26D27C2F3EE0064FF44 /* WebClient.swift */,
 			);
 			path = System;
@@ -213,6 +216,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				53105D2527C3722D0038204F /* PostSourceViewer.swift in Sources */,
+				535BBE0F27C764F100920283 /* HtmlEncoder.swift in Sources */,
 				5333A27627C30F470064FF44 /* PostListViewState.swift in Sources */,
 				5333A26027C2F3A80064FF44 /* ContentView.swift in Sources */,
 				5333A27927C313780064FF44 /* DateView.swift in Sources */,
