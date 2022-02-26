@@ -12,10 +12,31 @@ struct PostListView: View {
     @StateObject private var state = PostListViewState()
 
     @State private var selectedPost: String?
-    @State private var bodyText = ""
+    @State private var showEditor = false
 
     var body: some View {
-        HSplitView {
+        VStack {
+            if showEditor,
+               let id = selectedPost,
+               let post = state.post(id: id) {
+                PostSourceEditor(post: post, show: $showEditor)
+            } else {
+                PostListNavigator(showEditor: $showEditor, selectedPost: $selectedPost, state: state)
+            }
+        }
+        .navigationSubtitle("\(state.site.title) — \(state.name) <\(state.email)>")
+    }
+}
+
+
+struct PostListNavigator: View {
+
+    @Binding var showEditor: Bool
+    @Binding var selectedPost: String?
+    @ObservedObject var state: PostListViewState
+
+    var body: some View {
+        HStack(spacing: 0) {
             List(selection: $selectedPost) {
 
                 ForEach(state.posts, id: \.id) { post in
@@ -39,25 +60,53 @@ struct PostListView: View {
                 }
             }
             .listStyle(.inset(alternatesRowBackgrounds: true))
-            .frame(minWidth: 350, idealWidth: 350)
+            .frame(width: 400)
+
+            Divider()
 
             if let postId = selectedPost,
                let post = state.post(id: postId) {
-                PostSourceViewer(post: post)
-                    .frame(minWidth: 350)
+                VStack {
+                    VStack(spacing: 10) {
+                        HStack {
+                            Text(post.slugline)
+                                .font(.headline)
+
+                            Spacer()
+                            DateView(date: post.datePublished, format: .dateTimeNameLong)
+                                .font(.subheadline)
+                        }
+                        .lineLimit(1)
+
+                        Divider()
+                    }
+                    .padding([.horizontal, .top])
+                    WebPostPreview(document: post.text.markdownToHtml)
+                        .padding(.leading, 10)
+                }
+                .background(Color(nsColor: .textBackgroundColor))
+                .frame(minWidth: 400, idealWidth: 400)
+            } else {
+                VStack(alignment: .center, spacing: 20) {
+                    Image(systemName: "doc.text")
+                        .font(.system(size: 72).weight(.thin))
+                        .foregroundColor(.secondary)
+                    Text("No post selected")
+                        .font(.title)
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color(nsColor: .textBackgroundColor))
+                .frame(minWidth: 350, idealWidth: 350)
             }
         }
-        .navigationSubtitle("\(state.site.title) — \(state.name) <\(state.email)>")
-        .onChange(of: selectedPost) { postId in
-            let post = state.post(id: postId)
-            bodyText = post?.text ?? ""
-        }
+
         .toolbar {
 
             ToolbarItem {
                 if selectedPost != nil {
                     Button {
-                        print("Not implemented.")
+                        showEditor.toggle()
                     } label: {
                         Image(systemName: "square.and.pencil")
                     }
@@ -74,11 +123,30 @@ struct PostListView: View {
             }
         }
     }
+
 }
 
 // MARK: - Supplemental views
 
 extension PostListView {
+
+    @ViewBuilder
+    private func StatusIcon(_ status: WebClient.Post.Status) -> some View {
+        switch status {
+            case .draft:
+                Image(systemName: "icloud.slash")
+                    .foregroundColor(.secondary)
+                    .help(status.rawValue)
+            case .published:
+                Image(systemName: "icloud.fill")
+                    .foregroundColor(.mint)
+                    .help(status.rawValue)
+
+        }
+    }
+}
+
+extension PostListNavigator {
 
     @ViewBuilder
     private func StatusIcon(_ status: WebClient.Post.Status) -> some View {
