@@ -26,7 +26,6 @@
 		53DC2F0727CB20AE00D780EE /* PostPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0627CB20AE00D780EE /* PostPreview.swift */; };
 		53DC2F0927CB269700D780EE /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0827CB269700D780EE /* Color.swift */; };
 		53DC2F0B27CB281D00D780EE /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0A27CB281D00D780EE /* Logger.swift */; };
-		53DC2F0E27CB380D00D780EE /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = 53DC2F0D27CB380D00D780EE /* AnyCodable */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -57,7 +56,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				53DC2F0E27CB380D00D780EE /* AnyCodable in Frameworks */,
 				535BBE0D27C762E100920283 /* Markdown in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -181,7 +179,6 @@
 			name = WeblAdmin;
 			packageProductDependencies = (
 				535BBE0C27C762E100920283 /* Markdown */,
-				53DC2F0D27CB380D00D780EE /* AnyCodable */,
 			);
 			productName = WeblAdmin;
 			productReference = 5333A25A27C2F3A80064FF44 /* WeblAdmin.app */;
@@ -213,7 +210,6 @@
 			mainGroup = 5333A25127C2F3A80064FF44;
 			packageReferences = (
 				535BBE0B27C762E100920283 /* XCRemoteSwiftPackageReference "swift-markdown" */,
-				53DC2F0C27CB380D00D780EE /* XCRemoteSwiftPackageReference "AnyCodable" */,
 			);
 			productRefGroup = 5333A25B27C2F3A80064FF44 /* Products */;
 			projectDirPath = "";
@@ -462,14 +458,6 @@
 				kind = branch;
 			};
 		};
-		53DC2F0C27CB380D00D780EE /* XCRemoteSwiftPackageReference "AnyCodable" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Flight-School/AnyCodable";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.6.2;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -477,11 +465,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 535BBE0B27C762E100920283 /* XCRemoteSwiftPackageReference "swift-markdown" */;
 			productName = Markdown;
-		};
-		53DC2F0D27CB380D00D780EE /* AnyCodable */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 53DC2F0C27CB380D00D780EE /* XCRemoteSwiftPackageReference "AnyCodable" */;
-			productName = AnyCodable;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

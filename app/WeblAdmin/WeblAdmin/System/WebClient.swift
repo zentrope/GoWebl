@@ -5,7 +5,6 @@
 //  Created by Keith Irwin on 2/20/22.
 //
 
-import AnyCodable
 import SwiftUI
 import OSLog
 
@@ -73,7 +72,7 @@ final class WebClient: NSObject {
           }
         }
         """
-        let query = Query(query: gql, operationName: "Authenticate", variables: ["email" : AnyCodable(self.email), "pass" : AnyCodable(self.password)])
+        let query = Query(query: gql, operationName: "Authenticate", variables: ["email" : Param(self.email), "pass" : Param(self.password)])
 
         let result = try await doQuery(query)
 
@@ -103,7 +102,7 @@ extension WebClient {
         let mutation = Query(
             query: ql,
             operationName: "SetPostStatus",
-            variables: ["uuid" : AnyCodable(uuid), "isPublished" : AnyCodable(isPublished)]
+            variables: ["uuid" : Param(uuid), "isPublished" : Param(isPublished)]
         )
 
         let result = try await doQuery(mutation, token: token)
@@ -150,10 +149,37 @@ extension WebClient {
 
 extension WebClient {
 
+    /// Provides a wrapper around arbitrary values used as parameter lists for GraphQL queries and mutations.
+    struct Param<T>: Encodable {
+
+        var value: T
+
+        init(_ value: T) {
+            self.value = value
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.singleValueContainer()
+            switch self.value {
+                case let value as Bool:
+                    try container.encode(value)
+                case let value as String:
+                    try container.encode(value)
+                case let value as Int:
+                    try container.encode(value)
+                default:
+                    let context = EncodingError.Context(
+                        codingPath: container.codingPath,
+                        debugDescription: "Param value cannot be encoded")
+                                throw EncodingError.invalidValue(value, context)
+            }
+        }
+    }
+
     struct Query: Encodable {
         var query: String
         var operationName: String
-        var variables: [String:AnyCodable]
+        var variables: [String:Param<Any>]
     }
 
     struct GQLResponse: Decodable {
