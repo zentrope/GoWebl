@@ -38,11 +38,19 @@ struct MarkdownDecoder: MarkupWalker {
     // BLOCKS
 
     mutating func visitDocument(_ document: Document) -> () {
-        elements.append("<!doctype html>")
-        elements.append(#"<html><head><meta charset="UTF-8"><link href="style.css" type="text/css" rel="stylesheet"/></head><body>"#)
+        elements.append(contentsOf: [
+            "<!doctype html>",
+            #"<html lang="en">"#,
+            "<head>",
+            #"<meta charset="UTF-8">"#,
+            #"<link href="style.css" type="text/css" rel="stylesheet"/>"#,
+            "</head>",
+            "<body>"
+        ])
         descendInto(document)
         elements.append("</body></html>")
     }
+
     mutating func visitParagraph(_ paragraph: Paragraph) -> () {
         elements.append("<p>")
         descendInto(paragraph)
@@ -69,16 +77,21 @@ struct MarkdownDecoder: MarkupWalker {
     // LINK
 
     mutating func visitLink(_ link: Link) -> () {
-        let title = link.plainText
+        // NOTE: This library does not support titles (the text in quotes after the link).
+        let text = link.plainText
         let href = link.destination ?? "#"
-        let link = #"<a title="\#(title)" href="\#(href)">\#(title)</a>"#
+        let link = #"<a href="\#(href)">\#(text)</a>"#
         elements.append(link)
     }
 
     // STYLE
 
     mutating func visitInlineCode(_ inlineCode: InlineCode) -> () {
-        elements.append("<code>\(inlineCode.code)</code>")
+        elements.append(contentsOf: [
+            "<code>",
+            inlineCode.code.escapeHtml,
+            "</code>"
+        ])
     }
 
     mutating func visitEmphasis(_ emphasis: Emphasis) -> () {
@@ -97,8 +110,7 @@ struct MarkdownDecoder: MarkupWalker {
 
     mutating func visitCodeBlock(_ codeBlock: CodeBlock) -> () {
         elements.append("<pre>")
-        elements.append(codeBlock.code)
-        //descendInto(codeBlock)
+        elements.append(codeBlock.code.escapeHtml)
         elements.append("</pre>")
     }
 

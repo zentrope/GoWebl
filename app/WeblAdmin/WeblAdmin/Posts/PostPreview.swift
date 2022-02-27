@@ -1,16 +1,14 @@
 //
-//  PostSourceViewer.swift
+//  PostPreview.swift
 //  WeblAdmin
 //
-//  Created by Keith Irwin on 2/20/22.
+//  Created by Keith Irwin on 2/26/22.
 //
 
 import SwiftUI
 
-struct PostSourceViewer: View {
-
+struct PostPreview: View {
     var post: WebClient.Post
-
 
     var body: some View {
         VStack {
@@ -28,19 +26,9 @@ struct PostSourceViewer: View {
                 Divider()
             }
             .padding([.horizontal, .top])
-
-            VStack {
-                WebPostPreview(document: post.text.markdownToHtml)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.leading, 10)
+            WebPostPreview(document: post.text.markdownToHtml)
+                .padding(.leading, 10)
         }
-        .background(Color(nsColor: .textBackgroundColor))
-    }
-}
-
-fileprivate extension String {
-    var markdownToHtml: String {
-        HTMLEncoder(self).html()
+        .background(Color.textBackgroundColor)
     }
 }
