@@ -33,7 +33,7 @@ extension WebClient {
         return !result.isEmpty
     }
 
-    func togglePost(withId uuid: String, isPublished: Bool) async throws {
+    func togglePost(withId uuid: String, isPublished: Bool) async throws -> Post {
         let token = try await login()
         let ql = """
         mutation
@@ -48,7 +48,11 @@ extension WebClient {
         )
 
         let result = try await doQuery(mutation, token: token)
+        if let post = result.data.setPostStatus {
+            return post
+        }
         log.debug("\(String(describing: result))")
+        throw GraphQlError.NoViewerData
     }
 
     func updatePost(uuid: String, slugline: String, text: String, datePublished: Date) async throws -> Post {
@@ -63,10 +67,11 @@ extension WebClient {
             "u" : Param(uuid), "s": Param(slugline), "t" : Param(text), "d": Param(datePublished)
         ])
         let result = try await doQuery(mutation, token: token)
-        log.debug("\(String(describing: result))")
+
         if let post = result.data.updatePost {
             return post
         }
+        log.debug("\(String(describing: result))")
         throw GraphQlError.NoViewerData
     }
 
@@ -242,14 +247,14 @@ extension WebClient {
     }
 
     struct Post: Decodable, Identifiable, Equatable {
-        var id: String
-        var status: Status
-        var slugline: String
-        var dateCreated: Date
-        var dateUpdated: Date
-        var datePublished: Date
-        var wordCount: Int
-        var text: String
+        var id: String = ""
+        var status: Status = Status.draft
+        var slugline: String = ""
+        var dateCreated: Date = Date.distantPast
+        var dateUpdated: Date = Date.distantPast
+        var datePublished: Date = Date.distantPast
+        var wordCount: Int = 0
+        var text: String = ""
 
         private enum CodingKeys: String, CodingKey {
             case id = "uuid", status, slugline, dateCreated, dateUpdated, datePublished, wordCount, text

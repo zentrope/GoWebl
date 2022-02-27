@@ -23,10 +23,12 @@ final class PostListViewState: NSObject, ObservableObject {
 
     override init() {
         super.init()
+        Task { await self.refresh() }
 
-        //Task { await self.reload() }
+        NotificationCenter.default.addObserver(forName: DataCache.DataCacheDidChange, object: DataCache.shared, queue: .main) { _ in
+            Task { await self.reload() }
+        }
     }
-
 }
 
 // MARK: - Public API
@@ -38,11 +40,12 @@ extension PostListViewState {
     }
 
     func toggle(id: String, isPublished: Bool) {
+        log.debug("Setting post \(id) to isPublished: \(isPublished).")
         Task {
             do {
                 let client = WebClient()
-                try await client.togglePost(withId: id, isPublished: isPublished)
-                reload(client)
+                let post = try await client.togglePost(withId: id, isPublished: isPublished)
+                DataCache.shared[post.id] = post                
             } catch (let e) {
                 showAlert(error: e)
             }
@@ -50,7 +53,17 @@ extension PostListViewState {
     }
 
     func refresh() {
-        reload()
+        Task {
+            do {
+                log.debug("Reloading from server.")
+                let client = WebClient()
+                let viewerData = try await client.viewerData()
+                DataCache.shared.replaceAll(viewer: viewerData)
+                reload()
+            } catch (let e) {
+                showAlert(error: e)
+            }
+        }
     }
 }
 
@@ -58,19 +71,12 @@ extension PostListViewState {
 
 extension PostListViewState {
 
-    private func reload(_ wc: WebClient? = nil) {
-        Task {
-            do {
-                let client = wc ?? WebClient()
-                let viewerData = try await client.viewerData()
-                self.name = viewerData.name
-                self.email = viewerData.email
-                self.site = viewerData.site
-                self.posts = viewerData.posts.sorted(by: { $0.dateCreated > $1.dateCreated })
-            } catch (let e) {
-                showAlert(error: e)
-            }
-        }
+    private func reload() {
+        log.debug("Reloading from cache.")
+        self.name = DataCache.shared.name
+        self.email = DataCache.shared.email
+        self.site = DataCache.shared.site
+        self.posts = DataCache.shared.posts
     }
 
     private func showAlert(error: Error) {

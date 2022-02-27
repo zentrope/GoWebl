@@ -38,13 +38,10 @@ struct PostListView: View {
                     .frame(minWidth: 350, idealWidth: 350)
             }
         }
-        .task {
-            state.refresh()
-        }
         .navigationSubtitle("\(state.site.title) — \(state.name) <\(state.email)>")
         .sheet(isPresented: $showEditor, content: {
-            if let postId = selectedPost, let post = state.post(id: postId) {
-                PostSourceEditor(post: post)
+            if let postId = selectedPost {
+                PostSourceEditorView(postId: postId)
                     .frame(minWidth: 800, minHeight: 600)
             } else {
                 UnselectedView(message: "Selected Post Disappeared")
