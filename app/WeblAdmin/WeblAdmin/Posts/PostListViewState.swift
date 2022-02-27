@@ -24,17 +24,44 @@ final class PostListViewState: NSObject, ObservableObject {
     override init() {
         super.init()
 
-        Task { await self.reload() }
+        //Task { await self.reload() }
     }
+
+}
+
+// MARK: - Public API
+
+extension PostListViewState {
 
     func post(id: String?) -> WebClient.Post? {
         return posts.first(where: { $0.id == id })
     }
 
-    private func reload() {
+    func toggle(id: String, isPublished: Bool) {
         Task {
             do {
                 let client = WebClient()
+                try await client.togglePost(withId: id, isPublished: isPublished)
+                reload(client)
+            } catch (let e) {
+                showAlert(error: e)
+            }
+        }
+    }
+
+    func refresh() {
+        reload()
+    }
+}
+
+// MARK: - Private Implementation Details
+
+extension PostListViewState {
+
+    private func reload(_ wc: WebClient? = nil) {
+        Task {
+            do {
+                let client = wc ?? WebClient()
                 let viewerData = try await client.viewerData()
                 self.name = viewerData.name
                 self.email = viewerData.email

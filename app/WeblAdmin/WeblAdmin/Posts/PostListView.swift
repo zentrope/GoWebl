@@ -20,6 +20,9 @@ struct PostListView: View {
                 ForEach(state.posts, id: \.id) { post in
                     Item(post: post)
                         .padding(.vertical, 2)
+                        .contextMenu {
+                            ContextMenu(post: post)
+                        }
                 }
             }
             .listStyle(.inset(alternatesRowBackgrounds: true))
@@ -35,6 +38,9 @@ struct PostListView: View {
                     .frame(minWidth: 350, idealWidth: 350)
             }
         }
+        .task {
+            state.refresh()
+        }
         .navigationSubtitle("\(state.site.title) — \(state.name) <\(state.email)>")
         .sheet(isPresented: $showEditor, content: {
             if let postId = selectedPost, let post = state.post(id: postId) {
@@ -46,12 +52,18 @@ struct PostListView: View {
         })
         .toolbar {
             ToolbarItem {
-                if selectedPost != nil {
-                    Button {
-                        showEditor.toggle()
-                    } label: {
-                        Image(systemName: "square.and.pencil")
-                    }
+                Button {
+                    showEditor.toggle()
+                } label: {
+                    Image(systemName: "square.and.pencil")
+                }
+                .disabled(selectedPost == nil)
+            }
+            ToolbarItem(placement: .navigation) {
+                Button {
+                    state.refresh()
+                } label: {
+                    Image(systemName: "arrow.clockwise")
                 }
             }
         }
@@ -61,6 +73,20 @@ struct PostListView: View {
 // MARK: - Supplemental views
 
 extension PostListView {
+
+    @ViewBuilder
+    private func ContextMenu(post: WebClient.Post) -> some View {
+        switch post.status {
+            case .draft:
+                Button("Publish this post") {
+                    state.toggle(id: post.id, isPublished: true)
+                }
+            case .published:
+                Button("Unpublish this post (return to draft mode)") {
+                    state.toggle(id: post.id, isPublished: false)
+                }
+        }
+    }
 
     @ViewBuilder
     private func Item(post: WebClient.Post) -> some View {

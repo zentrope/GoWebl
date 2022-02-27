@@ -25,6 +25,8 @@
 		53DC2F0527CB200600D780EE /* UnselectedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0427CB200600D780EE /* UnselectedView.swift */; };
 		53DC2F0727CB20AE00D780EE /* PostPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0627CB20AE00D780EE /* PostPreview.swift */; };
 		53DC2F0927CB269700D780EE /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0827CB269700D780EE /* Color.swift */; };
+		53DC2F0B27CB281D00D780EE /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0A27CB281D00D780EE /* Logger.swift */; };
+		53DC2F0E27CB380D00D780EE /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = 53DC2F0D27CB380D00D780EE /* AnyCodable */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +49,7 @@
 		53DC2F0427CB200600D780EE /* UnselectedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnselectedView.swift; sourceTree = "<group>"; };
 		53DC2F0627CB20AE00D780EE /* PostPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostPreview.swift; sourceTree = "<group>"; };
 		53DC2F0827CB269700D780EE /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
+		53DC2F0A27CB281D00D780EE /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				53DC2F0E27CB380D00D780EE /* AnyCodable in Frameworks */,
 				535BBE0D27C762E100920283 /* Markdown in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -64,8 +68,9 @@
 		53287CB827C9F7330002E7C5 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				53287CBB27C9F74D0002E7C5 /* String.swift */,
 				53DC2F0827CB269700D780EE /* Color.swift */,
+				53DC2F0A27CB281D00D780EE /* Logger.swift */,
+				53287CBB27C9F74D0002E7C5 /* String.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -176,6 +181,7 @@
 			name = WeblAdmin;
 			packageProductDependencies = (
 				535BBE0C27C762E100920283 /* Markdown */,
+				53DC2F0D27CB380D00D780EE /* AnyCodable */,
 			);
 			productName = WeblAdmin;
 			productReference = 5333A25A27C2F3A80064FF44 /* WeblAdmin.app */;
@@ -207,6 +213,7 @@
 			mainGroup = 5333A25127C2F3A80064FF44;
 			packageReferences = (
 				535BBE0B27C762E100920283 /* XCRemoteSwiftPackageReference "swift-markdown" */,
+				53DC2F0C27CB380D00D780EE /* XCRemoteSwiftPackageReference "AnyCodable" */,
 			);
 			productRefGroup = 5333A25B27C2F3A80064FF44 /* Products */;
 			projectDirPath = "";
@@ -245,6 +252,7 @@
 				5333A27927C313780064FF44 /* DateView.swift in Sources */,
 				5333A25E27C2F3A80064FF44 /* WeblAdminApp.swift in Sources */,
 				53DC2F0927CB269700D780EE /* Color.swift in Sources */,
+				53DC2F0B27CB281D00D780EE /* Logger.swift in Sources */,
 				5333A27127C2F44B0064FF44 /* AccountPreferences.swift in Sources */,
 				5333A26E27C2F3EE0064FF44 /* WebClient.swift in Sources */,
 				535BBE0627C7595D00920283 /* WebPostPreview.swift in Sources */,
@@ -454,6 +462,14 @@
 				kind = branch;
 			};
 		};
+		53DC2F0C27CB380D00D780EE /* XCRemoteSwiftPackageReference "AnyCodable" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Flight-School/AnyCodable";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.6.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -461,6 +477,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 535BBE0B27C762E100920283 /* XCRemoteSwiftPackageReference "swift-markdown" */;
 			productName = Markdown;
+		};
+		53DC2F0D27CB380D00D780EE /* AnyCodable */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 53DC2F0C27CB380D00D780EE /* XCRemoteSwiftPackageReference "AnyCodable" */;
+			productName = AnyCodable;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

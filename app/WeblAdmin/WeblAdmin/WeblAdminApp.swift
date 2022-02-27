@@ -13,6 +13,8 @@ struct WeblAdminApp: App {
         WindowGroup {
             ContentView()
         }
+        .windowStyle(.titleBar)
+        .windowToolbarStyle(.unified(showsTitle: true))
 
         Settings {
             AccountPreferences()

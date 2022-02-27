@@ -5,12 +5,15 @@
 //  Created by Keith Irwin on 2/20/22.
 //
 
+import AnyCodable
 import SwiftUI
 import OSLog
 
-fileprivate let log = Logger(subsystem: "com.zentrop.WeblAdmin", category: "WebClient")
+fileprivate let log = Logger("WebClient")
 
-class WebClient: NSObject {
+// MARK: - WebClient
+
+final class WebClient: NSObject {
 
     @AppStorage("WAAccountEmail") private var email = ""
     @AppStorage("WAAccountPassword") private var password = ""
@@ -19,28 +22,6 @@ class WebClient: NSObject {
 
     override init() {
         super.init()
-    }
-
-    func test() async throws -> Bool {
-        let result = try await login()
-        return !result.isEmpty
-    }
-
-    func viewerData() async throws -> Viewer {
-        let token = try await login()
-
-        let ql = """
-        query {
-          viewer { id name type email
-            site { baseUrl title description }
-            posts { uuid status slugline dateCreated dateUpdated datePublished text wordCount }}}
-        """
-        let query = Query(query: ql, operationName: "", variables: [:])
-        let result = try await doQuery(query, token: token)
-        if let viewer = result.data.viewer {
-            return viewer
-        }
-        throw GraphQlError.NoViewerData
     }
 
     private func doQuery(_ query: Query, token: String? = nil) async throws -> GQLResponse {
@@ -92,13 +73,59 @@ class WebClient: NSObject {
           }
         }
         """
-        let query = Query(query: gql, operationName: "Authenticate", variables: ["email" : self.email, "pass" : self.password])
+        let query = Query(query: gql, operationName: "Authenticate", variables: ["email" : AnyCodable(self.email), "pass" : AnyCodable(self.password)])
 
         let result = try await doQuery(query)
 
         let token = result.data.authenticate?.token ?? ""
         self.token = token
         return token
+    }
+}
+
+// MARK: - Public API
+
+extension WebClient {
+
+    func test() async throws -> Bool {
+        let result = try await login()
+        return !result.isEmpty
+    }
+
+    func togglePost(withId uuid: String, isPublished: Bool) async throws {
+        let token = try await login()
+        let ql = """
+        mutation
+            SetPostStatus($uuid: String!, $isPublished: Boolean!) {
+              setPostStatus(uuid: $uuid, isPublished: $isPublished) {
+                uuid slugline status dateCreated dateUpdated datePublished wordCount text }}
+        """
+        let mutation = Query(
+            query: ql,
+            operationName: "SetPostStatus",
+            variables: ["uuid" : AnyCodable(uuid), "isPublished" : AnyCodable(isPublished)]
+        )
+
+        let result = try await doQuery(mutation, token: token)
+        log.debug("\(String(describing: result))")
+
+    }
+
+    func viewerData() async throws -> Viewer {
+        let token = try await login()
+
+        let ql = """
+        query {
+          viewer { id name type email
+            site { baseUrl title description }
+            posts { uuid status slugline dateCreated dateUpdated datePublished text wordCount }}}
+        """
+        let query = Query(query: ql, operationName: "", variables: [:])
+        let result = try await doQuery(query, token: token)
+        if let viewer = result.data.viewer {
+            return viewer
+        }
+        throw GraphQlError.NoViewerData
     }
 }
 
@@ -126,7 +153,7 @@ extension WebClient {
     struct Query: Encodable {
         var query: String
         var operationName: String
-        var variables: [String:String]
+        var variables: [String:AnyCodable]
     }
 
     struct GQLResponse: Decodable {
