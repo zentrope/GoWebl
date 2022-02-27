@@ -22,9 +22,79 @@ final class WebClient: NSObject {
     override init() {
         super.init()
     }
+}
+
+// MARK: - Public API
+
+extension WebClient {
+
+    func test() async throws -> Bool {
+        let result = try await login()
+        return !result.isEmpty
+    }
+
+    func togglePost(withId uuid: String, isPublished: Bool) async throws {
+        let token = try await login()
+        let ql = """
+        mutation
+            SetPostStatus($uuid: String!, $isPublished: Boolean!) {
+              setPostStatus(uuid: $uuid, isPublished: $isPublished) {
+                uuid slugline status dateCreated dateUpdated datePublished wordCount text }}
+        """
+        let mutation = Query(
+            query: ql,
+            operationName: "SetPostStatus",
+            variables: ["uuid" : Param(uuid), "isPublished" : Param(isPublished)]
+        )
+
+        let result = try await doQuery(mutation, token: token)
+        log.debug("\(String(describing: result))")
+    }
+
+    func updatePost(uuid: String, slugline: String, text: String, datePublished: Date) async throws -> Post {
+        let token = try await login()
+        let ql = """
+            mutation
+            UpdatePost($u: String! $s: String! $t: String! $d: String!) {
+              updatePost(uuid: $u slugline: $s text: $t datePublished: $d) {
+                uuid slugline status dateCreated dateUpdated datePublished text wordCount}}
+        """
+        let mutation = Query(query: ql, operationName: "UpdatePost", variables: [
+            "u" : Param(uuid), "s": Param(slugline), "t" : Param(text), "d": Param(datePublished)
+        ])
+        let result = try await doQuery(mutation, token: token)
+        log.debug("\(String(describing: result))")
+        if let post = result.data.updatePost {
+            return post
+        }
+        throw GraphQlError.NoViewerData
+    }
+
+    func viewerData() async throws -> Viewer {
+        let token = try await login()
+
+        let ql = """
+        query {
+          viewer { id name type email
+            site { baseUrl title description }
+            posts { uuid status slugline dateCreated dateUpdated datePublished text wordCount }}}
+        """
+        let query = Query(query: ql, operationName: "", variables: [:])
+        let result = try await doQuery(query, token: token)
+        if let viewer = result.data.viewer {
+            return viewer
+        }
+        throw GraphQlError.NoViewerData
+    }
+}
+
+// MARK: - Private Implementation Details
+
+extension WebClient {
 
     private func doQuery(_ query: Query, token: String? = nil) async throws -> GQLResponse {
         let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
         let payload = try encoder.encode(query)
 
         let path = "https://devtrope.com/query"
@@ -41,12 +111,14 @@ final class WebClient: NSObject {
 
         let (data, _) = try await URLSession.shared.data(for: request)
 
-//        guard let doc = String(data: data, encoding: .utf8) else {
-//            log.error("cannot decode raw data into UTF8 string")
-//            throw URLError(.cannotDecodeRawData)
-//        }
+//        if !query.operationName.isEmpty {
+//            guard let doc = String(data: data, encoding: .utf8) else {
+//                log.error("cannot decode raw data into UTF8 string")
+//                throw URLError(.cannotDecodeRawData)
+//            }
 //
-//        log.debug("decoding: \(doc)")
+//            log.debug("\n\ndecoding: \(doc)\n\n")
+//        }
 
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
@@ -79,52 +151,6 @@ final class WebClient: NSObject {
         let token = result.data.authenticate?.token ?? ""
         self.token = token
         return token
-    }
-}
-
-// MARK: - Public API
-
-extension WebClient {
-
-    func test() async throws -> Bool {
-        let result = try await login()
-        return !result.isEmpty
-    }
-
-    func togglePost(withId uuid: String, isPublished: Bool) async throws {
-        let token = try await login()
-        let ql = """
-        mutation
-            SetPostStatus($uuid: String!, $isPublished: Boolean!) {
-              setPostStatus(uuid: $uuid, isPublished: $isPublished) {
-                uuid slugline status dateCreated dateUpdated datePublished wordCount text }}
-        """
-        let mutation = Query(
-            query: ql,
-            operationName: "SetPostStatus",
-            variables: ["uuid" : Param(uuid), "isPublished" : Param(isPublished)]
-        )
-
-        let result = try await doQuery(mutation, token: token)
-        log.debug("\(String(describing: result))")
-
-    }
-
-    func viewerData() async throws -> Viewer {
-        let token = try await login()
-
-        let ql = """
-        query {
-          viewer { id name type email
-            site { baseUrl title description }
-            posts { uuid status slugline dateCreated dateUpdated datePublished text wordCount }}}
-        """
-        let query = Query(query: ql, operationName: "", variables: [:])
-        let result = try await doQuery(query, token: token)
-        if let viewer = result.data.viewer {
-            return viewer
-        }
-        throw GraphQlError.NoViewerData
     }
 }
 
@@ -167,6 +193,8 @@ extension WebClient {
                     try container.encode(value)
                 case let value as Int:
                     try container.encode(value)
+                case let value as Date:
+                    try container.encode(value)
                 default:
                     let context = EncodingError.Context(
                         codingPath: container.codingPath,
@@ -194,6 +222,8 @@ extension WebClient {
     struct GData: Decodable {
         var authenticate: Token?
         var viewer: Viewer?
+        var setPostStatus: Post?
+        var updatePost: Post?
     }
 
     struct Viewer: Decodable {

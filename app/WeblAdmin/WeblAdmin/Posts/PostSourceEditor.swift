@@ -7,11 +7,35 @@
 
 import SwiftUI
 
+class PostSourceEditorViewState: NSObject, ObservableObject {
+
+    @Published var showAlert = false
+    @Published var error: Error?
+
+    func update(post: WebClient.Post, newText: String) {
+        Task {
+            do {
+                let client = WebClient()
+                let updatedPost = try await client.updatePost(uuid: post.id, slugline: post.slugline, text: newText, datePublished: post.datePublished)
+                print("Updated: \(updatedPost.id)")
+            } catch (let err) {
+                showAlert(error: err)
+            }
+        }
+    }
+
+    func showAlert(error: Error) {
+        self.showAlert = true
+        self.error = error
+    }
+}
+
 struct PostSourceEditor: View {
     @Environment(\.dismiss) private var dismiss
 
     var post: WebClient.Post
 
+    @StateObject private var state = PostSourceEditorViewState()
     @State private var showPreview = false
     @State private var source = ""
 
@@ -47,12 +71,13 @@ struct PostSourceEditor: View {
 
             HStack {
                 Button("Save") {
-
+                    state.update(post: post, newText: source)
                 }
-                .disabled(true)
+                .disabled(post.text == source)
                 Button("Cancel") {
                     dismiss()
                 }
+                .keyboardShortcut(.cancelAction)
                 Spacer()
                 Button(showPreview ? "Hide Preview" : "Show Preview") {
                     showPreview.toggle()
