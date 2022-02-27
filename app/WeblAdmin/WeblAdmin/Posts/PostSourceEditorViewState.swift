@@ -5,7 +5,7 @@
 //  Created by Keith Irwin on 2/26/22.
 //
 
-import Foundation
+@preconcurrency import Foundation
 import OSLog
 
 @MainActor
@@ -17,11 +17,11 @@ class PostSourceEditorViewState: NSObject, ObservableObject {
 
     let log = Logger("PostSourceEditorViewState")
 
-    func update(post: WebClient.Post, newText: String) {
+    func update(post: WebClient.Post, title: String, source: String, published: Date) {
         Task {
             do {
                 let client = WebClient()
-                let updatedPost = try await client.updatePost(uuid: post.id, slugline: post.slugline, text: newText, datePublished: post.datePublished)
+                let updatedPost = try await client.updatePost(uuid: post.id, slugline: title, text: source, datePublished: published)
                 DataCache.shared[updatedPost.id] = updatedPost
                 self.post = updatedPost
                 log.debug("Updated: \(updatedPost.id)")

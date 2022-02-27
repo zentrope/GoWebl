@@ -17,4 +17,8 @@ extension String {
             .replacingOccurrences(of: "<", with: "&lt;")
             .replacingOccurrences(of: ">", with: "&gt;")
     }
+
+    var words: Int {
+        self.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.count
+    }
 }
