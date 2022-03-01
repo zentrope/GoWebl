@@ -19,6 +19,7 @@ struct PostListView: View {
             List(selection: $selectedPost) {
                 ForEach(state.posts, id: \.id) { post in
                     Item(post: post)
+                        .tag(post.id)
                         .padding(.vertical, 2)
                         .contextMenu {
                             ContextMenu(post: post)
@@ -39,6 +40,7 @@ struct PostListView: View {
             }
         }
         .navigationSubtitle("\(state.site.title) — \(state.name) <\(state.email)>")
+        .alert(state.error?.localizedDescription ?? "Error: check logs.", isPresented: $state.showAlert, actions: {})
         .sheet(isPresented: $showEditor, content: {
             if let postId = selectedPost {
                 PostSourceEditorView(postId: postId)
@@ -48,6 +50,13 @@ struct PostListView: View {
             }
         })
         .toolbar {
+            ToolbarItem {
+                Button {
+                    Task { self.selectedPost = await state.newPost() }
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
             ToolbarItem {
                 Button {
                     showEditor.toggle()
@@ -73,15 +82,22 @@ extension PostListView {
 
     @ViewBuilder
     private func ContextMenu(post: WebClient.Post) -> some View {
+        Button("Edit") {
+            selectedPost = post.id
+            showEditor.toggle()
+        }
         switch post.status {
             case .draft:
-                Button("Publish this post") {
+                Button("Publish") {
                     state.toggle(id: post.id, isPublished: true)
                 }
             case .published:
-                Button("Unpublish this post (return to draft mode)") {
+                Button("Unpublish (return to draft mode)") {
                     state.toggle(id: post.id, isPublished: false)
                 }
+        }
+        Button("Delete") {
+            state.deletePost(withId: post.id)
         }
     }
 
