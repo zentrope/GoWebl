@@ -35,8 +35,16 @@ final class PostListViewState: NSObject, ObservableObject {
 
 extension PostListViewState {
 
-    func post(id: String?) -> WebClient.Post? {
-        return posts.first(where: { $0.id == id })
+    func deletePost(withId id: String) {
+        Task {
+            do {
+                let client = WebClient()
+                try await client.deletePost(postId: id)
+                DataCache.shared[id] = nil
+            } catch (let e) {
+                showAlert(error: e)
+            }
+        }
     }
 
     func newPost() async -> String? {
@@ -70,17 +78,8 @@ extension PostListViewState {
         }
     }
 
-    func toggle(id: String, isPublished: Bool) {
-        log.debug("Setting post \(id) to isPublished: \(isPublished).")
-        Task {
-            do {
-                let client = WebClient()
-                let post = try await client.togglePost(withId: id, isPublished: isPublished)
-                DataCache.shared[post.id] = post                
-            } catch (let e) {
-                showAlert(error: e)
-            }
-        }
+    func post(id: String?) -> WebClient.Post? {
+        return posts.first(where: { $0.id == id })
     }
 
     func refresh() {
@@ -91,6 +90,19 @@ extension PostListViewState {
                 let viewerData = try await client.viewerData()
                 DataCache.shared.replaceAll(viewer: viewerData)
                 reload()
+            } catch (let e) {
+                showAlert(error: e)
+            }
+        }
+    }
+
+    func toggle(id: String, isPublished: Bool) {
+        log.debug("Setting post \(id) to isPublished: \(isPublished).")
+        Task {
+            do {
+                let client = WebClient()
+                let post = try await client.togglePost(withId: id, isPublished: isPublished)
+                DataCache.shared[post.id] = post                
             } catch (let e) {
                 showAlert(error: e)
             }

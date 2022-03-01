@@ -28,6 +28,35 @@ final class WebClient: NSObject {
 
 extension WebClient {
 
+    func createPost(post: Post) async throws -> Post {
+        let token = try await login()
+        let ql = """
+            mutation
+            CreatePost($slugline: String! $status: String! $text: String! $d: String! $token: String) {
+              createPost(slugline: $slugline, status: $status, text: $text, datePublished: $d, token: $token) {
+                uuid slugline status dateCreated dateUpdated datePublished text wordCount }}
+        """
+        let mutation = Query(query: ql, operationName: "CreatePost", variables: [
+            "slugline": Param(post.slugline),
+            "status": Param(post.status.rawValue),
+            "text" : Param(post.text),
+            "d": Param(post.datePublished)
+        ])
+        let result = try await doQuery(mutation, token: token)
+        if let post = result.data.createPost {
+            return post
+        }
+        throw GraphQlError.NoViewerData
+    }
+
+    func deletePost(postId id: String) async throws {
+        let token = try await login()
+        let ql = "mutation DeletePost($uuid: String!) { deletePost(uuid: $uuid) } "
+        let mutation = Query(query: ql, operationName: "DeletePost", variables: ["uuid": Param(id)])
+        let result = try await doQuery(mutation, token: token)
+        log.debug("\(String(describing: result))")
+    }
+
     func test() async throws -> Bool {
         let result = try await login()
         return !result.isEmpty
@@ -72,27 +101,6 @@ extension WebClient {
             return post
         }
         log.debug("\(String(describing: result))")
-        throw GraphQlError.NoViewerData
-    }
-
-    func createPost(post: Post) async throws -> Post {
-        let token = try await login()
-        let ql = """
-            mutation
-            CreatePost($slugline: String! $status: String! $text: String! $d: String! $token: String) {
-              createPost(slugline: $slugline, status: $status, text: $text, datePublished: $d, token: $token) {
-                uuid slugline status dateCreated dateUpdated datePublished text wordCount }}
-        """
-        let mutation = Query(query: ql, operationName: "CreatePost", variables: [
-            "slugline": Param(post.slugline),
-            "status": Param(post.status.rawValue),
-            "text" : Param(post.text),
-            "d": Param(post.datePublished)
-        ])
-        let result = try await doQuery(mutation, token: token)
-        if let post = result.data.createPost {
-            return post
-        }
         throw GraphQlError.NoViewerData
     }
 

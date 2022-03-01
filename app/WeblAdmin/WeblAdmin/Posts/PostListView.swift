@@ -40,6 +40,7 @@ struct PostListView: View {
             }
         }
         .navigationSubtitle("\(state.site.title) — \(state.name) <\(state.email)>")
+        .alert(state.error?.localizedDescription ?? "Error: check logs.", isPresented: $state.showAlert, actions: {})
         .sheet(isPresented: $showEditor, content: {
             if let postId = selectedPost {
                 PostSourceEditorView(postId: postId)
@@ -81,19 +82,22 @@ extension PostListView {
 
     @ViewBuilder
     private func ContextMenu(post: WebClient.Post) -> some View {
-        Button("Edit this post") {
+        Button("Edit") {
             selectedPost = post.id
             showEditor.toggle()
         }
         switch post.status {
             case .draft:
-                Button("Publish this post") {
+                Button("Publish") {
                     state.toggle(id: post.id, isPublished: true)
                 }
             case .published:
-                Button("Unpublish this post (return to draft mode)") {
+                Button("Unpublish (return to draft mode)") {
                     state.toggle(id: post.id, isPublished: false)
                 }
+        }
+        Button("Delete") {
+            state.deletePost(withId: post.id)
         }
     }
 
