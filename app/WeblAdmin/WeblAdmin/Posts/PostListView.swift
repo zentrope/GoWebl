@@ -73,6 +73,10 @@ extension PostListView {
 
     @ViewBuilder
     private func ContextMenu(post: WebClient.Post) -> some View {
+        Button("Edit this post") {
+            selectedPost = post.id
+            showEditor.toggle()
+        }
         switch post.status {
             case .draft:
                 Button("Publish this post") {
