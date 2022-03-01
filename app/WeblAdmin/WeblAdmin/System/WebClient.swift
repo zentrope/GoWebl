@@ -75,6 +75,27 @@ extension WebClient {
         throw GraphQlError.NoViewerData
     }
 
+    func createPost(post: Post) async throws -> Post {
+        let token = try await login()
+        let ql = """
+            mutation
+            CreatePost($slugline: String! $status: String! $text: String! $d: String! $token: String) {
+              createPost(slugline: $slugline, status: $status, text: $text, datePublished: $d, token: $token) {
+                uuid slugline status dateCreated dateUpdated datePublished text wordCount }}
+        """
+        let mutation = Query(query: ql, operationName: "CreatePost", variables: [
+            "slugline": Param(post.slugline),
+            "status": Param(post.status.rawValue),
+            "text" : Param(post.text),
+            "d": Param(post.datePublished)
+        ])
+        let result = try await doQuery(mutation, token: token)
+        if let post = result.data.createPost {
+            return post
+        }
+        throw GraphQlError.NoViewerData
+    }
+
     func viewerData() async throws -> Viewer {
         let token = try await login()
 
@@ -229,6 +250,7 @@ extension WebClient {
         var viewer: Viewer?
         var setPostStatus: Post?
         var updatePost: Post?
+        var createPost: Post?
     }
 
     struct Viewer: Decodable {
@@ -261,8 +283,8 @@ extension WebClient {
         }
 
         enum Status: String, Codable {
-            case published
-            case draft
+            case published = "published"
+            case draft = "draft"
         }
     }
 

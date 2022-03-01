@@ -19,6 +19,7 @@ struct PostListView: View {
             List(selection: $selectedPost) {
                 ForEach(state.posts, id: \.id) { post in
                     Item(post: post)
+                        .tag(post.id)
                         .padding(.vertical, 2)
                         .contextMenu {
                             ContextMenu(post: post)
@@ -48,6 +49,13 @@ struct PostListView: View {
             }
         })
         .toolbar {
+            ToolbarItem {
+                Button {
+                    Task { self.selectedPost = await state.newPost() }
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
             ToolbarItem {
                 Button {
                     showEditor.toggle()

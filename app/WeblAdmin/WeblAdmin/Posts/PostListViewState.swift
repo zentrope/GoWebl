@@ -39,6 +39,37 @@ extension PostListViewState {
         return posts.first(where: { $0.id == id })
     }
 
+    func newPost() async -> String? {
+        let body = "\n# New Post\n\nThis is where you type something. I mean, compose.\n\n"
+        let post = WebClient.Post(
+            id: UUID().uuidString,
+            status: .draft,
+            slugline: "new post",
+            dateCreated: Date(),
+            dateUpdated: Date(),
+            datePublished: Date(),
+            wordCount: body.words,
+            text: body
+        )
+
+        let createTask = Task { () -> String? in
+            let client = WebClient()
+            let newPost = try await client.createPost(post: post)
+            DataCache.shared[newPost.id] = newPost
+            return post.id
+        }
+
+        let result = await createTask.result
+        do {
+            let id = try result.get()
+            reload()
+            return id
+        } catch (let e) {
+            showAlert(error: e)
+            return nil
+        }
+    }
+
     func toggle(id: String, isPublished: Bool) {
         log.debug("Setting post \(id) to isPublished: \(isPublished).")
         Task {
