@@ -104,6 +104,37 @@ extension WebClient {
         throw GraphQlError.NoViewerData
     }
 
+    func updateSite(title: String, description: String, baseURL: String) async throws -> Site {
+        let token = try await login()
+        let ql = """
+        mutation
+            UpdateSite($t: String! $d: String! $b: String!) {
+              updateSite(title: $t description: $d baseUrl: $b) {
+                title description baseUrl }}
+        """
+        let mutation = Query(query: ql, operationName: "UpdateSite", variables: [
+            "t" : Param(title),
+            "d" : Param(description),
+            "b" : Param(baseURL)
+        ])
+        let result = try await doQuery(mutation, token: token)
+        if let site = result.data.updateSite {
+            return site
+        }
+        throw GraphQlError.NoViewerData
+    }
+
+    func updateViewer(name: String, email: String) async throws -> ViewerUpdate {
+        let token = try await login()
+        let ql = "mutation UpdateViewer($n: String! $e: String!) { updateViewer(name: $n, email: $e) { name email }}"
+        let mutation = Query(query: ql, operationName: "UpdateViewer", variables: ["n":Param(name), "e":Param(email)])
+        let result = try await doQuery(mutation, token: token)
+        if let update = result.data.updateViewer {
+            return update
+        }
+        throw GraphQlError.NoViewerData
+    }
+
     func viewerData() async throws -> Viewer {
         let token = try await login()
 
@@ -259,6 +290,13 @@ extension WebClient {
         var setPostStatus: Post?
         var updatePost: Post?
         var createPost: Post?
+        var updateSite: Site?
+        var updateViewer: ViewerUpdate?
+    }
+
+    struct ViewerUpdate: Decodable {
+        var name: String
+        var email: String
     }
 
     struct Viewer: Decodable {
@@ -315,4 +353,3 @@ extension WebClient {
         var token: String
     }
 }
-
