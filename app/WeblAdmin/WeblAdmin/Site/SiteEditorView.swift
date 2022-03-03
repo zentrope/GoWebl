@@ -26,28 +26,29 @@ struct SiteEditorView: View {
                 TextField("Title:", text: $state.siteTitle)
                 TextField("Description:", text: $state.siteDescription)
                 TextField("Base URL:", text: $state.siteBaseURL)
-                Button("Apply") {
-                    state.updateSite(title: state.siteTitle, description: state.siteDescription, baseURL: state.siteBaseURL)
+                HStack(alignment: .center) {
+                    Button("Apply") {
+                        state.updateSite(title: state.siteTitle, description: state.siteDescription, baseURL: state.siteBaseURL)
+                    }
+                    .disabled(!state.siteDirty)
+                    .controlSize(.small)
+                    StatusMessage(isWorking: state.savingSite, isDirty: state.siteDirty)
                 }
-                .disabled(!state.siteDirty)
-                .controlSize(.small)
+                .padding(.vertical, 4)
                 Divider()
                 TextField("Name:", text: $state.accountName)
                 TextField("Email:", text: $state.accountEmail)
-                Button("Apply") {
-
+                HStack {
+                    Button("Apply") {
+                        state.updateAccount(name: state.accountName, email: state.accountEmail)
+                    }
+                    .disabled(!state.accountDirty)
+                    .controlSize(.small)
+                    StatusMessage(isWorking: state.savingAccount, isDirty: state.accountDirty)
                 }
-                .controlSize(.small)
+                .padding(.vertical, 4)
             }
             HStack {
-                if state.working {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .controlSize(.small)
-                } else {
-                    Text(state.siteDirty ? "Unsaved" : state.message)
-                        .foregroundColor(state.siteDirty ? .red : .green)
-                }
                 Spacer()
                 Button("Done") {
                     dismiss()
@@ -57,6 +58,19 @@ struct SiteEditorView: View {
         }
         .alert(state.error?.localizedDescription ?? "Error", isPresented: $state.showAlert, actions: {})
         .padding()
+    }
+
+    @ViewBuilder
+    private func StatusMessage(isWorking: Bool, isDirty: Bool) -> some View {
+        if isWorking {
+            ProgressView()
+                .progressViewStyle(.circular)
+                .controlSize(.mini)
+        } else {
+            Image(systemName: isDirty ? "x.circle.fill" : "checkmark.circle.fill")
+                .foregroundColor(isDirty ? .red : .green)
+                .font(.callout)
+        }
     }
 }
 

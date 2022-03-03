@@ -23,8 +23,8 @@ final class SiteEditorViewState: NSObject, ObservableObject {
     @Published var showAlert = false
     @Published var error: Error?
 
-    @Published var working = false
-    @Published var message = ""
+    @Published var savingSite = false
+    @Published var savingAccount = false
 
     override init() {
         super.init()
@@ -39,20 +39,32 @@ final class SiteEditorViewState: NSObject, ObservableObject {
 
 extension SiteEditorViewState {
 
+    func updateAccount(name: String, email: String) {
+        self.savingAccount = true
+        Task {
+            do {
+                let client = WebClient()
+                let update = try await client.updateViewer(name: name, email: email)
+                DataCache.shared.email = update.email
+                DataCache.shared.name = update.name
+            } catch (let e) {
+                showAlert(error: e)
+            }
+            self.savingAccount = false
+        }
+    }
+
     func updateSite(title: String, description: String, baseURL: String) {
-        self.working = true
-        self.message = ""
+        self.savingSite = true
         Task {
             do {
                 let client = WebClient()
                 let site = try await client.updateSite(title: title, description: description, baseURL: baseURL)
                 DataCache.shared.replace(site: site)
-                reload()
-                self.message = "Saved"
             } catch (let error) {
                 showAlert(error: error)
             }
-            self.working = false
+            self.savingSite = false
         }
     }
 
@@ -62,6 +74,13 @@ extension SiteEditorViewState {
             return false
         }
         return current.title != siteTitle || current.description != siteDescription || current.baseUrl != siteBaseURL
+    }
+
+    var accountDirty: Bool {
+        if accountName.isEmpty {
+            return false
+        }
+        return accountName != DataCache.shared.name || accountEmail != DataCache.shared.email
     }
 }
 
