@@ -32,6 +32,10 @@ final class DataCache {
         notify()
     }
 
+    func replace(site: WebClient.Site) {
+        self.site = site
+    }
+
     private func replaceAll(posts: [WebClient.Post]) {
         cachedData.removeAll()
         for post in posts {

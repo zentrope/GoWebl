@@ -104,6 +104,26 @@ extension WebClient {
         throw GraphQlError.NoViewerData
     }
 
+    func updateSite(title: String, description: String, baseURL: String) async throws -> Site {
+        let token = try await login()
+        let ql = """
+        mutation
+            UpdateSite($t: String! $d: String! $b: String!) {
+              updateSite(title: $t description: $d baseUrl: $b) {
+                title description baseUrl }}
+        """
+        let mutation = Query(query: ql, operationName: "UpdateSite", variables: [
+            "t" : Param(title),
+            "d" : Param(description),
+            "b" : Param(baseURL)
+        ])
+        let result = try await doQuery(mutation, token: token)
+        if let site = result.data.updateSite {
+            return site
+        }
+        throw GraphQlError.NoViewerData
+    }
+
     func viewerData() async throws -> Viewer {
         let token = try await login()
 
@@ -259,6 +279,7 @@ extension WebClient {
         var setPostStatus: Post?
         var updatePost: Post?
         var createPost: Post?
+        var updateSite: Site?
     }
 
     struct Viewer: Decodable {
@@ -315,4 +336,3 @@ extension WebClient {
         var token: String
     }
 }
-

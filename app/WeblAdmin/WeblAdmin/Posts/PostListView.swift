@@ -13,6 +13,7 @@ struct PostListView: View {
 
     @State private var selectedPost: String?
     @State private var showEditor = false
+    @State private var showSiteEditor = false
 
     var body: some View {
         HStack(spacing: 0) {
@@ -49,6 +50,11 @@ struct PostListView: View {
                 UnselectedView(message: "Selected Post Disappeared")
             }
         })
+        .sheet(isPresented: $showSiteEditor, content: {
+            SiteEditorView()
+                .frame(width: 600)
+                .fixedSize(horizontal: false, vertical: true)
+        })
         .toolbar {
             ToolbarItem {
                 Button {
@@ -65,6 +71,14 @@ struct PostListView: View {
                 }
                 .disabled(selectedPost == nil)
             }
+            ToolbarItem(placement: .navigation) {
+                Button {
+                    showSiteEditor.toggle()
+                } label: {
+                    Image(systemName: "gearshape")
+                }
+            }
+
             ToolbarItem(placement: .navigation) {
                 Button {
                     state.refresh()
