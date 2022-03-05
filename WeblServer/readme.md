@@ -162,7 +162,7 @@ And hopefully, you're back in business.
 
 ## License
 
-Copyright (c) 2017-2021 Keith Irwin
+Copyright (c) 2017-2022 Keith Irwin
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published
