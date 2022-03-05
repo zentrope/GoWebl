@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { Router, Route, Redirect, Switch } from 'react-router-dom'
+import { Router, Route, Routes } from 'react-router-dom'
 
 import { MenuBar } from '../component/MenuBar'
 import { MetaBar } from '../component/MetaBar'
@@ -116,7 +116,7 @@ class MainPhase extends React.PureComponent {
         <section className="App">
           <MenuBar onClick={onMenuClick} selected={menu}/>
           <MetaBar visit={visit} logout={logout}/>
-          <Switch>
+          <Routes>
             <PropRoute path="/admin/home" component={Home} client={client} title={title} user={user}/>
             <PropRoute path="/admin/post/new" component={NewPost} client={client} onCancel={onCancel}/>
             <PropRoute path="/admin/post/:id" component={EditPost} client={client} onCancel={onCancel}/>
@@ -124,7 +124,7 @@ class MainPhase extends React.PureComponent {
             <PropRoute path="/admin/account/edit" component={EditAccount} client={client} onCancel={onCancel}/>
             <PropRoute path="/admin/account/password/edit" component={ChangePassword} client={client} onCancel={onCancel}/>
             <Redirect to="/admin/home"/>
-          </Switch>
+          </Routes>
         </section>
       </Router>
     )

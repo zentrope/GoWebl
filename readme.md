@@ -1,164 +1,20 @@
-# Web Log
+# WEBL 3
 
-## New Goal -- 2022
+This project is a protean project that changes whenever I want to try some new way to do a blog project.
 
-- Play around with Github issues and project features.
-- Port the admin interface to a Mac app.
-- Remove the react-based javascript web-app admin interface.
-- Port from GraphQL to a simpler query/command JSON/HTTP web interface.
-- Maybe: port from Postgres to sqlite.
+I’m in the process of adding a Desktop Mac App to use as a blog composer and site admin utility. When it’s done, I’ll delete the React based web app that does the same thing.
 
-----
+- WeblApp -- The mac app.
+- WeblServer -- A Golang server (postgres, templates, GraphQL).
+- WeblAdmin -- The old React based admin app.
 
-## Goal -- Olden Times
+(Go to the [WeblServer](./WeblServer) to see the old readme with its original motivations.)
 
-Learning Golang.
+I’ve just refactored the source repo so you can’t really build this without already knowing how to put it together. If you see a Makefile in the top level directory, it means I’ve refactored the build system.
 
-The goal of this learning project is to produce a single binary (except the Postgres database) that can render blog posts via cacheable server-side templates (to allow for search engines) as well as create and edit them via an interactive single-page client app. Normally, you'd serve both client and API via a web-proxy, etc, etc, but I want to see how close I can get to the JVM world's `uberjar` concept.
+Basically, you build the `webl` Go app (binary), and then point it at the resources in the `WeblServer` directory and at wherever you build the `WeblAdmin` app and things should work.
 
-## Quick Start
-
-Assuming you've got a database going using the defaults (see below):
-
-    $ make build
-    $ ./webl
-
-And if you want to point to a configuration file:
-
-    $ ./webl -c /path/to/config.json
-
-The config file should be a sparse version of what you can see in `./resources/config.json`. The default looks like:
-
-```javascript
-{
-  "storage": {
-    "user" : "blogsvc",
-    "password": "wanheda",
-    "database": "blogdb",
-    "host": "localhost",
-    "port": "5432"
-  },
-  "web": {
-    "port": "8080"
-    "title": "Web Log",
-    "base-url": "http://localhost:8080/"
-  }
-}
-```
-
-By "sparse" I mean that if you just want to change the web port, you can create a file with only that setting in it:
-
-```javascript
-{ "web": { "port" : "3001" } }
-```
-
-And the app will merge that into the defaults. No need to copy the defaults and tweak. Just change the ones you need to change and omit the rest.
-
-## Development
-
-I work on the project using two terminals:
-
-In the first terminal, start the server process itself:
-
-    $ make init
-    $ go run main.go
-
-In the other terminal, start the `yarn` process for working with the React-based admin app.
-
-    $ cd webl/admin
-    $ yarn start
-
-Then open `localhost:3000`.
-
-When in this mode, you won't be able to get to the admin page via the `/admin` route. And that's it. The admin app will reload when you make changes. You'll have to `^C` the server process, then up arrow and return to cycle it.
-
-## Docker
-
-Running, building, docker-composering: I've just not gotten to it yet. If you want to try this application out, I'd recommend going with stock Homebrew (or whatever) installs of Golang, Postgres and Yarn and leave it at that.
-
-However, I do plan to create some scripts that allow for building the app without having to install any of the dependencies (build or otherwise).
-
-## Deployment (new (v2))
-
-I think this is how it works:
-
-Make the app:
-
-    $ make build-freebsd
-
-then copy:
-
-- ./webl (binary)
-- ./resource/
-- ./admin/build/
-- ./assets/
-
-to the server, when start webl as:
-
-    $ ./webl -c config.json -app admin/build
-
-So what I need to do is package this up in a `dist` dir (as a zip,
-maybe) so I can copy it over as a single artifact, or use Transmit to
-deploy via sync. Anyway, not as easy as when all the assets were
-embedded in the Go binary itself.
-
-## Database Notes
-
-**Default (dev) database params**
-
-These are the default connection parameters for a Postgres instance:
-
-    database: webl_db
-    user:     webl_user
-    pass:     wanheda
-    host:     localhost
-    port:     5432
-
-This app is set up for a config file to change all these, but I'll document that later, when there's something worth worrying about.
-
-**Create Database**
-
-Create a user, then a database (owned by the user):
-
-    $ make db-init
-
-This will also set the user's password. The app itself will take care of populating all the tables.
-
-**Delete database**
-
-Drop the database, then the user:
-
-    $ make db-clean
-
-If something is holding open a connection, just restart the database itself and try again:
-
-    $ brew services restart postgres
-
-Homebrew's `brew services` stuff is actually kind handy.
-
-    $ brew install postgres
-    $ brew services start postgres
-    $ brew services list
-
-This is especially useful if you don't want to or can't use Docker on your Mac. (I have an old Macbook Air, for instance, that won't run it.)
-
-**Database is Ancient**
-
-If your local databases are incompatible because you've updated your server multiple times without ever starting it or reading the fine print about upgrading, you can do the following:
-
-    $ brew services stop postgresql
-    $ mv /usr/local/var/postgres ~/.Trash
-    $ initdb /usr/local/var/postgres
-    $ brew services start postgresql
-    $ brew services ls
-
-Make sure the process is stopped (and it should be already given the problem), remove the database files, run the `initdb` comment, start up postgresql and then verify that it's running.
-
-After that, run:
-
-    $ make db-init
-
-And hopefully, you're back in business.
+Don’t do it, though. It’s all running on a server, but I want this project to be in flux until the Mac app is done.
 
 ## License
 
