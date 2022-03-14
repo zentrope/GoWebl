@@ -62,6 +62,18 @@ extension WebClient {
         return !result.isEmpty
     }
 
+    func setPassword(toNewPassword password: String) async throws {
+        let token = try await login()
+        let ql = "mutation UpdateViewerPassword($p: String!) { updateViewerPassword(password: $p) { id }}"
+        let mutation = Query(query: ql, operationName: "UpdateViewerPassword", variables: ["p": Param(password)])
+        let result = try await doQuery(mutation, token: token)
+        if let viewerId = result.data.updateViewerPassword {
+            log.debug("\(String(describing: viewerId))")
+            return
+        }
+        throw GraphQlError.UnableToResetPassword
+    }
+
     func togglePost(withId uuid: String, isPublished: Bool) async throws -> Post {
         let token = try await login()
         let ql = """
@@ -124,7 +136,7 @@ extension WebClient {
         throw GraphQlError.NoViewerData
     }
 
-    func updateViewer(name: String, email: String) async throws -> ViewerUpdate {
+    func updateViewer(name: String, email: String) async throws -> GData.ViewerUpdate {
         let token = try await login()
         let ql = "mutation UpdateViewer($n: String! $e: String!) { updateViewer(name: $n, email: $e) { name email }}"
         let mutation = Query(query: ql, operationName: "UpdateViewer", variables: ["n":Param(name), "e":Param(email)])
@@ -226,11 +238,13 @@ extension WebClient {
     enum GraphQlError: Error, LocalizedError {
         case Error(String)
         case NoViewerData
+        case UnableToResetPassword
 
         var errorDescription: String? {
             switch self {
                 case let .Error(msg): return "gql: \(msg)"
                 case .NoViewerData: return "unable to retrieve data, check account preferences"
+                case .UnableToResetPassword: return "unable to reset password"
             }
         }
     }
@@ -292,11 +306,16 @@ extension WebClient {
         var createPost: Post?
         var updateSite: Site?
         var updateViewer: ViewerUpdate?
-    }
+        var updateViewerPassword: ViewerId?
 
-    struct ViewerUpdate: Decodable {
-        var name: String
-        var email: String
+        struct ViewerId: Decodable {
+            var id: String
+        }
+
+        struct ViewerUpdate: Decodable {
+            var name: String
+            var email: String
+        }
     }
 
     struct Viewer: Decodable {

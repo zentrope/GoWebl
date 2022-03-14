@@ -16,6 +16,26 @@
 :root {
     color-scheme: light dark;
     font: -apple-system-body;
+    --link-color: #369;
+    --code-color: firebrick;
+}
+
+@media (prefers-color-scheme: dark) {
+
+    :root {
+        --link-color: dodgerblue;
+        --code-color: red;
+    }
+}
+
+a {
+    text-decoration: none;
+    color: var(--link-color);
+}
+
+a:hover {
+    text-decoration: underline;
+    color: var(--link-color);
 }
 
 code {
