@@ -133,18 +133,19 @@ extension PostListView {
                 .foregroundColor(.secondary)
                 .help("Date published")
         }
+        .opacity(post.status == .draft ? 0.5 : 1)
     }
 
     @ViewBuilder
     private func StatusIcon(_ status: WebClient.Post.Status) -> some View {
         switch status {
             case .draft:
-                Image(systemName: "icloud.slash")
-                    .foregroundColor(.secondary)
+                Image(systemName: "xmark.icloud")
+                    //.foregroundColor(.secondary)
                     .help(status.rawValue)
             case .published:
-                Image(systemName: "icloud.fill")
-                    .foregroundColor(.mint)
+                Image(systemName: "checkmark.icloud")
+                    //.foregroundColor(.pink.opacity(0.5))
                     .help(status.rawValue)
 
         }
