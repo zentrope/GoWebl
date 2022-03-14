@@ -23,30 +23,50 @@ struct SiteEditorView: View {
             }
             .font(.title2)
             Form {
-                TextField("Title:", text: $state.siteTitle)
-                TextField("Description:", text: $state.siteDescription)
-                TextField("Base URL:", text: $state.siteBaseURL)
-                HStack(alignment: .center) {
-                    Button("Apply") {
-                        state.updateSite(title: state.siteTitle, description: state.siteDescription, baseURL: state.siteBaseURL)
+                Group {
+                    TextField("Title:", text: $state.siteTitle)
+                    TextField("Description:", text: $state.siteDescription)
+                    TextField("Base URL:", text: $state.siteBaseURL)
+                    HStack(alignment: .center) {
+                        Button("Apply") {
+                            state.updateSite(title: state.siteTitle, description: state.siteDescription, baseURL: state.siteBaseURL)
+                        }
+                        .disabled(!state.siteDirty)
+                        .controlSize(.small)
+                        StatusMessage(isWorking: state.savingSite, isDirty: state.siteDirty)
                     }
-                    .disabled(!state.siteDirty)
-                    .controlSize(.small)
-                    StatusMessage(isWorking: state.savingSite, isDirty: state.siteDirty)
+                    .padding(.vertical, 4)
                 }
-                .padding(.vertical, 4)
-                Divider()
-                TextField("Name:", text: $state.accountName)
-                TextField("Email:", text: $state.accountEmail)
-                HStack {
-                    Button("Apply") {
-                        state.updateAccount(name: state.accountName, email: state.accountEmail)
+
+                Group {
+                    Divider()
+                    TextField("Name:", text: $state.accountName)
+                    TextField("Email:", text: $state.accountEmail)
+                    HStack {
+                        Button("Apply") {
+                            state.updateAccount(name: state.accountName, email: state.accountEmail)
+                        }
+                        .disabled(!state.accountDirty)
+                        .controlSize(.small)
+                        StatusMessage(isWorking: state.savingAccount, isDirty: state.accountDirty)
                     }
-                    .disabled(!state.accountDirty)
-                    .controlSize(.small)
-                    StatusMessage(isWorking: state.savingAccount, isDirty: state.accountDirty)
+                    .padding(.vertical, 4)
                 }
-                .padding(.vertical, 4)
+
+                Group {
+                    Divider()
+                    SecureField("New password:", text: $state.newPassword)
+                    SecureField("Confirm password:", text: $state.confirmPassword)
+                    HStack {
+                        Button("Save") {
+                            state.updatePassword(toNewPassword: state.newPassword)
+                        }
+                        .disabled(state.newPassword != state.confirmPassword)
+                        .disabled(state.newPassword.count < 8)
+                        .controlSize(.small)
+                    }
+                    .padding(.vertical, 4)
+                }
             }
             HStack {
                 Spacer()

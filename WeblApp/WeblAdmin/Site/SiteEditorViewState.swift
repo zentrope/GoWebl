@@ -5,7 +5,7 @@
 //  Created by Keith Irwin on 3/2/22.
 //
 
-import Foundation
+import SwiftUI
 import OSLog
 
 @MainActor
@@ -20,11 +20,16 @@ final class SiteEditorViewState: NSObject, ObservableObject {
     @Published var accountName = ""
     @Published var accountEmail = ""
 
+    @Published var newPassword = ""
+    @Published var confirmPassword = ""
+
     @Published var showAlert = false
     @Published var error: Error?
 
     @Published var savingSite = false
     @Published var savingAccount = false
+
+    @AppStorage("WAAccountPassword") private var savedPassword = ""
 
     override init() {
         super.init()
@@ -51,6 +56,21 @@ extension SiteEditorViewState {
                 showAlert(error: e)
             }
             self.savingAccount = false
+        }
+    }
+
+    func updatePassword(toNewPassword password: String) {
+
+        Task {
+            do {
+                let client = WebClient()
+                try await client.setPassword(toNewPassword: password)
+                self.savedPassword = password
+                self.newPassword = ""
+                self.confirmPassword = ""
+            } catch (let error) {
+                showAlert(error: error)
+            }
         }
     }
 
