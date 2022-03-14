@@ -9,6 +9,8 @@ import SwiftUI
 
 struct PostListView: View {
 
+    @Environment(\.openURL) var openURL
+
     @StateObject private var state = PostListViewState()
 
     @State private var selectedPost: String?
@@ -56,13 +58,24 @@ struct PostListView: View {
                 .fixedSize(horizontal: false, vertical: true)
         })
         .toolbar {
+            ToolbarItem(placement: .navigation) {
+                Button {
+                    showSiteEditor.toggle()
+                } label: {
+                    Image(systemName: "gearshape")
+                }
+                .help("Update metadata about the site")
+            }
+
             ToolbarItem {
                 Button {
                     Task { self.selectedPost = await state.newPost() }
                 } label: {
                     Image(systemName: "plus")
                 }
+                .help("Create a new post")
             }
+
             ToolbarItem {
                 Button {
                     showEditor.toggle()
@@ -70,21 +83,27 @@ struct PostListView: View {
                     Image(systemName: "square.and.pencil")
                 }
                 .disabled(selectedPost == nil)
-            }
-            ToolbarItem(placement: .navigation) {
-                Button {
-                    showSiteEditor.toggle()
-                } label: {
-                    Image(systemName: "gearshape")
-                }
+                .help("Edit the currently selected post")
             }
 
-            ToolbarItem(placement: .navigation) {
+            ToolbarItem {
                 Button {
                     state.refresh()
                 } label: {
                     Image(systemName: "arrow.clockwise")
                 }
+                .help("Refresh posts from the published site")
+            }
+
+            ToolbarItem {
+                Button {
+                    if let baseUrl = URL(string: DataCache.shared.site.baseUrl) {
+                        openURL(baseUrl)
+                    }
+                } label: {
+                    Image(systemName: "link")
+                }
+                .help("Visit the published site")
             }
         }
     }
@@ -121,17 +140,18 @@ extension PostListView {
             StatusIcon(post.status)
                 .font(.callout)
                 .frame(width: 15)
-            Text("\(post.wordCount)")
-                .frame(width: 40, alignment: .trailing)
-                .help("Word count")
             Text("\(post.slugline)")
                 .lineLimit(1)
             Spacer()
             DateView(date: post.datePublished, format: .dateDense)
-                .frame(width: 130, alignment: .leading)
+                .frame(width: 110, alignment: .leading)
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .help("Date published")
+            Text("\(post.wordCount)")
+                .font(.caption.monospacedDigit())
+                .frame(width: 40, alignment: .trailing)
+                .help("Word count")
         }
         .opacity(post.status == .draft ? 0.5 : 1)
     }
@@ -140,14 +160,12 @@ extension PostListView {
     private func StatusIcon(_ status: WebClient.Post.Status) -> some View {
         switch status {
             case .draft:
-                Image(systemName: "xmark.icloud")
-                    //.foregroundColor(.secondary)
+                Image(systemName: "square.dashed")
                     .help(status.rawValue)
             case .published:
-                Image(systemName: "checkmark.icloud")
-                    //.foregroundColor(.pink.opacity(0.5))
+                Image(systemName: "p.square")
+                    .foregroundColor(.secondary)
                     .help(status.rawValue)
-
         }
     }
 }
