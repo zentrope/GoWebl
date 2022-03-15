@@ -125,6 +125,12 @@ extension PostSourceEditorView {
                 state.update(post: state.post, title: slugline, source: source, published: datePublished)
             }
             .disabled(!isDirty)
+
+            Button("Save & Close") {
+                state.update(post: state.post, title: slugline, source: source, published: datePublished)
+                dismiss()
+            }
+            .disabled(!isDirty)
         }
     }
 }
