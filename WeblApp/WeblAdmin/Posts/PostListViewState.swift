@@ -23,7 +23,12 @@ final class PostListViewState: NSObject, ObservableObject {
 
     override init() {
         super.init()
-        Task { await self.refresh() }
+        Task {
+            // If we've just opened a new window, populate it before going back to the server.
+            await self.reload()
+            // Go back to the server and re-populate the data cache.
+            await self.refresh()
+        }
 
         NotificationCenter.default.addObserver(forName: DataCache.DataCacheDidChange, object: DataCache.shared, queue: .main) { _ in
             Task { await self.reload() }
