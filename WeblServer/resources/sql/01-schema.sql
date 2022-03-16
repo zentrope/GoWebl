@@ -14,7 +14,9 @@ create table if not exists author (
 
 insert into author (email, handle, password)
   values ('root@example.com', 'root',
-    '243261243130244676522f2f447452782e5036687451506b302f45684f65384a417a597853356e2f646a554237386358374e4c71635674574d47724f');
+    '243261243130245663427467716d4d434b545a37666f34323178357a2e694c777063735869354d306c37465472705a7a6c695a5363554b5572356832');
+
+-- first dot last (no case)
 
 create type post_status as enum ('published', 'draft');
 
