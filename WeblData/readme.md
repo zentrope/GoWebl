@@ -48,7 +48,7 @@ These are the default connection parameters for a Postgres instance:
     host:     localhost
     port:     5432
 
-The app ()[WeblServer](../WeblServer)) takes a config file to change all these.
+The app [WeblServer](../WeblServer) takes a config file to change all these.
 
 ## Create Database
 
