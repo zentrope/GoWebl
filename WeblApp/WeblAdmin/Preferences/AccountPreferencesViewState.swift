@@ -9,6 +9,10 @@ import CoreData
 import OSLog
 import SwiftUI
 
+extension Notification.Name {
+    static let WeblAccountPreferenceDidChange = Notification.Name("AccountPreferenceDidChange")
+}
+
 @MainActor
 class AccountPreferencesViewState: NSObject, ObservableObject {
 
@@ -97,6 +101,8 @@ class AccountPreferencesViewState: NSObject, ObservableObject {
         savedEmail = account.user
         savedPassword = account.password
         savedEndpoint = account.host
+
+        NotificationCenter.default.post(name: .WeblAccountPreferenceDidChange, object: nil)
     }
 
     func test() {

@@ -30,8 +30,16 @@ final class PostListViewState: NSObject, ObservableObject {
             await self.refresh()
         }
 
-        NotificationCenter.default.addObserver(forName: DataCache.DataCacheDidChange, object: DataCache.shared, queue: .main) { _ in
+        NotificationCenter.default.addObserver(forName: .WeblDataCacheDidChange, object: DataCache.shared, queue: .main) { _ in
             Task { await self.reload() }
+        }
+
+        NotificationCenter.default.addObserver(forName: .WeblAccountPreferenceDidChange, object: nil, queue: .main) { _ in
+            Task {
+                await DataCache.shared.clear() // clear the cache
+                await self.reload() // clear the view
+                await self.refresh() // retrieve new data from server based on changed account
+            }
         }
     }
 }
@@ -46,8 +54,8 @@ extension PostListViewState {
                 let client = WebClient()
                 try await client.deletePost(postId: id)
                 DataCache.shared[id] = nil
-            } catch (let e) {
-                showAlert(error: e)
+            } catch {
+                showAlert(error: error)
             }
         }
     }
