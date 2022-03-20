@@ -16,6 +16,7 @@ final class WebClient: NSObject {
 
     @AppStorage("WAAccountEmail") private var email = ""
     @AppStorage("WAAccountPassword") private var password = ""
+    @AppStorage("WAAccountEndpoint") private var endpoint = ""
 
     private var token = ""
 
@@ -59,6 +60,11 @@ extension WebClient {
 
     func test() async throws -> Bool {
         let result = try await login()
+        return !result.isEmpty
+    }
+
+    func test(user: String, pass: String, host: String) async throws -> Bool {
+        let result = try await login(user: user, pass: pass, host: host)
         return !result.isEmpty
     }
 
@@ -169,12 +175,12 @@ extension WebClient {
 
 extension WebClient {
 
-    private func doQuery(_ query: Query, token: String? = nil) async throws -> GQLResponse {
+    private func doQuery(_ query: Query, token: String? = nil, host: String? = nil) async throws -> GQLResponse {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         let payload = try encoder.encode(query)
 
-        let path = "https://devtrope.com/query"
+        let path = "\(host ?? self.endpoint)/query"
         guard let url = URLComponents(string: path) else { throw URLError(.badURL) }
 
         var request = URLRequest(url: url.url!)
@@ -210,7 +216,7 @@ extension WebClient {
         return gdoc
     }
 
-    private func login() async throws -> String {
+    private func login(user: String, pass: String, host: String) async throws -> String {
         if !token.isEmpty {
             return token
         }
@@ -221,13 +227,17 @@ extension WebClient {
           }
         }
         """
-        let query = Query(query: gql, operationName: "Authenticate", variables: ["email" : Param(self.email), "pass" : Param(self.password)])
+        let query = Query(query: gql, operationName: "Authenticate", variables: ["email" : Param(user), "pass" : Param(pass)])
 
-        let result = try await doQuery(query)
+        let result = try await doQuery(query, host: host)
 
         let token = result.data.authenticate?.token ?? ""
         self.token = token
         return token
+    }
+
+    private func login() async throws -> String {
+        return try await login(user: self.email, pass: self.password, host: self.endpoint)
     }
 }
 

@@ -7,10 +7,13 @@
 
 import Foundation
 
+extension Notification.Name {
+    static let WeblDataCacheDidChange = NSNotification.Name("WeblDataCacheDidChange")
+}
+
 @MainActor
 final class DataCache {
 
-    static let DataCacheDidChange = NSNotification.Name("DataCacheDidChange")
     static let shared = DataCache()
 
     var uuid = ""
@@ -29,11 +32,25 @@ final class DataCache {
         self.site = viewer.site
         self.type = viewer.type
         replaceAll(posts: viewer.posts)
-        notify()
+        sendNotification()
     }
 
     func replace(site: WebClient.Site) {
         self.site = site
+    }
+
+    /// Clear out all data: does _not_ send a notification by default.
+    /// - Parameter notify: Send a notification after everything is cleared.
+    func clear(notify: Bool = false) {
+        self.uuid = ""
+        self.name = ""
+        self.email = ""
+        self.site = WebClient.Site(baseUrl: "", title: "", description: "")
+        self.type = ""
+        posts.removeAll()
+        if notify {
+            sendNotification()
+        }
     }
 
     private func replaceAll(posts: [WebClient.Post]) {
@@ -52,11 +69,11 @@ final class DataCache {
         set(newValue) {
             cachedData[index] = newValue
             self.posts = cachedData.values.sorted(by: { $0.dateCreated > $1.dateCreated })
-            notify()
+            sendNotification()
         }
     }
 
-    private func notify() {
-        NotificationCenter.default.post(name: DataCache.DataCacheDidChange, object: self)
+    private func sendNotification() {
+        NotificationCenter.default.post(name: .WeblDataCacheDidChange, object: self)
     }
 }

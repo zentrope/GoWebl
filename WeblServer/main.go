@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Keith Irwin
+// Copyright (c) 2017-present Keith Irwin
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published
@@ -43,11 +43,9 @@ func init() {
 
 	resourcePath := filepath.Join(dir, "resources")
 	assetPath := filepath.Join(dir, "assets")
-	adminPath := filepath.Join(dir, "admin")
 
 	flag.StringVar(&resourceDir, "resources", resourcePath, "Path to scripts, templates.")
 	flag.StringVar(&assetDir, "assets", assetPath, "Path to web assets.")
-	flag.StringVar(&adminDir, "app", adminPath, "Path to admin web app.")
 	flag.StringVar(&overrideFile, "c", "", "Path to configuration override file.")
 
 	flag.Parse()
@@ -55,7 +53,6 @@ func init() {
 	log.Println("Config:")
 	t := "- %-9v '%v'"
 	log.Printf(t, "resource:", resourceDir)
-	log.Printf(t, "admin:", adminDir)
 	log.Printf(t, "asset:", assetDir)
 	log.Printf(t, "override:", overrideFile)
 }
@@ -63,7 +60,7 @@ func init() {
 func mkResources() server.Resources {
 	log.Println("Constructing resources.")
 
-	r, err := server.NewResources(resourceDir, assetDir, adminDir)
+	r, err := server.NewResources(resourceDir, assetDir)
 	if err != nil {
 		log.Fatal(err)
 	}

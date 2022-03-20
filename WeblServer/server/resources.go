@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Keith Irwin
+// Copyright (c) 2017-present Keith Irwin
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published
@@ -28,12 +28,11 @@ import (
 type Resources struct {
 	privateDir string
 	publicDir  string
-	adminDir   string
 }
 
 // NewResources returns a new instance for the resource
 // manager for loading static files.
-func NewResources(privateDir, publicDir, adminDir string) (Resources, error) {
+func NewResources(privateDir, publicDir string) (Resources, error) {
 	pr, err := filepath.Abs(privateDir)
 	if err != nil {
 		return Resources{}, nil
@@ -44,15 +43,9 @@ func NewResources(privateDir, publicDir, adminDir string) (Resources, error) {
 		return Resources{}, nil
 	}
 
-	ad, err := filepath.Abs(adminDir)
-	if err != nil {
-		return Resources{}, nil
-	}
-
 	return Resources{
 		privateDir: pr,
 		publicDir:  pu,
-		adminDir:   ad,
 	}, nil
 }
 
@@ -65,20 +58,8 @@ func (r Resources) resolveTemplate(name string) (*template.Template, error) {
 	return template.New(name).Parse(templateString)
 }
 
-func (r Resources) adminFileExists(name string) bool {
-	return fileExists(r.adminDir, name)
-}
-
 func (r Resources) publicFileServer() http.Handler {
 	return http.FileServer(http.Dir(r.publicDir))
-}
-
-func (r Resources) adminFileServer() http.Handler {
-	return http.FileServer(http.Dir(r.adminDir))
-}
-
-func (r Resources) adminString(name string) (string, error) {
-	return loadFile(r.adminDir, name)
 }
 
 func (r Resources) privateString(name string) (string, error) {
