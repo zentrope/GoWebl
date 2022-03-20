@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Keith Irwin
+// Copyright (c) 2017-present Keith Irwin
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published
@@ -85,11 +85,6 @@ func NewWebApplication(config *AppConfig, resources Resources,
 
 	// GraphQL
 	service.HandleFunc("/graphql", graphQlClientPage)
-	service.HandleFunc("/static/", staticPage)
-	service.HandleFunc("/vendor/", staticPage)
-
-	// Admin Post Manager
-	service.HandleFunc("/admin/", adminPage)
 
 	// Public Blog Routes
 	service.HandleFunc("/feeds/json", jsonFeed)
@@ -231,30 +226,6 @@ func queryApi(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(responseJSON)
-}
-
-func staticPage(w http.ResponseWriter, r *http.Request) {
-	resources := resolveRes(r)
-	fs := resources.adminFileServer()
-	fs.ServeHTTP(w, r)
-}
-
-func adminPage(w http.ResponseWriter, r *http.Request) {
-	resources := resolveRes(r)
-	fs := resources.adminFileServer()
-
-	if resources.adminFileExists(r.URL.Path[1:]) {
-		fs.ServeHTTP(w, r)
-		return
-	}
-
-	page, err := resources.adminString("index.html")
-	if err != nil {
-		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
-		return
-	}
-
-	fmt.Fprintf(w, page)
 }
 
 func rssFeed(w http.ResponseWriter, r *http.Request) {
@@ -421,7 +392,7 @@ func getOriginDomain(r *http.Request) string {
 
 	hostname, err := os.Hostname()
 	if err != nil {
-		log.Printf("Unable to get hostname: ", err)
+		log.Printf("Unable to get hostname: %v", err)
 		return localhost
 	}
 
