@@ -4,11 +4,11 @@ This project is a protean project that changes whenever I want to try some new w
 
 I’m in the process of adding a Desktop Mac App to use as a blog composer and site admin utility. When it’s done, I’ll delete the React based web app that does the same thing.
 
-- WeblApp -- The mac app.
-- WeblServer -- A Golang server (postgres, templates, GraphQL).
-- WeblAdmin -- The old React based admin app.
+- [console](./console) -- A mac app for creating and editing posts, and setting the site tile and description.
+- [server](./server) -- A Go server (postgres, templates, GraphQL).
+- [database](./database) -- Database scripts, etc, for postgres.
 
-(Go to the [WeblServer](./WeblServer) to see the old readme with its original motivations.)
+(Go to the [server](./server) to see the old readme with its original motivations.)
 
 I’ve just refactored the source repo so you can’t really build this without already knowing how to put it together. If you see a Makefile in the top level directory, it means I’ve refactored the build system.
 

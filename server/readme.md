@@ -2,11 +2,12 @@
 
 ## New Goal -- 2022
 
-- Play around with Github issues and project features.
-- Port the admin interface to a Mac app.
-- Remove the react-based javascript web-app admin interface.
+- [x] Play around with Github issues and project features.
+- [x] Port the admin interface to a Mac app.
+- [x] Remove the react-based javascript web-app admin interface.
 - Port from GraphQL to a simpler query/command JSON/HTTP web interface.
 - Maybe: port from Postgres to sqlite.
+- Maybe: use the Mac app to generate (and publish?) a static site
 
 ----
 
