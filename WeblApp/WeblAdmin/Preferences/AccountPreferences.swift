@@ -11,30 +11,31 @@ struct AccountPreferences: View {
 
     @StateObject private var state = AccountPreferencesViewState()
 
-    @AppStorage("WAAccountEmail") private var savedEmail = ""
-    @AppStorage("WAAccountPassword") private var savedPassword = ""
-    @AppStorage("WAAccountEndpoint") private var savedEndpoint = ""
-
     @State private var formName = ""
     @State private var formHost = ""
     @State private var formUser = ""
     @State private var formPassword = ""
 
-    @State private var selectedAccount: UUID?
-
     var body: some View {
         HStack(spacing: 10) {
 
             VStack(alignment: .leading, spacing: 10) {
-                List(selection: $selectedAccount) {
-                    ForEach(state.accounts, id: \.id) { account in
-                        Label(account.name, systemImage: "cylinder.split.1x2")
-                            .tint(.blue)
-                            .tag(account.id)
+
+                // Using a table so that we can set the selection value after a slight delay.
+                Table(state.accounts, selection: $state.selectedAccount) {
+                    TableColumn("Account") { account in
+                        HStack(alignment: .center) {
+                            Text(account.name)
+                            Spacer()
+                            if state.isDefault(id: account.id) {
+                                Image(systemName: "checkmark")
+                            }
+                        }
                     }
                 }
-                .listStyle(.inset)
-                .onChange(of: selectedAccount) { accountId in
+                .tableStyle(.bordered(alternatesRowBackgrounds: false))
+                .labelsHidden()
+                .onChange(of: state.selectedAccount) { accountId in                    
                     state.selectAccount(id: accountId)
                 }
 
@@ -47,21 +48,21 @@ struct AccountPreferences: View {
                     .controlSize(.small)
 
                     Button {
-                        if let id = selectedAccount {
+                        if let id = state.selectedAccount {
                             state.deleteAccount(id: id)
                         }
                     } label: {
                         Image(systemName: "minus")
                     }
-                    .disabled(selectedAccount == nil || state.accounts.isEmpty)
+                    .disabled(state.selectedAccount == nil || state.accounts.isEmpty)
                     .controlSize(.small)
                     Spacer()
                 }
             }
-            .frame(width: 150)
+            .frame(width: 175)
             .alert(state.error?.localizedDescription ?? "Error", isPresented: $state.showAlert) {}
 
-            if selectedAccount == nil {
+            if state.selectedAccount == nil {
                 NoSelection()
             } else {
                 AccountForm()
@@ -70,56 +71,58 @@ struct AccountPreferences: View {
         .padding()
         .frame(width: 600, height: 200)
         .fixedSize()
-        .onAppear {
-            selectedAccount = state.accounts.first?.id
-        }
     }
+}
 
-    @ViewBuilder
-    private func AccountForm() -> some View {
+// MARK: - Supplemental Views
+
+extension AccountPreferences {
+
+    @ViewBuilder private func AccountForm() -> some View {
         VStack {
             Form {
+                // Form
                 TextField("Name:", text: $state.account.name)
                 TextField("Host:", text: $state.account.host)
                 TextField("User:", text: $state.account.user)
                 SecureField("Password:", text: $state.account.password)
-            }
 
-            Spacer()
+                // Test message result
+                Group {
+                    switch state.result {
+                        case .untested:
+                            Text(" ")
+                        case .succeeded:
+                            Text("Success")
+                                .foregroundColor(.green)
+                        case .failed(let msg):
+                            Text(msg)
+                                .foregroundColor(.red)
+                    }
+                }
+                .font(.callout)
 
-            HStack(alignment: .center, spacing: 20) {
-                Button("Test") {
-                    state.test()
-                    //state.testConnection(email: email, password: password)
-                }
-                switch state.result {
-                    case .untested:
-                        EmptyView()
-                    case .succeeded:
-                        Text("Success")
-                            .foregroundColor(.green)
-                    case .failed(let msg):
-                        Text(msg)
-                            .foregroundColor(.red)
-                }
-                Spacer()
-                Button("Use") {
-                    savedEmail = state.account.user
-                    savedPassword = state.account.password
-                    savedEndpoint = state.account.host
-                }
-                .disabled(savedEmail == state.account.user && savedPassword == state.account.password && savedEndpoint == state.account.host)
-                Button("Save") {
-                    state.save()
+                // Control buttons
+
+                HStack(alignment: .center, spacing: 20) {
+                    Button("Test") {
+                        state.test()
+                    }
+                    Spacer()
+                    Button("Use") {
+                        state.setAsDefault()
+                    }
+                    .disabled(state.isDefault)
+                    Button("Save") {
+                        state.save()
+                    }
                 }
             }
-            .padding(.top)
         }
         .padding()
     }
 
-    @ViewBuilder
-    private func NoSelection() -> some View {
+    @ViewBuilder private func NoSelection() -> some View {
         VStack {
             if state.accounts.isEmpty {
                 Text("Click [+] to create an account")
@@ -131,5 +134,4 @@ struct AccountPreferences: View {
         .foregroundColor(.secondary)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-
 }

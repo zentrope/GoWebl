@@ -6,8 +6,8 @@
 //
 
 import CoreData
-import Foundation
 import OSLog
+import SwiftUI
 
 @MainActor
 class AccountPreferencesViewState: NSObject, ObservableObject {
@@ -16,9 +16,15 @@ class AccountPreferencesViewState: NSObject, ObservableObject {
 
     @Published var accounts = [Account]()
     @Published var account = Account()
+    @Published var selectedAccount: UUID?
     @Published var result: TestResult = .untested
     @Published var showAlert = false
     @Published var error: Error?
+
+    @AppStorage("WMAccountID") private var savedAccountId = ""
+    @AppStorage("WAAccountEmail") private var savedEmail = ""
+    @AppStorage("WAAccountPassword") private var savedPassword = ""
+    @AppStorage("WAAccountEndpoint") private var savedEndpoint = ""
 
     enum TestResult {
         case untested
@@ -38,7 +44,16 @@ class AccountPreferencesViewState: NSObject, ObservableObject {
         super.init()
         Task {
             await reload()
+            await setInitialSelection()
         }
+    }
+
+    var isDefault: Bool {
+        savedAccountId == account.id.uuidString
+    }
+
+    func isDefault(id: UUID) -> Bool {
+        id.uuidString == savedAccountId
     }
 
     func createNewAccount() {
@@ -77,7 +92,15 @@ class AccountPreferencesViewState: NSObject, ObservableObject {
         }
     }
 
+    func setAsDefault() {
+        savedAccountId = account.id.uuidString
+        savedEmail = account.user
+        savedPassword = account.password
+        savedEndpoint = account.host
+    }
+
     func test() {
+        self.result = .untested
         Task {
             do {
                 let client = WebClient()
@@ -109,6 +132,15 @@ class AccountPreferencesViewState: NSObject, ObservableObject {
 
 extension AccountPreferencesViewState {
 
+    private func setInitialSelection() {
+        Task {
+            // HACK: Delaying assignment seems to be necessary. My guess is that List and Table don't finish initializing until some time after they're actually rendered thus overwriting whatever selection we set. Or it's a bug.
+            try await Task.sleep(nanoseconds: 100_000)
+            let accountId = UUID(uuidString: savedAccountId) ?? self.accounts.first?.id
+            selectedAccount = accountId
+        }
+    }
+
     private func reload() {
         Task {
             do {
@@ -139,7 +171,6 @@ extension AccountPreferencesViewState {
         var host = ""
 
         init() {
-
         }
 
         init(_ mo: AccountMO) {
