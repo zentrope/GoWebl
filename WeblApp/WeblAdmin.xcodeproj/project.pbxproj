@@ -22,6 +22,7 @@
 		535BBE0A27C75E1B00920283 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = 535BBE0927C75E1B00920283 /* style.css */; };
 		535BBE0D27C762E100920283 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 535BBE0C27C762E100920283 /* Markdown */; };
 		535BBE0F27C764F100920283 /* HtmlEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535BBE0E27C764F100920283 /* HtmlEncoder.swift */; };
+		535F9AB727E695FA00A296A1 /* WeblData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 535F9AB527E695FA00A296A1 /* WeblData.xcdatamodeld */; };
 		53A3937227CB46F500927CA5 /* DataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A3937127CB46F500927CA5 /* DataCache.swift */; };
 		53A3937427CB537600927CA5 /* PostSourceEditorViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A3937327CB537600927CA5 /* PostSourceEditorViewState.swift */; };
 		53DC2F0527CB200600D780EE /* UnselectedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0427CB200600D780EE /* UnselectedView.swift */; };
@@ -31,6 +32,9 @@
 		53F0027027D0938700D7346D /* AccountPreferencesViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F0026F27D0938700D7346D /* AccountPreferencesViewState.swift */; };
 		53F0027327D094EC00D7346D /* SiteEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F0027227D094EC00D7346D /* SiteEditorView.swift */; };
 		53F0027527D09C5200D7346D /* SiteEditorViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F0027427D09C5200D7346D /* SiteEditorViewState.swift */; };
+		53F15CC127E699D400AD6F14 /* AccountMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F15CBF27E699D400AD6F14 /* AccountMO+CoreDataClass.swift */; };
+		53F15CC627E69A8000AD6F14 /* AccountMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F15CC527E69A8000AD6F14 /* AccountMO+CoreDataProperties.swift */; };
+		53F15CC827E69B1500AD6F14 /* CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F15CC727E69B1500AD6F14 /* CoreData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +54,7 @@
 		535BBE0527C7595D00920283 /* WebPostPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPostPreview.swift; sourceTree = "<group>"; };
 		535BBE0927C75E1B00920283 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = style.css; sourceTree = "<group>"; };
 		535BBE0E27C764F100920283 /* HtmlEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HtmlEncoder.swift; sourceTree = "<group>"; };
+		535F9AB627E695FA00A296A1 /* WeblData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = WeblData.xcdatamodel; sourceTree = "<group>"; };
 		53A3937127CB46F500927CA5 /* DataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataCache.swift; sourceTree = "<group>"; };
 		53A3937327CB537600927CA5 /* PostSourceEditorViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostSourceEditorViewState.swift; sourceTree = "<group>"; };
 		53DC2F0427CB200600D780EE /* UnselectedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnselectedView.swift; sourceTree = "<group>"; };
@@ -59,6 +64,9 @@
 		53F0026F27D0938700D7346D /* AccountPreferencesViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesViewState.swift; sourceTree = "<group>"; };
 		53F0027227D094EC00D7346D /* SiteEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteEditorView.swift; sourceTree = "<group>"; };
 		53F0027427D09C5200D7346D /* SiteEditorViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteEditorViewState.swift; sourceTree = "<group>"; };
+		53F15CBF27E699D400AD6F14 /* AccountMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountMO+CoreDataClass.swift"; sourceTree = "<group>"; };
+		53F15CC527E69A8000AD6F14 /* AccountMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		53F15CC727E69B1500AD6F14 /* CoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +124,7 @@
 				5333A25D27C2F3A80064FF44 /* WeblAdminApp.swift */,
 				5333A26127C2F3A90064FF44 /* Assets.xcassets */,
 				5333A27727C313620064FF44 /* Common */,
+				535F9ABC27E6977000A296A1 /* CoreData */,
 				5302C49D27CDF58F001C7B72 /* Editor */,
 				53287CB827C9F7330002E7C5 /* Extensions */,
 				5333A27227C30F270064FF44 /* Posts */,
@@ -181,6 +190,17 @@
 				535BBE0927C75E1B00920283 /* style.css */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		535F9ABC27E6977000A296A1 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				53F15CBF27E699D400AD6F14 /* AccountMO+CoreDataClass.swift */,
+				53F15CC527E69A8000AD6F14 /* AccountMO+CoreDataProperties.swift */,
+				53F15CC727E69B1500AD6F14 /* CoreData.swift */,
+				535F9AB527E695FA00A296A1 /* WeblData.xcdatamodeld */,
+			);
+			path = CoreData;
 			sourceTree = "<group>";
 		};
 		53F0027127D094DC00D7346D /* Site */ = {
@@ -272,12 +292,15 @@
 				53DC2F0727CB20AE00D780EE /* PostPreview.swift in Sources */,
 				53105D2527C3722D0038204F /* PostSourceEditorView.swift in Sources */,
 				53287CBC27C9F74D0002E7C5 /* String.swift in Sources */,
+				53F15CC627E69A8000AD6F14 /* AccountMO+CoreDataProperties.swift in Sources */,
+				53F15CC827E69B1500AD6F14 /* CoreData.swift in Sources */,
 				53DC2F0527CB200600D780EE /* UnselectedView.swift in Sources */,
 				535BBE0F27C764F100920283 /* HtmlEncoder.swift in Sources */,
 				5333A27627C30F470064FF44 /* PostListViewState.swift in Sources */,
 				53F0027327D094EC00D7346D /* SiteEditorView.swift in Sources */,
 				5333A26027C2F3A80064FF44 /* ContentView.swift in Sources */,
 				5333A27927C313780064FF44 /* DateView.swift in Sources */,
+				53F15CC127E699D400AD6F14 /* AccountMO+CoreDataClass.swift in Sources */,
 				53A3937227CB46F500927CA5 /* DataCache.swift in Sources */,
 				5333A25E27C2F3A80064FF44 /* WeblAdminApp.swift in Sources */,
 				53DC2F0927CB269700D780EE /* Color.swift in Sources */,
@@ -286,6 +309,7 @@
 				53F0027027D0938700D7346D /* AccountPreferencesViewState.swift in Sources */,
 				5333A27127C2F44B0064FF44 /* AccountPreferences.swift in Sources */,
 				53F0027527D09C5200D7346D /* SiteEditorViewState.swift in Sources */,
+				535F9AB727E695FA00A296A1 /* WeblData.xcdatamodeld in Sources */,
 				5333A26E27C2F3EE0064FF44 /* WebClient.swift in Sources */,
 				535BBE0627C7595D00920283 /* WebPostPreview.swift in Sources */,
 				5333A27427C30F3B0064FF44 /* PostListView.swift in Sources */,
@@ -416,7 +440,7 @@
 				CODE_SIGN_ENTITLEMENTS = WeblAdmin/WeblAdmin.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 73;
+				CURRENT_PROJECT_VERSION = 213;
 				DEVELOPMENT_ASSET_PATHS = "\"WeblAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -443,7 +467,7 @@
 				CODE_SIGN_ENTITLEMENTS = WeblAdmin/WeblAdmin.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 73;
+				CURRENT_PROJECT_VERSION = 213;
 				DEVELOPMENT_ASSET_PATHS = "\"WeblAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -503,6 +527,19 @@
 			productName = Markdown;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		535F9AB527E695FA00A296A1 /* WeblData.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				535F9AB627E695FA00A296A1 /* WeblData.xcdatamodel */,
+			);
+			currentVersion = 535F9AB627E695FA00A296A1 /* WeblData.xcdatamodel */;
+			path = WeblData.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 5333A25227C2F3A80064FF44 /* Project object */;
 }
