@@ -35,7 +35,7 @@ psqldep:
 		exit 1; \
 	fi
 
-.PHONY: db-clean db-init
+.PHONY: db-clean db-init db-schema
 
 db-clean: psqldep ## Delete the local dev database
 	$(PSQL) template1 -c "drop database $(DB_NAME)"
@@ -46,10 +46,10 @@ db-init: psqldep ## Create a local dev database with default creds
 	$(PSQL) $(DB_NAME) -c "$(DB_SETUP)"
 
 db-schema: psqldep ## Try to use the webl server to load the schema
-	@cd ../WeblServer ; go run . -resources resources -assets assets & echo $$! > /tmp/webl.pid
+	@cd ../server ; go run . -resources resources -assets assets & echo $$! > /tmp/webl.pid
 	@sleep 2
 	@kill $$(cat /tmp/webl.pid)
-	@cd ../WeblData
+	@cd ../database
 
 .PHONY: help
 
