@@ -8,7 +8,7 @@
 import Foundation
 import OSLog
 
-fileprivate let log = Logger(subsystem: "com.zentrope.WeblAdmin", category: "PostListViewState")
+fileprivate let log = Logger("PostListViewState")
 
 @MainActor
 final class PostListViewState: NSObject, ObservableObject {
@@ -60,35 +60,28 @@ extension PostListViewState {
         }
     }
 
-    func newPost() async -> String? {
-        let slugline = DataCache.shared.getNewPostName()
-        let body = "\n# \(slugline)\n\nThis is where you type something. I mean, compose.\n\n"
-        let post = WebClient.Post(
-            id: UUID().uuidString,
-            status: .draft,
-            slugline: slugline,
-            dateCreated: Date(),
-            dateUpdated: Date(),
-            datePublished: Date(),
-            wordCount: body.words,
-            text: body
-        )
+    func createNewPost() {
+        Task {
+            do {
+                let slugline = DataCache.shared.getNewPostName()
+                let body = "\n# \(slugline)\n\nThis is where you type something. I mean, compose.\n\n"
+                let post = WebClient.Post(
+                    id: UUID().uuidString,
+                    status: .draft,
+                    slugline: slugline,
+                    dateCreated: Date(),
+                    dateUpdated: Date(),
+                    datePublished: Date(),
+                    wordCount: body.words,
+                    text: body
+                )
 
-        let createTask = Task { () -> String? in
-            let client = WebClient()
-            let newPost = try await client.createPost(post: post)
-            DataCache.shared[newPost.id] = newPost
-            return post.id
-        }
-
-        let result = await createTask.result
-        do {
-            let id = try result.get()
-            reload()
-            return id
-        } catch (let e) {
-            showAlert(error: e)
-            return nil
+                let client = WebClient()
+                let newPost = try await client.createPost(post: post)
+                DataCache.shared[newPost.id] = newPost
+            } catch {
+                showAlert(error: error)
+            }
         }
     }
 

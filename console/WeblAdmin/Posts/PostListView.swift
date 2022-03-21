@@ -69,7 +69,7 @@ struct PostListView: View {
 
             ToolbarItem {
                 Button {
-                    Task { self.selectedPost = await state.newPost() }
+                    state.createNewPost()
                 } label: {
                     Image(systemName: "plus")
                 }
