@@ -61,11 +61,12 @@ extension PostListViewState {
     }
 
     func newPost() async -> String? {
-        let body = "\n# New Post\n\nThis is where you type something. I mean, compose.\n\n"
+        let slugline = DataCache.shared.getNewPostName()
+        let body = "\n# \(slugline)\n\nThis is where you type something. I mean, compose.\n\n"
         let post = WebClient.Post(
             id: UUID().uuidString,
             status: .draft,
-            slugline: "new post",
+            slugline: slugline,
             dateCreated: Date(),
             dateUpdated: Date(),
             datePublished: Date(),
