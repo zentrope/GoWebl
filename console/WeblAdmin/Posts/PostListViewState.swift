@@ -23,23 +23,17 @@ final class PostListViewState: NSObject, ObservableObject {
 
     override init() {
         super.init()
-        Task {
-            // If we've just opened a new window, populate it before going back to the server.
-            await self.reload()
-            // Go back to the server and re-populate the data cache.
-            await self.refresh()
-        }
+        self.reload() // If we've just opened a new window, populate it before going back to the server.
+        self.refresh() // Go back to the server and re-populate the data cache.
 
         NotificationCenter.default.addObserver(forName: .WeblDataCacheDidChange, object: DataCache.shared, queue: .main) { _ in
-            Task { await self.reload() }
+            self.reload()
         }
 
         NotificationCenter.default.addObserver(forName: .WeblAccountPreferenceDidChange, object: nil, queue: .main) { _ in
-            Task {
-                await DataCache.shared.clear() // clear the cache
-                await self.reload() // clear the view
-                await self.refresh() // retrieve new data from server based on changed account
-            }
+            DataCache.shared.clear() // clear the cache
+            self.reload() // clear the view
+            self.refresh() // retrieve new data from server based on changed account
         }
     }
 }

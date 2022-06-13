@@ -46,10 +46,8 @@ class AccountPreferencesViewState: NSObject, ObservableObject {
 
     override init() {
         super.init()
-        Task {
-            await reload()
-            await setInitialSelection()
-        }
+        reload()
+        setInitialSelection()
     }
 
     var isDefault: Bool {
