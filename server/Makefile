@@ -42,7 +42,6 @@ vendor: ## Install and sync deps
 
 init: ## Make sure everything is set up properly for dev.
 	@$(MAKE) vendor
-	cd admin ; yarn
 
 ##-----------------------------------------------------------------------------
 ## Build
@@ -52,7 +51,6 @@ init: ## Make sure everything is set up properly for dev.
 
 clean: ## Clean build artifacts.
 	rm -rf webl
-	rm -rf admin/build
 	rm -rf dist
 
 build-freebsd: init ## Build a version for FreeBSD
@@ -73,7 +71,6 @@ DIST_ASSETS = $(DIST)/assets
 
 dist-clean: clean ## Clean everything (vendor, node_modules, dist).
 	rm -rf vendor
-	rm -rf admin/node_modules
 
 dist-prepare:
 	if [ -e "dist" ]; then rm -rf dist ; fi
