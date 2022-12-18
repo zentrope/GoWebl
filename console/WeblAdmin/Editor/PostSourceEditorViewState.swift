@@ -5,7 +5,7 @@
 //  Created by Keith Irwin on 2/26/22.
 //
 
-@preconcurrency import Foundation
+import Foundation
 import OSLog
 
 @MainActor

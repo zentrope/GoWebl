@@ -70,10 +70,18 @@ struct SiteEditorView: View {
             }
             HStack {
                 Spacer()
-                Button("Done") {
+                Button {
                     dismiss()
+                } label: {
+                    Text("Cancel").frame(width: 60)
                 }
                 .keyboardShortcut(.cancelAction)
+                Button {
+                    dismiss()
+                } label: {
+                    Text("OK").frame(width: 60)
+                }
+                .keyboardShortcut(.defaultAction)
             }
         }
         .alert(state.error?.localizedDescription ?? "Error", isPresented: $state.showAlert, actions: {})

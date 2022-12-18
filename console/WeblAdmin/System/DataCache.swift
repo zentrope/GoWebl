@@ -53,6 +53,19 @@ final class DataCache {
         }
     }
 
+    func getNewPostName() -> String {
+        let names = Set(posts.map { $0.slugline })
+        let root = "new post"
+        var candidate = "\(root)"
+        for index in (1..<100) {
+            if names.contains(candidate) {
+                candidate = "\(root) \(index)"
+                continue
+            }
+        }
+        return candidate
+    }
+
     private func replaceAll(posts: [WebClient.Post]) {
         cachedData.removeAll()
         for post in posts {

@@ -33,10 +33,7 @@ final class SiteEditorViewState: NSObject, ObservableObject {
 
     override init() {
         super.init()
-
-        Task {
-            await reload()
-        }
+        reload()
     }
 }
 

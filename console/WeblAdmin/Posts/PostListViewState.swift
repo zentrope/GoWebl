@@ -8,7 +8,7 @@
 import Foundation
 import OSLog
 
-fileprivate let log = Logger(subsystem: "com.zentrope.WeblAdmin", category: "PostListViewState")
+fileprivate let log = Logger("PostListViewState")
 
 @MainActor
 final class PostListViewState: NSObject, ObservableObject {
@@ -23,23 +23,17 @@ final class PostListViewState: NSObject, ObservableObject {
 
     override init() {
         super.init()
-        Task {
-            // If we've just opened a new window, populate it before going back to the server.
-            await self.reload()
-            // Go back to the server and re-populate the data cache.
-            await self.refresh()
-        }
+        self.reload() // If we've just opened a new window, populate it before going back to the server.
+        self.refresh() // Go back to the server and re-populate the data cache.
 
         NotificationCenter.default.addObserver(forName: .WeblDataCacheDidChange, object: DataCache.shared, queue: .main) { _ in
-            Task { await self.reload() }
+            self.reload()
         }
 
         NotificationCenter.default.addObserver(forName: .WeblAccountPreferenceDidChange, object: nil, queue: .main) { _ in
-            Task {
-                await DataCache.shared.clear() // clear the cache
-                await self.reload() // clear the view
-                await self.refresh() // retrieve new data from server based on changed account
-            }
+            DataCache.shared.clear() // clear the cache
+            self.reload() // clear the view
+            self.refresh() // retrieve new data from server based on changed account
         }
     }
 }
@@ -60,34 +54,28 @@ extension PostListViewState {
         }
     }
 
-    func newPost() async -> String? {
-        let body = "\n# New Post\n\nThis is where you type something. I mean, compose.\n\n"
-        let post = WebClient.Post(
-            id: UUID().uuidString,
-            status: .draft,
-            slugline: "new post",
-            dateCreated: Date(),
-            dateUpdated: Date(),
-            datePublished: Date(),
-            wordCount: body.words,
-            text: body
-        )
+    func createNewPost() {
+        Task {
+            do {
+                let slugline = DataCache.shared.getNewPostName()
+                let body = "\n# \(slugline)\n\nThis is where you type something. I mean, compose.\n\n"
+                let post = WebClient.Post(
+                    id: UUID().uuidString,
+                    status: .draft,
+                    slugline: slugline,
+                    dateCreated: Date(),
+                    dateUpdated: Date(),
+                    datePublished: Date(),
+                    wordCount: body.words,
+                    text: body
+                )
 
-        let createTask = Task { () -> String? in
-            let client = WebClient()
-            let newPost = try await client.createPost(post: post)
-            DataCache.shared[newPost.id] = newPost
-            return post.id
-        }
-
-        let result = await createTask.result
-        do {
-            let id = try result.get()
-            reload()
-            return id
-        } catch (let e) {
-            showAlert(error: e)
-            return nil
+                let client = WebClient()
+                let newPost = try await client.createPost(post: post)
+                DataCache.shared[newPost.id] = newPost
+            } catch {
+                showAlert(error: error)
+            }
         }
     }
 

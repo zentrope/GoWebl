@@ -18,31 +18,28 @@ struct PostListView: View {
     @State private var showSiteEditor = false
 
     var body: some View {
-        HStack(spacing: 0) {
+        NavigationView/*(spacing: 0)*/ {
             List(selection: $selectedPost) {
                 ForEach(state.posts, id: \.id) { post in
                     Item(post: post)
                         .tag(post.id)
-                        .padding(.vertical, 2)
+                        .padding(.vertical, 5)
                         .contextMenu {
                             ContextMenu(post: post)
                         }
                 }
             }
             .listStyle(.inset(alternatesRowBackgrounds: true))
-            .frame(width: 400)
-
-            Divider()
-
+            .background(.background)
+            .frame(minWidth: 250, maxWidth: .infinity)
             if let postId = selectedPost, let post = state.post(id: postId) {
                 PostPreview(post: post)
-                    .frame(minWidth: 400, idealWidth: 400)
+                    .frame(minWidth: 400, idealWidth: 400, maxWidth: .infinity)
             } else {
                 UnselectedView(message: "No Post Selected")
                     .frame(minWidth: 350, idealWidth: 350)
             }
         }
-        .navigationSubtitle("\(state.site.title) — \(state.name) <\(state.email)>")
         .alert(state.error?.localizedDescription ?? "Error: check logs.", isPresented: $state.showAlert, actions: {})
         .sheet(isPresented: $showEditor, content: {
             if let postId = selectedPost {
@@ -58,53 +55,45 @@ struct PostListView: View {
                 .fixedSize(horizontal: false, vertical: true)
         })
         .toolbar {
-            ToolbarItem(placement: .navigation) {
-                Button {
-                    showSiteEditor.toggle()
-                } label: {
-                    Image(systemName: "gearshape")
-                }
-                .help("Update metadata about the site")
+            Button {
+                state.createNewPost()
+            } label: {
+                Image(systemName: "plus")
             }
+            .help("Create a new post")
 
-            ToolbarItem {
-                Button {
-                    Task { self.selectedPost = await state.newPost() }
-                } label: {
-                    Image(systemName: "plus")
-                }
-                .help("Create a new post")
+            Button {
+                showEditor.toggle()
+            } label: {
+                Image(systemName: "square.and.pencil")
             }
+            .disabled(selectedPost == nil)
+            .help("Edit the currently selected post")
 
-            ToolbarItem {
-                Button {
-                    showEditor.toggle()
-                } label: {
-                    Image(systemName: "square.and.pencil")
-                }
-                .disabled(selectedPost == nil)
-                .help("Edit the currently selected post")
-            }
+            Spacer()
 
-            ToolbarItem {
-                Button {
-                    state.refresh()
-                } label: {
-                    Image(systemName: "arrow.clockwise")
-                }
-                .help("Refresh posts from the published site")
+            Button {
+                state.refresh()
+            } label: {
+                Image(systemName: "arrow.clockwise")
             }
+            .help("Refresh posts from the published site")
 
-            ToolbarItem {
-                Button {
-                    if let baseUrl = URL(string: DataCache.shared.site.baseUrl) {
-                        openURL(baseUrl)
-                    }
-                } label: {
-                    Image(systemName: "link")
+            Button {
+                if let baseUrl = URL(string: DataCache.shared.site.baseUrl) {
+                    openURL(baseUrl)
                 }
-                .help("Visit the published site")
+            } label: {
+                Image(systemName: "link")
             }
+            .help("Visit the published site")
+
+            Button {
+                showSiteEditor.toggle()
+            } label: {
+                Image(systemName: "gearshape")
+            }
+            .help("Update metadata about the site")
         }
     }
 }
@@ -133,38 +122,53 @@ extension PostListView {
             state.deletePost(withId: post.id)
         }
     }
+}
 
-    @ViewBuilder
-    private func Item(post: WebClient.Post) -> some View {
-        HStack(alignment: .center) {
-            StatusIcon(post.status)
-                .font(.callout)
-                .frame(width: 15)
-            Text("\(post.slugline)")
-                .lineLimit(1)
-            Spacer()
-            DateView(date: post.datePublished, format: .dateDense)
-                .frame(width: 110, alignment: .leading)
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .help("Date published")
-            Text("\(post.wordCount)")
-                .font(.caption.monospacedDigit())
-                .frame(width: 40, alignment: .trailing)
-                .help("Word count")
+struct Item: View {
+
+    var post: WebClient.Post
+
+    var body: some View {
+
+        VStack(alignment: .leading, spacing: 2) {
+
+            HStack(alignment: .center) {
+                Text("\(post.slugline)")
+                    .font(.system(.title3, design: .rounded))
+                    .fontWeight(.medium)
+                    .lineLimit(1)
+                Spacer()
+            }
+
+            HStack(alignment: .center) {
+                if post.status == .draft {
+                    Text("Unpublished")
+                        .font(.callout.italic())
+                } else {
+                    DateView(date: post.datePublished, format: .dateNameShort)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .font(.callout)
+                        .help("Date published")
+                }
+                Spacer()
+                Text("\(post.wordCount)w")
+                    .font(.caption.monospacedDigit())
+            }
+            .foregroundColor(.secondary)
         }
-        .opacity(post.status == .draft ? 0.5 : 1)
+//        .foregroundColor(post.status == .draft ? .secondary : .primary)
     }
+}
 
-    @ViewBuilder
-    private func StatusIcon(_ status: WebClient.Post.Status) -> some View {
+struct StatusIcon: View {
+    var status: WebClient.Post.Status
+    var body: some View {
         switch status {
             case .draft:
                 Image(systemName: "square.dashed")
                     .help(status.rawValue)
             case .published:
                 Image(systemName: "p.square")
-                    .foregroundColor(.secondary)
                     .help(status.rawValue)
         }
     }
