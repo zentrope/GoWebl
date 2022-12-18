@@ -71,7 +71,7 @@ struct SiteEditorView: View {
             HStack {
                 Spacer()
                 Button {
-                    //
+                    dismiss()
                 } label: {
                     Text("Cancel").frame(width: 60)
                 }

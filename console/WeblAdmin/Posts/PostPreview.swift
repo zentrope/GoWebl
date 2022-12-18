@@ -15,15 +15,14 @@ struct PostPreview: View {
             VStack(spacing: 10) {
                 HStack {
                     Text(post.slugline)
-                        .font(.headline)
+                        .font(.system(.title, design: .rounded))
+                        .fontWeight(.semibold)
 
                     Spacer()
                     DateView(date: post.datePublished, format: .dateTimeNameLong)
-                        .font(.subheadline)
+                        .font(.body)
                 }
                 .lineLimit(1)
-
-                Divider()
             }
             .padding([.horizontal, .top])
             WebPostPreview(document: post.text.markdownToHtml)
