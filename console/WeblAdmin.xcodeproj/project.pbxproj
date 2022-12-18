@@ -18,6 +18,7 @@
 		5333A27427C30F3B0064FF44 /* PostListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5333A27327C30F3B0064FF44 /* PostListView.swift */; };
 		5333A27627C30F470064FF44 /* PostListViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5333A27527C30F470064FF44 /* PostListViewState.swift */; };
 		5333A27927C313780064FF44 /* DateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5333A27827C313780064FF44 /* DateView.swift */; };
+		534B79A2294FA38700B3B0AA /* SiteMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 534B79A0294FA38700B3B0AA /* SiteMO.swift */; };
 		535BBE0627C7595D00920283 /* WebPostPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535BBE0527C7595D00920283 /* WebPostPreview.swift */; };
 		535BBE0A27C75E1B00920283 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = 535BBE0927C75E1B00920283 /* style.css */; };
 		535BBE0D27C762E100920283 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 535BBE0C27C762E100920283 /* Markdown */; };
@@ -51,6 +52,7 @@
 		5333A27327C30F3B0064FF44 /* PostListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostListView.swift; sourceTree = "<group>"; };
 		5333A27527C30F470064FF44 /* PostListViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostListViewState.swift; sourceTree = "<group>"; };
 		5333A27827C313780064FF44 /* DateView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateView.swift; sourceTree = "<group>"; };
+		534B79A0294FA38700B3B0AA /* SiteMO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteMO.swift; sourceTree = "<group>"; };
 		535BBE0527C7595D00920283 /* WebPostPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPostPreview.swift; sourceTree = "<group>"; };
 		535BBE0927C75E1B00920283 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = style.css; sourceTree = "<group>"; };
 		535BBE0E27C764F100920283 /* HtmlEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HtmlEncoder.swift; sourceTree = "<group>"; };
@@ -195,6 +197,7 @@
 		535F9ABC27E6977000A296A1 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
+				534B79A0294FA38700B3B0AA /* SiteMO.swift */,
 				53F15CBF27E699D400AD6F14 /* AccountMO+CoreDataClass.swift */,
 				53F15CC527E69A8000AD6F14 /* AccountMO+CoreDataProperties.swift */,
 				53F15CC727E69B1500AD6F14 /* CoreData.swift */,
@@ -306,6 +309,7 @@
 				53DC2F0927CB269700D780EE /* Color.swift in Sources */,
 				53DC2F0B27CB281D00D780EE /* Logger.swift in Sources */,
 				53A3937427CB537600927CA5 /* PostSourceEditorViewState.swift in Sources */,
+				534B79A2294FA38700B3B0AA /* SiteMO.swift in Sources */,
 				53F0027027D0938700D7346D /* AccountPreferencesViewState.swift in Sources */,
 				5333A27127C2F44B0064FF44 /* AccountPreferences.swift in Sources */,
 				53F0027527D09C5200D7346D /* SiteEditorViewState.swift in Sources */,
@@ -370,7 +374,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.4;
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -425,7 +429,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.4;
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -443,7 +447,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 459;
+				CURRENT_PROJECT_VERSION = 466;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WeblAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;
@@ -456,7 +460,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2022.1;
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
+				MARKETING_VERSION = 2022.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zentrope.WeblAdmin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -473,7 +478,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 459;
+				CURRENT_PROJECT_VERSION = 466;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WeblAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;
@@ -486,7 +491,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2022.1;
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
+				MARKETING_VERSION = 2022.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zentrope.WeblAdmin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
