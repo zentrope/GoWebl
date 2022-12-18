@@ -19,6 +19,7 @@
 		5333A27627C30F470064FF44 /* PostListViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5333A27527C30F470064FF44 /* PostListViewState.swift */; };
 		5333A27927C313780064FF44 /* DateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5333A27827C313780064FF44 /* DateView.swift */; };
 		534B79A2294FA38700B3B0AA /* SiteMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 534B79A0294FA38700B3B0AA /* SiteMO.swift */; };
+		534B79A5294FA80500B3B0AA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 534B79A4294FA80500B3B0AA /* SettingsView.swift */; };
 		535BBE0627C7595D00920283 /* WebPostPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535BBE0527C7595D00920283 /* WebPostPreview.swift */; };
 		535BBE0A27C75E1B00920283 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = 535BBE0927C75E1B00920283 /* style.css */; };
 		535BBE0D27C762E100920283 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 535BBE0C27C762E100920283 /* Markdown */; };
@@ -53,6 +54,7 @@
 		5333A27527C30F470064FF44 /* PostListViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostListViewState.swift; sourceTree = "<group>"; };
 		5333A27827C313780064FF44 /* DateView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateView.swift; sourceTree = "<group>"; };
 		534B79A0294FA38700B3B0AA /* SiteMO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteMO.swift; sourceTree = "<group>"; };
+		534B79A4294FA80500B3B0AA /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		535BBE0527C7595D00920283 /* WebPostPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPostPreview.swift; sourceTree = "<group>"; };
 		535BBE0927C75E1B00920283 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = style.css; sourceTree = "<group>"; };
 		535BBE0E27C764F100920283 /* HtmlEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HtmlEncoder.swift; sourceTree = "<group>"; };
@@ -134,6 +136,7 @@
 				5333A26327C2F3A90064FF44 /* Preview Content */,
 				53F0027127D094DC00D7346D /* Site */,
 				5333A26C27C2F3D10064FF44 /* System */,
+				534B79A3294FA7F300B3B0AA /* Views */,
 			);
 			path = WeblAdmin;
 			sourceTree = "<group>";
@@ -186,6 +189,14 @@
 			path = Common;
 			sourceTree = "<group>";
 		};
+		534B79A3294FA7F300B3B0AA /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				534B79A4294FA80500B3B0AA /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		535BBE0827C75DFA00920283 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -197,10 +208,10 @@
 		535F9ABC27E6977000A296A1 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
-				534B79A0294FA38700B3B0AA /* SiteMO.swift */,
 				53F15CBF27E699D400AD6F14 /* AccountMO+CoreDataClass.swift */,
 				53F15CC527E69A8000AD6F14 /* AccountMO+CoreDataProperties.swift */,
 				53F15CC727E69B1500AD6F14 /* CoreData.swift */,
+				534B79A0294FA38700B3B0AA /* SiteMO.swift */,
 				535F9AB527E695FA00A296A1 /* WeblData.xcdatamodeld */,
 			);
 			path = CoreData;
@@ -317,6 +328,7 @@
 				5333A26E27C2F3EE0064FF44 /* WebClient.swift in Sources */,
 				535BBE0627C7595D00920283 /* WebPostPreview.swift in Sources */,
 				5333A27427C30F3B0064FF44 /* PostListView.swift in Sources */,
+				534B79A5294FA80500B3B0AA /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -447,7 +459,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 466;
+				CURRENT_PROJECT_VERSION = 518;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WeblAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;
@@ -478,7 +490,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 466;
+				CURRENT_PROJECT_VERSION = 518;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WeblAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;
