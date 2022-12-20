@@ -22,10 +22,11 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Site", systemImage: "doc.on.doc")
                 }
-            AccountPreferences()
+            AccountSettingsView()
                 .tabItem {
                     Label("Accounts", systemImage: "person.2")
                 }
         }
+        .navigationTitle("Settings")
     }
 }

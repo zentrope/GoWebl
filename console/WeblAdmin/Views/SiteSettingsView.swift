@@ -43,8 +43,7 @@ struct SiteSettingsView: View {
         }
         .padding()
         .frame(width: 400)
-        .fixedSize(horizontal: true, vertical: true)
-        .navigationTitle("Site Settings")
+        .fixedSize(horizontal: true, vertical: true)        
     }
 
     private func save() {

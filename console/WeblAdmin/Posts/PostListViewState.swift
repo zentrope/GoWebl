@@ -32,13 +32,13 @@ final class PostListViewState: NSObject, ObservableObject {
             }
         }
 
-        NotificationCenter.default.addObserver(forName: .WeblAccountPreferenceDidChange, object: nil, queue: .main) { _ in
-            Task {
-                await DataCache.shared.clear() // clear the cache
-                await self.reload() // clear the view
-                await self.refresh() // retrieve new data from server based on changed account
-            }
-        }
+//        NotificationCenter.default.addObserver(forName: .WeblAccountPreferenceDidChange, object: nil, queue: .main) { _ in
+//            Task {
+//                await DataCache.shared.clear() // clear the cache
+//                await self.reload() // clear the view
+//                await self.refresh() // retrieve new data from server based on changed account
+//            }
+//        }
     }
 }
 

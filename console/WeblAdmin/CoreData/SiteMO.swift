@@ -15,7 +15,7 @@ import CoreData
 extension SiteMO {
 
     public static func retrieve() -> SiteMO {
-        let context = CoreData.shared.container.viewContext
+        let context = CoreData.viewContext
         let request = SiteMO.fetchRequest()
         if let site = try? context.fetch(request).first {
             return site
@@ -31,14 +31,14 @@ extension SiteMO {
     }
 
     public func save() throws {
-        let context = CoreData.shared.container.viewContext
+        let context = CoreData.viewContext
         if context.hasChanges {
             try context.save()
         }
     }
 
     public func rollback() {
-        let context = CoreData.shared.container.viewContext
+        let context = CoreData.viewContext
         context.rollback()
     }
 }
