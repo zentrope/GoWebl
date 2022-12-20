@@ -22,7 +22,6 @@ struct WeblAdminApp: App {
         Settings {
             SettingsView()
                 .environment(\.managedObjectContext, CoreData.shared.container.viewContext)
-//            AccountPreferences()
         }
     }
 }

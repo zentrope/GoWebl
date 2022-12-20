@@ -9,6 +9,10 @@
 import Foundation
 import CoreData
 
+@objc(AccountMO)
+public class AccountMO: NSManagedObject {
+
+}
 
 extension AccountMO {
 

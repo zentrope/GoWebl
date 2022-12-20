@@ -67,10 +67,12 @@ struct AccountPreferences: View {
             } else {
                 AccountForm()
             }
+
         }
         .padding()
         .frame(width: 600, height: 200)
         .fixedSize()
+        .navigationTitle("Account Settings")
     }
 }
 
@@ -118,6 +120,7 @@ extension AccountPreferences {
                     }
                 }
             }
+            Spacer()
         }
         .padding()
     }

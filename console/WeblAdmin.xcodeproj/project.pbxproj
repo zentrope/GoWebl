@@ -25,6 +25,7 @@
 		535BBE0D27C762E100920283 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 535BBE0C27C762E100920283 /* Markdown */; };
 		535BBE0F27C764F100920283 /* HtmlEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535BBE0E27C764F100920283 /* HtmlEncoder.swift */; };
 		535F9AB727E695FA00A296A1 /* WeblData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 535F9AB527E695FA00A296A1 /* WeblData.xcdatamodeld */; };
+		539B9CFB29515A5800F53946 /* SiteSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539B9CFA29515A5800F53946 /* SiteSettingsView.swift */; };
 		53A3937227CB46F500927CA5 /* DataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A3937127CB46F500927CA5 /* DataCache.swift */; };
 		53A3937427CB537600927CA5 /* PostSourceEditorViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A3937327CB537600927CA5 /* PostSourceEditorViewState.swift */; };
 		53DC2F0527CB200600D780EE /* UnselectedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0427CB200600D780EE /* UnselectedView.swift */; };
@@ -34,8 +35,7 @@
 		53F0027027D0938700D7346D /* AccountPreferencesViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F0026F27D0938700D7346D /* AccountPreferencesViewState.swift */; };
 		53F0027327D094EC00D7346D /* SiteEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F0027227D094EC00D7346D /* SiteEditorView.swift */; };
 		53F0027527D09C5200D7346D /* SiteEditorViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F0027427D09C5200D7346D /* SiteEditorViewState.swift */; };
-		53F15CC127E699D400AD6F14 /* AccountMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F15CBF27E699D400AD6F14 /* AccountMO+CoreDataClass.swift */; };
-		53F15CC627E69A8000AD6F14 /* AccountMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F15CC527E69A8000AD6F14 /* AccountMO+CoreDataProperties.swift */; };
+		53F15CC627E69A8000AD6F14 /* AccountMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F15CC527E69A8000AD6F14 /* AccountMO.swift */; };
 		53F15CC827E69B1500AD6F14 /* CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F15CC727E69B1500AD6F14 /* CoreData.swift */; };
 /* End PBXBuildFile section */
 
@@ -59,6 +59,7 @@
 		535BBE0927C75E1B00920283 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = style.css; sourceTree = "<group>"; };
 		535BBE0E27C764F100920283 /* HtmlEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HtmlEncoder.swift; sourceTree = "<group>"; };
 		535F9AB627E695FA00A296A1 /* WeblData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = WeblData.xcdatamodel; sourceTree = "<group>"; };
+		539B9CFA29515A5800F53946 /* SiteSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteSettingsView.swift; sourceTree = "<group>"; };
 		53A3937127CB46F500927CA5 /* DataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataCache.swift; sourceTree = "<group>"; };
 		53A3937327CB537600927CA5 /* PostSourceEditorViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostSourceEditorViewState.swift; sourceTree = "<group>"; };
 		53DC2F0427CB200600D780EE /* UnselectedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnselectedView.swift; sourceTree = "<group>"; };
@@ -68,8 +69,7 @@
 		53F0026F27D0938700D7346D /* AccountPreferencesViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesViewState.swift; sourceTree = "<group>"; };
 		53F0027227D094EC00D7346D /* SiteEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteEditorView.swift; sourceTree = "<group>"; };
 		53F0027427D09C5200D7346D /* SiteEditorViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteEditorViewState.swift; sourceTree = "<group>"; };
-		53F15CBF27E699D400AD6F14 /* AccountMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountMO+CoreDataClass.swift"; sourceTree = "<group>"; };
-		53F15CC527E69A8000AD6F14 /* AccountMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		53F15CC527E69A8000AD6F14 /* AccountMO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountMO.swift; sourceTree = "<group>"; };
 		53F15CC727E69B1500AD6F14 /* CoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -132,7 +132,6 @@
 				5302C49D27CDF58F001C7B72 /* Editor */,
 				53287CB827C9F7330002E7C5 /* Extensions */,
 				5333A27227C30F270064FF44 /* Posts */,
-				5333A26F27C2F4220064FF44 /* Preferences */,
 				5333A26327C2F3A90064FF44 /* Preview Content */,
 				53F0027127D094DC00D7346D /* Site */,
 				5333A26C27C2F3D10064FF44 /* System */,
@@ -159,15 +158,6 @@
 			path = System;
 			sourceTree = "<group>";
 		};
-		5333A26F27C2F4220064FF44 /* Preferences */ = {
-			isa = PBXGroup;
-			children = (
-				5333A27027C2F44B0064FF44 /* AccountPreferences.swift */,
-				53F0026F27D0938700D7346D /* AccountPreferencesViewState.swift */,
-			);
-			path = Preferences;
-			sourceTree = "<group>";
-		};
 		5333A27227C30F270064FF44 /* Posts */ = {
 			isa = PBXGroup;
 			children = (
@@ -192,7 +182,10 @@
 		534B79A3294FA7F300B3B0AA /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				5333A27027C2F44B0064FF44 /* AccountPreferences.swift */,
+				53F0026F27D0938700D7346D /* AccountPreferencesViewState.swift */,
 				534B79A4294FA80500B3B0AA /* SettingsView.swift */,
+				539B9CFA29515A5800F53946 /* SiteSettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -208,8 +201,7 @@
 		535F9ABC27E6977000A296A1 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
-				53F15CBF27E699D400AD6F14 /* AccountMO+CoreDataClass.swift */,
-				53F15CC527E69A8000AD6F14 /* AccountMO+CoreDataProperties.swift */,
+				53F15CC527E69A8000AD6F14 /* AccountMO.swift */,
 				53F15CC727E69B1500AD6F14 /* CoreData.swift */,
 				534B79A0294FA38700B3B0AA /* SiteMO.swift */,
 				535F9AB527E695FA00A296A1 /* WeblData.xcdatamodeld */,
@@ -306,7 +298,7 @@
 				53DC2F0727CB20AE00D780EE /* PostPreview.swift in Sources */,
 				53105D2527C3722D0038204F /* PostSourceEditorView.swift in Sources */,
 				53287CBC27C9F74D0002E7C5 /* String.swift in Sources */,
-				53F15CC627E69A8000AD6F14 /* AccountMO+CoreDataProperties.swift in Sources */,
+				53F15CC627E69A8000AD6F14 /* AccountMO.swift in Sources */,
 				53F15CC827E69B1500AD6F14 /* CoreData.swift in Sources */,
 				53DC2F0527CB200600D780EE /* UnselectedView.swift in Sources */,
 				535BBE0F27C764F100920283 /* HtmlEncoder.swift in Sources */,
@@ -314,7 +306,6 @@
 				53F0027327D094EC00D7346D /* SiteEditorView.swift in Sources */,
 				5333A26027C2F3A80064FF44 /* ContentView.swift in Sources */,
 				5333A27927C313780064FF44 /* DateView.swift in Sources */,
-				53F15CC127E699D400AD6F14 /* AccountMO+CoreDataClass.swift in Sources */,
 				53A3937227CB46F500927CA5 /* DataCache.swift in Sources */,
 				5333A25E27C2F3A80064FF44 /* WeblAdminApp.swift in Sources */,
 				53DC2F0927CB269700D780EE /* Color.swift in Sources */,
@@ -322,6 +313,7 @@
 				53A3937427CB537600927CA5 /* PostSourceEditorViewState.swift in Sources */,
 				534B79A2294FA38700B3B0AA /* SiteMO.swift in Sources */,
 				53F0027027D0938700D7346D /* AccountPreferencesViewState.swift in Sources */,
+				539B9CFB29515A5800F53946 /* SiteSettingsView.swift in Sources */,
 				5333A27127C2F44B0064FF44 /* AccountPreferences.swift in Sources */,
 				53F0027527D09C5200D7346D /* SiteEditorViewState.swift in Sources */,
 				535F9AB727E695FA00A296A1 /* WeblData.xcdatamodeld in Sources */,
@@ -459,7 +451,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 518;
+				CURRENT_PROJECT_VERSION = 561;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WeblAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;
@@ -490,7 +482,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 518;
+				CURRENT_PROJECT_VERSION = 561;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WeblAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;

@@ -9,59 +9,23 @@ import SwiftUI
 
 struct SettingsView: View {
 
-    @ObservedObject private var site = SiteMO.retrieve()
+    enum MenuItem: Hashable {
+        case site
+        case account
+    }
+
+    @State private var selection = MenuItem.site
 
     var body: some View {
-        VStack(spacing: 20) {
-            Form {
-                TextField("Title:", text: $site.title)
-                TextField("Subtitle:", text: $site.subtitle)
-                TextField("Author:", text: $site.author)
-                TextField("BaseURL:", text: $site.baseUrl, prompt: Text("https://example.com"))
-            }
-
-            HStack {
-                Spacer()
-                Button {
-                    site.rollback()
-                } label: {
-                    Text("Cancel")
-                        .frame(width: 60)
+        TabView {
+            SiteSettingsView()
+                .tabItem {
+                    Label("Site", systemImage: "doc.on.doc")
                 }
-                .disabled(!site.hasPersistentChangedValues)
-                .keyboardShortcut(.cancelAction)
-
-                Button {
-                    save()
-                } label: {
-                    Text("Save")
-                        .frame(width: 60)
+            AccountPreferences()
+                .tabItem {
+                    Label("Accounts", systemImage: "person.2")
                 }
-                .disabled(!site.hasPersistentChangedValues)
-                .keyboardShortcut(.return)
-            }
         }
-        .padding()
-        .frame(width: 400)
-        .fixedSize(horizontal: true, vertical: true)
-        .navigationTitle("Site Settings")
-    }
-
-    private func save() {
-        do {
-            site.author = site.author.trimmingCharacters(in: .whitespacesAndNewlines)
-            site.title = site.title.trimmingCharacters(in: .whitespacesAndNewlines)
-            site.subtitle = site.subtitle.trimmingCharacters(in: .whitespacesAndNewlines)
-            site.baseUrl = site.baseUrl.trimmingCharacters(in: .whitespacesAndNewlines)
-            try site.save()
-        } catch {
-            print("ERROR SAVE: \(error)")
-        }
-    }
-}
-
-struct SettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        SettingsView()
     }
 }
