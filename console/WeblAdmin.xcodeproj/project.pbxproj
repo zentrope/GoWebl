@@ -125,14 +125,14 @@
 				5333A25F27C2F3A80064FF44 /* ContentView.swift */,
 				5333A25D27C2F3A80064FF44 /* WeblAdminApp.swift */,
 				5333A26127C2F3A90064FF44 /* Assets.xcassets */,
-				5333A27727C313620064FF44 /* Common */,
-				535F9ABC27E6977000A296A1 /* CoreData */,
 				5302C49D27CDF58F001C7B72 /* Editor */,
 				53287CB827C9F7330002E7C5 /* Extensions */,
+				535F9ABC27E6977000A296A1 /* Model */,
 				5333A27227C30F270064FF44 /* Posts */,
 				5333A26327C2F3A90064FF44 /* Preview Content */,
 				53F0027127D094DC00D7346D /* Site */,
 				5333A26C27C2F3D10064FF44 /* System */,
+				535BBE0827C75DFA00920283 /* Resources */,
 				534B79A3294FA7F300B3B0AA /* Views */,
 			);
 			path = WeblAdmin;
@@ -166,23 +166,15 @@
 			path = Posts;
 			sourceTree = "<group>";
 		};
-		5333A27727C313620064FF44 /* Common */ = {
-			isa = PBXGroup;
-			children = (
-				5333A27827C313780064FF44 /* DateView.swift */,
-				53DC2F0427CB200600D780EE /* UnselectedView.swift */,
-				535BBE0527C7595D00920283 /* WebPostPreview.swift */,
-				535BBE0827C75DFA00920283 /* Resources */,
-			);
-			path = Common;
-			sourceTree = "<group>";
-		};
 		534B79A3294FA7F300B3B0AA /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				539B9CFC29515BF100F53946 /* AccountSettingsView.swift */,
+				5333A27827C313780064FF44 /* DateView.swift */,
 				534B79A4294FA80500B3B0AA /* SettingsView.swift */,
 				539B9CFA29515A5800F53946 /* SiteSettingsView.swift */,
+				53DC2F0427CB200600D780EE /* UnselectedView.swift */,
+				535BBE0527C7595D00920283 /* WebPostPreview.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -195,7 +187,7 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		535F9ABC27E6977000A296A1 /* CoreData */ = {
+		535F9ABC27E6977000A296A1 /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				53F15CC527E69A8000AD6F14 /* AccountMO.swift */,
@@ -203,7 +195,7 @@
 				534B79A0294FA38700B3B0AA /* SiteMO.swift */,
 				535F9AB527E695FA00A296A1 /* WeblData.xcdatamodeld */,
 			);
-			path = CoreData;
+			path = Model;
 			sourceTree = "<group>";
 		};
 		53F0027127D094DC00D7346D /* Site */ = {
@@ -447,7 +439,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 605;
+				CURRENT_PROJECT_VERSION = 608;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WeblAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;
@@ -478,7 +470,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 605;
+				CURRENT_PROJECT_VERSION = 608;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WeblAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;

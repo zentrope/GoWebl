@@ -15,7 +15,7 @@
 
 :root {
     color-scheme: light dark;
-    font: -apple-system-body;
+    font: -apple-system-body;    
     --link-color: #369;
     --code-color: firebrick;
 }
