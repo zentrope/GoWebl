@@ -32,4 +32,19 @@ struct CoreData {
     static var viewContext: NSManagedObjectContext {
         shared.container.viewContext
     }
+
+    static func newBackgroundContext() -> NSManagedObjectContext {
+        let context = shared.container.newBackgroundContext()
+        context.automaticallyMergesChangesFromParent = true
+        context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+        return context
+    }
+}
+
+extension NSManagedObjectContext {
+    func commit() throws {
+        if hasChanges {
+            try save()
+        }
+    }
 }

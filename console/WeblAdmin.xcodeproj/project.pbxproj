@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		53105D2527C3722D0038204F /* PostSourceEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53105D2427C3722D0038204F /* PostSourceEditorView.swift */; };
+		53138D1A2952D03B003A9531 /* PostMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53138D182952D03B003A9531 /* PostMO.swift */; };
+		53138D1C2952D731003A9531 /* LocalPostList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53138D1B2952D731003A9531 /* LocalPostList.swift */; };
+		53138D1E2952E21D003A9531 /* LocalPostDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53138D1D2952E21D003A9531 /* LocalPostDetail.swift */; };
 		53287CBC27C9F74D0002E7C5 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53287CBB27C9F74D0002E7C5 /* String.swift */; };
 		5333A25E27C2F3A80064FF44 /* WeblAdminApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5333A25D27C2F3A80064FF44 /* WeblAdminApp.swift */; };
 		5333A26027C2F3A80064FF44 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5333A25F27C2F3A80064FF44 /* ContentView.swift */; };
@@ -28,6 +31,7 @@
 		539B9CFD29515BF100F53946 /* AccountSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539B9CFC29515BF100F53946 /* AccountSettingsView.swift */; };
 		53A3937227CB46F500927CA5 /* DataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A3937127CB46F500927CA5 /* DataCache.swift */; };
 		53A3937427CB537600927CA5 /* PostSourceEditorViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A3937327CB537600927CA5 /* PostSourceEditorViewState.swift */; };
+		53DBFB0029541B8D00592718 /* LocalPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DBFAFF29541B8D00592718 /* LocalPostView.swift */; };
 		53DC2F0527CB200600D780EE /* UnselectedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0427CB200600D780EE /* UnselectedView.swift */; };
 		53DC2F0727CB20AE00D780EE /* PostPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0627CB20AE00D780EE /* PostPreview.swift */; };
 		53DC2F0927CB269700D780EE /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0827CB269700D780EE /* Color.swift */; };
@@ -40,6 +44,9 @@
 
 /* Begin PBXFileReference section */
 		53105D2427C3722D0038204F /* PostSourceEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostSourceEditorView.swift; sourceTree = "<group>"; };
+		53138D182952D03B003A9531 /* PostMO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostMO.swift; sourceTree = "<group>"; };
+		53138D1B2952D731003A9531 /* LocalPostList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalPostList.swift; sourceTree = "<group>"; };
+		53138D1D2952E21D003A9531 /* LocalPostDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalPostDetail.swift; sourceTree = "<group>"; };
 		53287CBB27C9F74D0002E7C5 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		5333A25A27C2F3A80064FF44 /* WeblAdmin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeblAdmin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5333A25D27C2F3A80064FF44 /* WeblAdminApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeblAdminApp.swift; sourceTree = "<group>"; };
@@ -61,6 +68,7 @@
 		539B9CFC29515BF100F53946 /* AccountSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSettingsView.swift; sourceTree = "<group>"; };
 		53A3937127CB46F500927CA5 /* DataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataCache.swift; sourceTree = "<group>"; };
 		53A3937327CB537600927CA5 /* PostSourceEditorViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostSourceEditorViewState.swift; sourceTree = "<group>"; };
+		53DBFAFF29541B8D00592718 /* LocalPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalPostView.swift; sourceTree = "<group>"; };
 		53DC2F0427CB200600D780EE /* UnselectedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnselectedView.swift; sourceTree = "<group>"; };
 		53DC2F0627CB20AE00D780EE /* PostPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostPreview.swift; sourceTree = "<group>"; };
 		53DC2F0827CB269700D780EE /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
@@ -171,6 +179,9 @@
 			children = (
 				539B9CFC29515BF100F53946 /* AccountSettingsView.swift */,
 				5333A27827C313780064FF44 /* DateView.swift */,
+				53138D1D2952E21D003A9531 /* LocalPostDetail.swift */,
+				53138D1B2952D731003A9531 /* LocalPostList.swift */,
+				53DBFAFF29541B8D00592718 /* LocalPostView.swift */,
 				534B79A4294FA80500B3B0AA /* SettingsView.swift */,
 				539B9CFA29515A5800F53946 /* SiteSettingsView.swift */,
 				53DC2F0427CB200600D780EE /* UnselectedView.swift */,
@@ -192,6 +203,7 @@
 			children = (
 				53F15CC527E69A8000AD6F14 /* AccountMO.swift */,
 				53F15CC727E69B1500AD6F14 /* CoreData.swift */,
+				53138D182952D03B003A9531 /* PostMO.swift */,
 				534B79A0294FA38700B3B0AA /* SiteMO.swift */,
 				535F9AB527E695FA00A296A1 /* WeblData.xcdatamodeld */,
 			);
@@ -294,8 +306,10 @@
 				535BBE0F27C764F100920283 /* HtmlEncoder.swift in Sources */,
 				5333A27627C30F470064FF44 /* PostListViewState.swift in Sources */,
 				53F0027327D094EC00D7346D /* SiteEditorView.swift in Sources */,
+				53138D1A2952D03B003A9531 /* PostMO.swift in Sources */,
 				5333A26027C2F3A80064FF44 /* ContentView.swift in Sources */,
 				5333A27927C313780064FF44 /* DateView.swift in Sources */,
+				53DBFB0029541B8D00592718 /* LocalPostView.swift in Sources */,
 				53A3937227CB46F500927CA5 /* DataCache.swift in Sources */,
 				5333A25E27C2F3A80064FF44 /* WeblAdminApp.swift in Sources */,
 				53DC2F0927CB269700D780EE /* Color.swift in Sources */,
@@ -305,6 +319,8 @@
 				539B9CFB29515A5800F53946 /* SiteSettingsView.swift in Sources */,
 				53F0027527D09C5200D7346D /* SiteEditorViewState.swift in Sources */,
 				535F9AB727E695FA00A296A1 /* WeblData.xcdatamodeld in Sources */,
+				53138D1E2952E21D003A9531 /* LocalPostDetail.swift in Sources */,
+				53138D1C2952D731003A9531 /* LocalPostList.swift in Sources */,
 				5333A26E27C2F3EE0064FF44 /* WebClient.swift in Sources */,
 				535BBE0627C7595D00920283 /* WebPostPreview.swift in Sources */,
 				5333A27427C30F3B0064FF44 /* PostListView.swift in Sources */,
@@ -439,7 +455,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 608;
+				CURRENT_PROJECT_VERSION = 736;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WeblAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;
@@ -470,7 +486,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 608;
+				CURRENT_PROJECT_VERSION = 736;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WeblAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;

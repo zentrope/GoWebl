@@ -12,16 +12,17 @@ struct WeblAdminApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(\.managedObjectContext, CoreData.viewContext)
+                .frame(minWidth: 500, minHeight: 300)
         }
-        .windowStyle(.hiddenTitleBar)
-        .windowToolbarStyle(.unified)
+        .windowToolbarStyle(.unified(showsTitle: false))
         .commands {
             SidebarCommands()
         }
 
         Settings {
             SettingsView()
-                .environment(\.managedObjectContext, CoreData.shared.container.viewContext)
+                .environment(\.managedObjectContext, CoreData.viewContext)
         }
     }
 }
