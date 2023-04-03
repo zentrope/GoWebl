@@ -26,6 +26,19 @@
             </uniquenessConstraint>
         </uniquenessConstraints>
     </entity>
+    <entity name="ResourceMO" representedClassName="ResourceMO" syncable="YES">
+        <attribute name="data" optional="YES" attributeType="Binary"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="mimeType" optional="YES" attributeType="String"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="text" optional="YES" attributeType="String"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="id"/>
+                <constraint value="name"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
     <entity name="SiteMO" representedClassName="SiteMO" syncable="YES">
         <attribute name="author" optional="YES" attributeType="String"/>
         <attribute name="baseUrl" optional="YES" attributeType="String"/>

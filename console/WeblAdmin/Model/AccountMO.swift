@@ -1,5 +1,5 @@
 //
-//  AccountMO+CoreDataProperties.swift
+//  AccountMO.swift
 //  WeblAdmin
 //
 //  Created by Keith Irwin on 3/19/22.

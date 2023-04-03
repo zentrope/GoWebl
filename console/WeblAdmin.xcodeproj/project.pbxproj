@@ -32,6 +32,7 @@
 		53A3937227CB46F500927CA5 /* DataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A3937127CB46F500927CA5 /* DataCache.swift */; };
 		53A3937427CB537600927CA5 /* PostSourceEditorViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A3937327CB537600927CA5 /* PostSourceEditorViewState.swift */; };
 		53DBFB0029541B8D00592718 /* LocalPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DBFAFF29541B8D00592718 /* LocalPostView.swift */; };
+		53DBFB0429542B7400592718 /* ResourceMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DBFB0229542B7400592718 /* ResourceMO.swift */; };
 		53DC2F0527CB200600D780EE /* UnselectedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0427CB200600D780EE /* UnselectedView.swift */; };
 		53DC2F0727CB20AE00D780EE /* PostPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0627CB20AE00D780EE /* PostPreview.swift */; };
 		53DC2F0927CB269700D780EE /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DC2F0827CB269700D780EE /* Color.swift */; };
@@ -69,6 +70,7 @@
 		53A3937127CB46F500927CA5 /* DataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataCache.swift; sourceTree = "<group>"; };
 		53A3937327CB537600927CA5 /* PostSourceEditorViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostSourceEditorViewState.swift; sourceTree = "<group>"; };
 		53DBFAFF29541B8D00592718 /* LocalPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalPostView.swift; sourceTree = "<group>"; };
+		53DBFB0229542B7400592718 /* ResourceMO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceMO.swift; sourceTree = "<group>"; };
 		53DC2F0427CB200600D780EE /* UnselectedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnselectedView.swift; sourceTree = "<group>"; };
 		53DC2F0627CB20AE00D780EE /* PostPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostPreview.swift; sourceTree = "<group>"; };
 		53DC2F0827CB269700D780EE /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
@@ -204,6 +206,7 @@
 				53F15CC527E69A8000AD6F14 /* AccountMO.swift */,
 				53F15CC727E69B1500AD6F14 /* CoreData.swift */,
 				53138D182952D03B003A9531 /* PostMO.swift */,
+				53DBFB0229542B7400592718 /* ResourceMO.swift */,
 				534B79A0294FA38700B3B0AA /* SiteMO.swift */,
 				535F9AB527E695FA00A296A1 /* WeblData.xcdatamodeld */,
 			);
@@ -312,6 +315,7 @@
 				53DBFB0029541B8D00592718 /* LocalPostView.swift in Sources */,
 				53A3937227CB46F500927CA5 /* DataCache.swift in Sources */,
 				5333A25E27C2F3A80064FF44 /* WeblAdminApp.swift in Sources */,
+				53DBFB0429542B7400592718 /* ResourceMO.swift in Sources */,
 				53DC2F0927CB269700D780EE /* Color.swift in Sources */,
 				53DC2F0B27CB281D00D780EE /* Logger.swift in Sources */,
 				53A3937427CB537600927CA5 /* PostSourceEditorViewState.swift in Sources */,
@@ -455,7 +459,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 736;
+				CURRENT_PROJECT_VERSION = 741;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WeblAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;
@@ -486,7 +490,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 736;
+				CURRENT_PROJECT_VERSION = 741;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"WeblAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;

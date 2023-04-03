@@ -1,5 +1,5 @@
 //
-//  SiteMO+CoreDataProperties.swift
+//  SiteMO.swift
 //  WeblAdmin
 //
 //  Created by Keith Irwin on 12/18/22.

@@ -1,5 +1,5 @@
 //
-//  PostMO+CoreDataProperties.swift
+//  PostMO.swift
 //  WeblAdmin
 //
 //  Created by Keith Irwin on 12/20/22.
